@@ -1,0 +1,4 @@
+# Project exclude paths
+/commons-esclient/target/
+/service-jd/target/
+/union-jd-api/target/

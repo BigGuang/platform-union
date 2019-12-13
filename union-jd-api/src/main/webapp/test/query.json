@@ -1,0 +1,19 @@
+{
+  "from": "0",
+  "size": "10",
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "range": {
+            "useEndTime": {
+              "format": "strict_date_optional_time",
+              "lte": "2019-09-23"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

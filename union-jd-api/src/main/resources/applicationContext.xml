@@ -1,0 +1,88 @@
+<beans xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns="http://www.springframework.org/schema/beans" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+      http://www.springframework.org/schema/context
+      http://www.springframework.org/schema/context/spring-context.xsd
+      http://www.springframework.org/schema/mvc
+      http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+      http://www.springframework.org/schema/aop
+      http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+      http://www.springframework.org/schema/task
+      http://www.springframework.org/schema/task/spring-task-3.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--项目的一些配置-->
+    <bean id="configUtils" class="com.waps.utils.ConfigUtils" lazy-init="false" init-method="init">
+        <!--<property name="spiderConfigPath" value="/Users/xguang/works_spider/config/"/>-->
+        <!--<property name="jobsBackFile" value="/Users/xguang/works_spider/jobs/jobsBackUp.json"/>-->
+        <property name="htmlDirPath" value="/Users/xguang/temp03/"/>
+        <!--<property name="elasticSearchIP" value="10.1.0.2"/>-->
+        <!--<property name="elasticSearchPort" value="9300"/>-->
+
+        <!--linux配置-->
+        <!--<property name="spiderConfigPath" value="/usr/local/spider/config/"/>-->
+        <!--<property name="jobsBackFile" value="/usr/local/spider/jobs/jobsBackUp.json"/>-->
+        <!--<property name="htmlDirPath" value="/usr/local/news_html/"/>-->
+        <!--<property name="elasticSearchIP" value="localhost"/>-->
+        <property name="apiHost" value="http://api.wapg.cn"/>
+        <property name="elasticSearchIP" value="10.1.0.8"/>
+        <property name="elasticSearchPort" value="9300"/>
+    </bean>
+
+    <!--    <bean id="socketServer" class="com.waps.union_jd_api.socket.SocketNonBlockServer" lazy-init="false"-->
+    <!--          init-method="init">-->
+    <!--    </bean>-->
+
+    <!--common的一些配置，基础配置-->
+    <bean id="commons-config" class="com.waps.common.Config" lazy-init="false" init-method="init">
+        <property name="ipDataPath" value="/usr/local/api_app/QQWry.dat"/>
+    </bean>
+
+    <!--新版ES连接的配置，支持多节点，写法：10.1.0.2:9200,10.1.0.3:9200,10.1.0.4:9200-->
+    <bean id="esConfig" class="com.waps.elastic.search.ESConfig" lazy-init="false" init-method="init">
+        <property name="elasticSearchClusterNodes" value="10.1.0.8:9200"/>
+    </bean>
+
+
+
+<!--    <context:component-scan base-package="com.waps.**"/>-->
+<!--    Netty相关配置-->
+<!--    <bean id="annotationPropertyConfigurerNetty"-->
+<!--          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
+<!--        <property name="order" value="1"/>-->
+<!--        <property name="ignoreUnresolvablePlaceholders" value="true"/>-->
+<!--        <property name="locations">-->
+<!--            <list>-->
+<!--                <value>classpath:netty.properties</value>-->
+<!--            </list>-->
+<!--        </property>-->
+<!--    </bean>-->
+
+<!--    <bean id="nettyDemoServer" class="com.robot.server.NettyServer" init-method="init"-->
+<!--          destroy-method="destory">-->
+<!--        <property name="port" value="${netty_port}"/>-->
+<!--    </bean>-->
+
+<!--    <bean id="closeFutureHandler" class="com.robot.server.handlerImpl.CloseFutureHandler">-->
+<!--        <property name="nextHandler">-->
+<!--            <null/>-->
+<!--        </property>-->
+<!--    </bean>-->
+
+<!--    <bean id="exceptionFutureHandler" class="com.robot.server.handlerImpl.ExceptionFutureHandler">-->
+<!--        <property name="nextHandler">-->
+<!--            <null/>-->
+<!--        </property>-->
+<!--    </bean>-->
+
+<!--    <bean id="bussinessFutureHandler" class="com.robot.server.handlerImpl.BussinessFutureHandler">-->
+<!--        <property name="nextHandler">-->
+<!--            <null/>-->
+<!--        </property>-->
+<!--    </bean>-->
+
+</beans>

@@ -1,0 +1,28 @@
+{
+  "mp_template_msg": {
+    "appid": "wx441c534516758ef0",
+    "data": {
+      "keyword3": {
+        "value": "2019/10/1-2019/10/31"
+      },
+      "keyword4": {
+        "value": "2019/11/20 14:42"
+      },
+      "keyword1": {
+        "value": "s140"
+      },
+      "keyword2": {
+        "value": "33333元"
+      },
+      "remark": {
+        "value": "如有疑问请与京东小妹联系！"
+      },
+      "first": {
+        "value": "尊敬的万品京选群主，您本月的提款已到账"
+      }
+    },
+    "template_id": "-YQBojykAQ5fKrpkTSFIO7QqPdWYP0RH6RR8niS6kkY",
+    "url": "pages/index/index"
+  },
+  "touser": "oX_N4t9eOs4xd2HCdQxsF8Xo3A_A"
+}

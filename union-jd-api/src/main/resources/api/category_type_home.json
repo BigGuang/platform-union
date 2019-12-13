@@ -1,0 +1,60 @@
+{
+  "data": [
+    {
+      "grade": "1",
+      "id": "1343",
+      "name": "女装",
+      "parentId": "1315",
+      "img": "http://api.wapg.cn/jd_union/images/group/01.png"
+    },
+    {
+      "grade": "1",
+      "id": "1342",
+      "name": "男装",
+      "parentId": "1315",
+      "img": "http://api.wapg.cn/jd_union/images/group/02.png"
+    },
+    {
+      "grade": "0",
+      "id": "1315",
+      "name": "服饰内衣",
+      "parentId": "0",
+      "img": "http://api.wapg.cn/jd_union/images/group/03.png"
+    },
+    {
+      "grade": "0",
+      "id": "1319",
+      "name": "母婴",
+      "parentId": "0",
+      "img": "http://api.wapg.cn/jd_union/images/group/04.png"
+    },
+    {
+      "grade": "0",
+      "id": "1316",
+      "name": "美妆护肤",
+      "parentId": "0",
+      "img": "http://api.wapg.cn/jd_union/images/group/05.png"
+    },
+    {
+      "grade": "0",
+      "id": "9847",
+      "name": "家具",
+      "parentId": "0",
+      "img": "http://api.wapg.cn/jd_union/images/group/06.png"
+    },
+    {
+      "grade": "0",
+      "id": "17329",
+      "name": "箱包皮具",
+      "parentId": "0",
+      "img": "http://api.wapg.cn/jd_union/images/group/07.png"
+    },
+    {
+      "grade": "0",
+      "id": "1320",
+      "name": "食品饮料",
+      "parentId": "0",
+      "img": "http://api.wapg.cn/jd_union/images/group/08.png"
+    }
+  ]
+}

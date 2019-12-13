@@ -1,0 +1,33 @@
+生成合成图需要加入一个文字水印，来改变md5
+
+句子api接口偶尔会报错，需要加入尝试再次提交
+
+java.net.UnknownHostException: ex-api.botorange.com
+        at java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:184)
+        at java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+        at java.net.Socket.connect(Socket.java:589)
+        at sun.security.ssl.SSLSocketImpl.connect(SSLSocketImpl.java:668)
+        at sun.security.ssl.BaseSSLSocketImpl.connect(BaseSSLSocketImpl.java:173)
+        at sun.net.NetworkClient.doConnect(NetworkClient.java:180)
+        at sun.net.www.http.HttpClient.openServer(HttpClient.java:463)
+        at sun.net.www.http.HttpClient.openServer(HttpClient.java:558)
+        at sun.net.www.protocol.https.HttpsClient.<init>(HttpsClient.java:264)
+        at sun.net.www.protocol.https.HttpsClient.New(HttpsClient.java:367)
+        at sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.getNewHttpClient(AbstractDelegateHttpsURLConnection.java:191)
+        at sun.net.www.protocol.http.HttpURLConnection.plainConnect0(HttpURLConnection.java:1138)
+        at sun.net.www.protocol.http.HttpURLConnection.plainConnect(HttpURLConnection.java:1032)
+        at sun.net.www.protocol.https.AbstractDelegateHttpsURLConnection.connect(AbstractDelegateHttpsURLConnection.java:177)
+        at sun.net.www.protocol.https.HttpsURLConnectionImpl.connect(HttpsURLConnectionImpl.java:153)
+        at com.waps.union_jd_api.utils.HttpUtils.postJsonString(HttpUtils.java:23)
+        at com.waps.union_jd_api.utils.HttpUtils$postJsonString.call(Unknown Source)
+        at com.waps.union_jd_api.service.WeChatRobotService.sendImage(WeChatRobotService.groovy:402)
+        at com.waps.union_jd_api.service.WeChatRobotService.getMessage(WeChatRobotService.groovy:222)
+        at com.waps.union_jd_api.controller.WeChatRobotController$1.run(WeChatRobotController.java:52)
+        at java.lang.Thread.run(Thread.java:748)
+
+
+活动转链
+https://u.jd.com/negdPb
+https://u.jd.com/cusmXR
+https://u.jd.com/Cxirxt
+https://u.jd.com/t3uFLh

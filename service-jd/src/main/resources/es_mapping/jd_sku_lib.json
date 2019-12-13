@@ -1,0 +1,201 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "skuId": {
+      "type": "keyword"
+    },
+    "skuName": {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "spuid": {
+      "type": "keyword"
+    },
+    "isHot": {
+      "type": "integer"
+    },
+    "brandCode": {
+      "type": "keyword"
+    },
+    "brandName": {
+      "type": "text",
+      "analyzer": "ik_max_word",
+      "search_analyzer": "ik_smart",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "owner": {
+      "type": "keyword"
+    },
+    "categoryInfo": {
+      "properties": {
+        "cid1": {
+          "type": "keyword"
+        },
+        "cid1Name": {
+          "type": "keyword"
+        },
+        "cid2": {
+          "type": "keyword"
+        },
+        "cid2Name": {
+          "type": "keyword"
+        },
+        "cid3": {
+          "type": "keyword"
+        },
+        "cid3Name": {
+          "type": "keyword"
+        }
+      }
+    },
+    "commissionInfo": {
+      "properties": {
+        "commission": {
+          "type": "double"
+        },
+        "commissionShare": {
+          "type": "double"
+        }
+      }
+    },
+    "couponInfo": {
+      "properties": {
+        "couponList": {
+          "properties": {
+            "bindType": {
+              "type": "integer"
+            },
+            "discount": {
+              "type": "double"
+            },
+            "link": {
+              "type": "keyword"
+            },
+            "platformType": {
+              "type": "integer"
+            },
+            "quota": {
+              "type": "double"
+            },
+            "getStartTime": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+            },
+            "getEndTime": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+            },
+            "useStartTime": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+            },
+            "useEndTime": {
+              "type": "date",
+              "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+            },
+            "isBest": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "goodCommentsShare": {
+      "type": "double"
+    },
+    "imageInfo": {
+      "properties": {
+        "imageList": {
+          "properties": {
+            "url": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
+    "inOrderCount30Days": {
+      "type": "double"
+    },
+    "isJdSale": {
+      "type": "integer"
+    },
+    "materialUrl": {
+      "type": "keyword"
+    },
+    "priceInfo": {
+      "properties": {
+        "price": {
+          "type": "double"
+        },
+        "lowestPrice": {
+          "type": "double"
+        },
+        "lowestPriceType": {
+          "type": "double"
+        }
+      }
+    },
+    "shopInfo": {
+      "properties": {
+        "shopName": {
+          "type": "text",
+          "analyzer": "ik_max_word",
+          "search_analyzer": "ik_smart",
+          "fields": {
+            "raw": {
+              "type": "keyword"
+            }
+          },
+          "store": true
+        }
+      }
+    },
+    "pinGouInfo": {
+      "properties": {
+        "pingouPrice": {
+          "type": "double"
+        },
+        "pingouTmCount": {
+          "type": "keyword"
+        },
+        "pingouUrl": {
+          "type": "keyword"
+        },
+        "pingouStartTime": {
+          "type": "date",
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+        },
+        "pingouEndTime": {
+          "type": "date",
+          "format": "yyyy-MM-dd HH:mm:ss||yyyy-MM-dd||epoch_millis"
+        }
+      }
+    },
+    "createtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    },
+    "modifytime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

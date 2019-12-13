@@ -1,0 +1,65 @@
+{
+  "from": 0,
+  "size": 10,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "bool": {
+            "should": [
+              {
+                "match_all": {}
+              },
+              {
+                "match": {
+                  "skuList.positionId": "${pid}"
+                }
+              },
+              {
+                "match": {
+                  "skuList.ext1": "${phone}"
+                }
+              },
+              {
+                "match": {
+                  "orderId": "${orderId}"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "should": [
+              {
+                "match_phrase": {
+                  "validCode": "16"
+                }
+              },
+              {
+                "match_phrase": {
+                  "validCode": "17"
+                }
+              }
+            ],
+            "minimum_should_match": 1
+          }
+        },
+        {
+          "range": {
+            "orderTime_Date": {
+              "gte": "${stime}",
+              "lte": "${etime}"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "sort": {
+    "orderTime_Date": {
+      "order": "${sort}"
+    }
+  }
+}

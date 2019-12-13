@@ -1,0 +1,17 @@
+[
+  {
+    "name": "wpjx",
+    "app_id": "wx234eda29ae85396d",
+    "app_secret": "3473ef94bd5744bcab601c8756c7f56f"
+  },
+  {
+    "name": "wphx",
+    "app_id": "wx51546016a2d42464",
+    "app_secret": "362c795d83649bffe9981788330a53c1"
+  },
+  {
+    "name": "wpjx_office",
+    "app_id": "wx441c534516758ef0",
+    "app_secret": "db330f7a282f73595bccdd448612f8bd"
+  }
+]

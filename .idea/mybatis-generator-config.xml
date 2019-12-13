@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MyBatisGeneratorConfiguration">
+    <option name="credentials">
+      <map>
+        <entry key="jdbc:mysql://10.1.0.53:3306/jd_union">
+          <value>
+            <Credential>
+              <option name="username" value="root" />
+            </Credential>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="tableConfigs">
+      <map>
+        <entry key="waps_jd_user">
+          <value>
+            <TableConfig>
+              <option name="basePackage" value="com.waps.service.jd.db" />
+              <option name="comment" value="true" />
+              <option name="domainName" value="WapsJdUser" />
+              <option name="domainPackage" value="com.waps.service.jd.db.domain" />
+              <option name="exampleName" value="WapsJdUserExample" />
+              <option name="examplePackage" value="com.waps.service.jd.db.example" />
+              <option name="examplePostfix" value="Example" />
+              <option name="mapperName" value="WapsJdUserMapper" />
+              <option name="mapperPackage" value="com.waps.service.jd.db.mapper" />
+              <option name="mapperPostfix" value="Mapper" />
+              <option name="moduleRootPath" value="$PROJECT_DIR$" />
+              <option name="name" value="waps_jd_user" />
+              <option name="needForUpdate" value="true" />
+              <option name="offsetLimit" value="true" />
+              <option name="primaryKey" value="id" />
+              <option name="resourcePath" value="src/main/resources" />
+              <option name="sourcePath" value="src/main/java" />
+              <option name="tableName" value="waps_jd_user" />
+              <option name="useExample" value="true" />
+              <option name="xmlPackage" value="mapper" />
+            </TableConfig>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
