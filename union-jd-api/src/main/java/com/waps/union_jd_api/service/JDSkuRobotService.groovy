@@ -32,6 +32,10 @@ class JDSkuRobotService {
         System.out.println("==JDSkuRobotService==")
     }
 
+    public String getSkuList(String pid, String searchWord, Integer findSize) {
+        return getSkuList(pid, searchWord, findSize, false)
+    }
+
     /**
      * 搜索京东商品，30个一次，然后在30个中找 自营+有券，不足的情况再依次加有券、自营
      * @param pid
@@ -41,7 +45,7 @@ class JDSkuRobotService {
      * @param findSize
      * @return
      */
-    public String getSkuList(String pid, String searchWord, Integer findSize) {
+    public String getSkuList(String pid, String searchWord, Integer findSize, boolean isFilter) {
         ArrayList imgList = new ArrayList()
         StringBuffer buffer = new StringBuffer()
         if (pid) {
@@ -92,9 +96,11 @@ class JDSkuRobotService {
                         String skuName = goodsResp.getSkuName()
                         String _shortName = getShortTitle(skuName)
 
-                        boolean hasBad=BadWordUtils.isContaintBadWord(skuName,BadWordUtils.minMatchTYpe)
+                        boolean hasBad = false
+                        if (isFilter)
+                            hasBad = BadWordUtils.isContaintBadWord(skuName, BadWordUtils.minMatchTYpe)
 
-                        if(!hasBad) {
+                        if (!hasBad) {
                             if (StringUtils.isNull(_temp_title.get(_shortName))) {
                                 String owner = goodsResp.getOwner()
                                 Coupon coupon = autoFindCouponByBest(goodsResp.getCouponInfo().couponList)
