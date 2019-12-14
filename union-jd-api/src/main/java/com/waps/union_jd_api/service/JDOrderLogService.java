@@ -13,6 +13,7 @@ import com.robot.netty.server.OnLineService;
 import com.waps.union_jd_api.utils.JDConfig;
 import com.waps.utils.StringUtils;
 import org.elasticsearch.search.SearchHits;
+import org.jsoup.helper.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -102,6 +103,11 @@ public class JDOrderLogService {
                 if (!jdOrderInfoESMap.getOrderTime().equals("0")) {
                     jdOrderInfoESMap.setOrderTime_Date(timeTmp2DateStr(jdOrderInfoESMap.getOrderTime()));
                 }
+                if (!StringUtils.isNull(jdOrderInfoESMap.getExt1()) && jdOrderInfoESMap.getExt1().contains("_")) {
+                    String[] group = jdOrderInfoESMap.getExt1().split("_");
+                    jdOrderInfoESMap.setExt1_positionId(group[0]);
+                    jdOrderInfoESMap.setExt1_user(group[1]);
+                }
 
                 List<SkuInfoESMap> newSkuList = new ArrayList<>();
                 List<SkuInfoESMap> skuInfoESMapList = jdOrderInfoESMap.getSkuList();
@@ -134,6 +140,11 @@ public class JDOrderLogService {
                         JDMediaInfoESMap jdMediaInfoESMap = OnLineService.getChennelInfo(positionId);
                         if (jdMediaInfoESMap != null)
                             skuInfoESMap.setPositionName(jdMediaInfoESMap.getChannel_name());
+                    }
+                    if (!StringUtils.isNull(skuInfoESMap.getExt1()) && skuInfoESMap.getExt1().contains("_")) {
+                        String[] group = skuInfoESMap.getExt1().split("_");
+                        skuInfoESMap.setExt1_positionId(group[0]);
+                        skuInfoESMap.setExt1_user(group[1]);
                     }
                     newSkuList.add(skuInfoESMap);
                 }

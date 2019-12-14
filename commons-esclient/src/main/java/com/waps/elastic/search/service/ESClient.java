@@ -457,7 +457,6 @@ public class ESClient {
         String json = null;
         try {
             json = new TemplateUtils().getFreeMarkerFromResource(freeMarkerFtlPath, template_params, "UTF-8");
-            System.out.println(json);
         } catch (Exception e) {
             System.out.println("freemarkerTemplate error:" + e.getLocalizedMessage());
         }

@@ -15,6 +15,8 @@ class JDOrderInfoESMap extends ESBaseBean{
     String parentId
     String plus
     String ext1
+    String ext1_positionId
+    String ext1_user
     String orderEmt
     List<SkuInfoESMap> skuList = new ArrayList<>()
     String createtime
@@ -42,6 +44,8 @@ class SkuInfoESMap {
     double finalRate
     String skuId
     String ext1
+    String ext1_positionId
+    String ext1_user
     double subsidyRate
     String unionAlias
     String subUnionId

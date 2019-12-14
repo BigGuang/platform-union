@@ -41,6 +41,12 @@
     "ext1": {
       "type": "keyword"
     },
+    "ext1_positionId": {
+      "type": "keyword"
+    },
+    "ext1_user": {
+      "type": "keyword"
+    },
     "orderEmt": {
       "type": "keyword"
     },
@@ -113,6 +119,12 @@
           "type": "keyword"
         },
         "ext1": {
+          "type": "keyword"
+        },
+        "ext1_positionId": {
+          "type": "keyword"
+        },
+        "ext1_user": {
           "type": "keyword"
         },
         "subsidyRate": {
