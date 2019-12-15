@@ -339,12 +339,8 @@ public class UnionAppUserController {
             if (!StringUtils.isNull(buildLinkBean.getUid())) {
                 UnionAppUserESMap unionAppUserESMap = unionAppUserService.loadUserByID(buildLinkBean.getUid());
                 if (unionAppUserESMap != null) {
-                    long pid = 0;
-                    if (!StringUtils.isNull(unionAppUserESMap.getChannel_id())) {
-                        pid = Long.parseLong(unionAppUserESMap.getChannel_id());
-                    } else if (!StringUtils.isNull(unionAppUserESMap.getF_id())) {
-                        pid = Long.parseLong(unionAppUserESMap.getF_id());
-                    }
+                    long pid = unionAppUserService.findCommissionPositionID(unionAppUserESMap);
+
                     //超级用户直接算佣金订单，非超级用户走通用
                     if (StringUtils.isNull(buildLinkBean.getPlace())) {
                         PromotionCodeParams promotionCodeParams = new PromotionCodeParams();
@@ -373,7 +369,9 @@ public class UnionAppUserController {
                         promotionCodeCommonParams.setCouponUrl(buildLinkBean.getCouponUrl());
                         promotionCodeCommonParams.setSiteId(JDConfig.SITE_ID);
                         promotionCodeCommonParams.setPositionId(JDConfig.SITE_PID_LONG);
-                        promotionCodeCommonParams.setExt1(unionAppUserESMap.getId());
+                        //ext1=享受佣金pid+'_'+phone
+                        String ext1 = pid + "_" + unionAppUserESMap.getPhone();
+                        promotionCodeCommonParams.setExt1(ext1);
                         String retJson = jdUnionService.getGoodsUnionLinkCommon(promotionCodeCommonParams);
                         JSONObject jsonObject = JSONObject.parseObject(retJson);
                         int code = jsonObject.getInteger("code");
