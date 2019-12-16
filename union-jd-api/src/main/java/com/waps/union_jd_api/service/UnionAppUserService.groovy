@@ -48,6 +48,13 @@ class UnionAppUserService {
         return ucode.toLowerCase()
     }
 
+    public String makeInviteCode(String id) {
+        if (!StringUtils.isNull(id)) {
+            String ucode = id.substring(id.length() - 6, id.length())
+            return ucode.toLowerCase()
+        }
+    }
+
     /**
      * 保存用户信息, 小程序以手机号作为用户标识
      * @param unionAppUserESMap
@@ -67,6 +74,18 @@ class UnionAppUserService {
                     String md5_id = new MD5().getMD5(unionAppUserESMap.getWx_id())
                     unionAppUserESMap.setId(md5_id)
                 }
+            }
+
+            //已有用户，f_code从已有信息读取，或从f_user_id生成
+            UnionAppUserESMap _loadAppUserMap = loadUserByID(unionAppUserESMap.getId())
+            if (_loadAppUserMap) {
+                println "用户已存在:" + _loadAppUserMap.getUser_name() + " id:" + _loadAppUserMap.getId()
+                if (!StringUtils.isNull(_loadAppUserMap.getF_code())) {
+                    unionAppUserESMap.setF_code(_loadAppUserMap.getF_code())
+                } else if (!StringUtils.isNull(_loadAppUserMap.getF_user_id())) {
+                    unionAppUserESMap.setF_code(makeInviteCode(_loadAppUserMap.getF_user_id()))
+                }
+                println "f_code:" + unionAppUserESMap.getF_code()
             }
 
             unionAppUserESMap.setU_code(getUCode(unionAppUserESMap))
@@ -129,6 +148,8 @@ class UnionAppUserService {
                     if (!StringUtils.isNull(unionAppUserTreeBean.getF_phone()) && unionAppUserTreeBean.getF_phone().length() == 11) {
                         String f_user_id = new MD5().getMD5(unionAppUserTreeBean.getF_phone())
                         unionAppUserESMap.setF_user_id(f_user_id)
+                        unionAppUserESMap.setF_code(makeInviteCode(f_user_id))
+                        unionAppUserESMap.setInvite_user_id(f_user_id)   //重要，记录邀请人，永不改变
                     }
 
                     //导师信息也同步过来
@@ -171,7 +192,6 @@ class UnionAppUserService {
             } else {
                 unionAppUserESMap.setRole_id(Config.USER_ROLE_LEVEL_0)  //普通会员
             }
-
 
             if (!StringUtils.isNull(unionAppUserESMap.getId())) {
                 GetResponse response = unionAppUserESService.load(unionAppUserESMap.getId())
@@ -440,20 +460,52 @@ class UnionAppUserService {
      * 找出直接购买的佣金受益pid
      * @return
      */
-    public Long findCommissionPositionID(UnionAppUserESMap unionAppUserESMap) {
-        long pid = 0;
+    public Long findCommissionPositionID(UnionAppUserESMap unionAppUserESMap, boolean isLoopFindPid) {
+        long pid = 0
         if (unionAppUserESMap != null) {
-
             if (!StringUtils.isNull(unionAppUserESMap.getChannel_id())) {
                 pid = Long.parseLong(unionAppUserESMap.getChannel_id());
             } else if (!StringUtils.isNull(unionAppUserESMap.getF_id())) {
                 pid = Long.parseLong(unionAppUserESMap.getF_id());
             }
         }
-        if(pid==0){
-
+        if (isLoopFindPid) {
+            //如果本人没有channel_id,找上级
+            if (pid == 0) {
+                pid = findPositionIDLoop(unionAppUserESMap)
+            }
         }
         return pid
+    }
+
+
+    /**
+     * 一直往上找channel_id,直到找到一个
+     * @param unionAppUserESMap
+     * @return
+     */
+    public Long findPositionIDLoop(UnionAppUserESMap unionAppUserESMap) {
+        String f_code = unionAppUserESMap.getF_code()
+        if (StringUtils.isNull(f_code)) {
+            f_code = makeInviteCode(unionAppUserESMap.getF_user_id())
+        }
+        println "上级邀请码:" + f_code
+        if (true) {
+            UnionAppUserESMap f_userMap = loadUserByCODE(f_code)
+
+            if (f_userMap) {
+                if (f_userMap.getChannel_id()) {
+                    println "找到佣金收益 channel_id:" + f_userMap.getChannel_id() + "  channel_name:" + f_userMap.getChannel_name() + "  " +
+                            "user_name:" + f_userMap.getUser_name() + "  " + f_userMap.getId()
+                    Long pid = Long.parseLong(f_userMap.getChannel_id())
+                    return pid
+                } else {
+                    return findPositionIDLoop(f_userMap)
+                }
+            } else {
+                println "==邀请码为:" + f_code + " 的用户不存在!!!== "
+            }
+        }
     }
 
 

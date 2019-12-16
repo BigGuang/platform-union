@@ -15,7 +15,12 @@
               },
               {
                 "match": {
-                  "skuList.ext1": "${uid!'nil'}"
+                  "skuList.ext1_positionId": "${pid!'nil'}"
+                }
+              },
+              {
+                "match": {
+                  "skuList.ext1_user": "${phone!'nil'}"
                 }
               },
               {

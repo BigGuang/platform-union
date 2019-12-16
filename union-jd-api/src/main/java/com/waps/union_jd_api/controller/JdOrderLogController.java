@@ -76,7 +76,7 @@ public class JdOrderLogController {
     @RequestMapping(value = "/log_list", method = RequestMethod.GET)
     public void log_list(
             @RequestParam(value = "pid", required = false) String pid,
-            @RequestParam(value = "uid", required = false) String uid,
+            @RequestParam(value = "phone", required = false) String phone,
             @RequestParam(value = "isValid", required = false) String isValid,
             @RequestParam(value = "stime", required = false) String start,
             @RequestParam(value = "etime", required = false) String end,
@@ -88,17 +88,21 @@ public class JdOrderLogController {
             HttpServletResponse response
     ) throws Exception {
 
+        System.out.println("==log_list==");
+        System.out.println("pid:"+pid);
+        System.out.println("phone:"+phone);
+        System.out.println("isValid:"+isValid);
 
         HashMap<String, Object> params = new HashMap<>();
         params.put("pid", pid);
-        params.put("uid", uid);
+        params.put("phone", phone);
 
 //        （-1：未知,2.无效-拆单,3.无效-取消,4.无效-京东帮帮主订单,5.无效-账号异常,6.无效-赠品类目不返佣,7.无效-校园订单,8.无效-企业订单,9.无效-团购订单,10.无效-开增值税专用发票订单,11.无效-乡村推广员下单,12.无效-自己推广自己下单,13.无效-违规订单,14.无效-来源与备案网址不符,15.待付款,16.已付款,17.已完成,18.已结算（5.9号不再支持结算状态回写展示））
-        if (!StringUtils.isNull(isValid) && isValid.equals("0")) {
-            params.put("validCode","\",-1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,\"");
+        if (StringUtils.isNull(isValid) || (!StringUtils.isNull(isValid) && isValid.equals("0"))) {
+            params.put("validCode", "\",-1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,\"");
         } else {
             params.put("isValid", true);
-            params.put("validCode","16\",\"17");
+            params.put("validCode", "16\",\"17");
         }
 
         if (StringUtils.isNull(sort)) {
@@ -134,11 +138,11 @@ public class JdOrderLogController {
         }
 
         SearchHits hits = jdOrderLogService.findChannelOrderListToHits(params);
-        ArrayList<Map<String,Object>> list=new ArrayList<>();
-        SearchHit[] searchHits=hits.getHits();
-        for(int i=0;i<searchHits.length;i++){
-            SearchHit hit=searchHits[i];
-            Map<String,Object> map=hit.getSourceAsMap();
+        ArrayList<Map<String, Object>> list = new ArrayList<>();
+        SearchHit[] searchHits = hits.getHits();
+        for (int i = 0; i < searchHits.length; i++) {
+            SearchHit hit = searchHits[i];
+            Map<String, Object> map = hit.getSourceAsMap();
             list.add(map);
         }
         Map map = new HashMap();
@@ -209,11 +213,11 @@ public class JdOrderLogController {
         }
 
         SearchHits hits = jdOrderLogService.findAllOrderListToHits(params);
-        ArrayList<Map<String,Object>> list=new ArrayList<>();
-        SearchHit[] searchHits=hits.getHits();
-        for(int i=0;i<searchHits.length;i++){
-            SearchHit hit=searchHits[i];
-            Map<String,Object> map=hit.getSourceAsMap();
+        ArrayList<Map<String, Object>> list = new ArrayList<>();
+        SearchHit[] searchHits = hits.getHits();
+        for (int i = 0; i < searchHits.length; i++) {
+            SearchHit hit = searchHits[i];
+            Map<String, Object> map = hit.getSourceAsMap();
             list.add(map);
         }
         Map map = new HashMap();

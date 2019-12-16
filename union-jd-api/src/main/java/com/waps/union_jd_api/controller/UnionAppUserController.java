@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -132,10 +133,10 @@ public class UnionAppUserController {
         if (!StringUtils.isNull(phone)) {
             id = new MD5().getMD5(phone);
         }
-        if (!StringUtils.isNull(id)) {
-            params.put("f_user_id", id);
-        } else {
-            params.put("f_user_id", "");
+
+        UnionAppUserESMap unionAppUserESMap = unionAppUserService.loadUserByID(id);
+        if (!StringUtils.isNull(unionAppUserESMap.getU_code())) {
+            params.put("f_code", unionAppUserESMap.getU_code());
         }
 
         SearchHits hits = unionAppUserService.findFans(params, page, size);
@@ -158,6 +159,8 @@ public class UnionAppUserController {
                                 HttpServletRequest request,
                                 HttpServletResponse response) throws Exception {
         try {
+            code = URLDecoder.decode(code, "UTF-8");
+            code = code.replaceAll(" ", "");
             if (code.length() == 6) {
                 UnionAppUserESMap unionUserESMap = unionAppUserService.loadUserByCODE(code);
                 if (unionUserESMap != null) {
@@ -339,10 +342,11 @@ public class UnionAppUserController {
             if (!StringUtils.isNull(buildLinkBean.getUid())) {
                 UnionAppUserESMap unionAppUserESMap = unionAppUserService.loadUserByID(buildLinkBean.getUid());
                 if (unionAppUserESMap != null) {
-                    long pid = unionAppUserService.findCommissionPositionID(unionAppUserESMap);
+
 
                     //超级用户直接算佣金订单，非超级用户走通用
                     if (StringUtils.isNull(buildLinkBean.getPlace())) {
+                        long pid = unionAppUserService.findCommissionPositionID(unionAppUserESMap, false);
                         PromotionCodeParams promotionCodeParams = new PromotionCodeParams();
                         promotionCodeParams.setApp_key(JDConfig.APP_KEY);
                         promotionCodeParams.setApp_secret(JDConfig.SECRET_KEY);
@@ -362,6 +366,7 @@ public class UnionAppUserController {
                             ResponseUtils.write(response, new ReturnMessageBean(code, message));
                         }
                     } else {
+                        long pid = unionAppUserService.findCommissionPositionID(unionAppUserESMap, true);
                         PromotionCodeCommonParams promotionCodeCommonParams = new PromotionCodeCommonParams();
                         promotionCodeCommonParams.setApp_key(JDConfig.APP_KEY);
                         promotionCodeCommonParams.setApp_secret(JDConfig.SECRET_KEY);
