@@ -346,7 +346,7 @@ public class UnionAppUserController {
 
                     //超级用户直接算佣金订单，非超级用户走通用
                     if (StringUtils.isNull(buildLinkBean.getPlace())) {
-                        long pid = unionAppUserService.findCommissionPositionID(unionAppUserESMap, false);
+                        long pid = unionAppUserService.findCommissionPositionID(unionAppUserESMap, true);
                         PromotionCodeParams promotionCodeParams = new PromotionCodeParams();
                         promotionCodeParams.setApp_key(JDConfig.APP_KEY);
                         promotionCodeParams.setApp_secret(JDConfig.SECRET_KEY);
