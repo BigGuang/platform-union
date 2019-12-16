@@ -435,6 +435,28 @@ class UnionAppUserService {
         max_channel_name = "W" + (base_num + 1)
         return max_channel_name
     }
+
+    /**
+     * 找出直接购买的佣金受益pid
+     * @return
+     */
+    public Long findCommissionPositionID(UnionAppUserESMap unionAppUserESMap) {
+        long pid = 0;
+        if (unionAppUserESMap != null) {
+
+            if (!StringUtils.isNull(unionAppUserESMap.getChannel_id())) {
+                pid = Long.parseLong(unionAppUserESMap.getChannel_id());
+            } else if (!StringUtils.isNull(unionAppUserESMap.getF_id())) {
+                pid = Long.parseLong(unionAppUserESMap.getF_id());
+            }
+        }
+        if(pid==0){
+
+        }
+        return pid
+    }
+
+
 }
 
 class UnionAppUserTreeBean {

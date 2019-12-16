@@ -86,7 +86,7 @@ class WeChatRobotService {
         if (type == 7) {
 
             //判断文字中是否有敏感词
-            if (RobotConfigService.hasBlackWords(content)) {
+            if (RobotConfigService.hasBlackWords(content) && !isRoomMsg) {
                 return
             }
 
@@ -204,7 +204,7 @@ class WeChatRobotService {
 
                 //记录
                 saveLog(jdRobotMsgESMap)
-                String text = jdSkuRobotService.getSkuList(pid, search, 6)
+                String text = jdSkuRobotService.getSkuList(pid, search, 6, isRoomMsg)
                 if (true) {
 
                     HashMap paramMap = new HashMap()
