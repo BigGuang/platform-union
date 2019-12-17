@@ -31,7 +31,7 @@ class TestController {
                                 HttpServletResponse response) throws Exception {
         UnionAppUserESMap unionAppUserESMap = unionAppUserService.loadUserByID(uid)
         if (unionAppUserESMap) {
-            long commissionPositionID=unionAppUserService.findCommissionPositionID(unionAppUserESMap)
+            long commissionPositionID=unionAppUserService.findCommissionPositionID(unionAppUserESMap,true)
             ResponseUtils.write(response, new ReturnMessageBean(200, "",""+commissionPositionID).toString());
         } else {
             ResponseUtils.write(response, new ReturnMessageBean(404, "用户不存在").toString());

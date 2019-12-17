@@ -135,8 +135,10 @@ public class UnionAppUserController {
         }
 
         UnionAppUserESMap unionAppUserESMap = unionAppUserService.loadUserByID(id);
-        if (!StringUtils.isNull(unionAppUserESMap.getU_code())) {
+        if (unionAppUserESMap != null && !StringUtils.isNull(unionAppUserESMap.getU_code())) {
             params.put("f_code", unionAppUserESMap.getU_code());
+        } else {
+            params.put("f_code", "");
         }
 
         SearchHits hits = unionAppUserService.findFans(params, page, size);
@@ -145,6 +147,13 @@ public class UnionAppUserController {
         List<Map<String, Object>> userList = new ArrayList<>();
         for (SearchHit hit : hitList) {
             Map<String, Object> userMap = hit.getSourceAsMap();
+            String u_code = (String) userMap.get("u_code");
+            if (!StringUtils.isNull(u_code)) {
+                Map<String, String> pMap = new HashMap<>();
+                pMap.put("f_code", u_code);
+                long countFans = unionAppUserService.countFans(pMap);
+                userMap.put("countFans", countFans);
+            }
             userList.add(userMap);
         }
         Map ret = new HashMap();
@@ -162,7 +171,7 @@ public class UnionAppUserController {
             code = URLDecoder.decode(code, "UTF-8");
             code = code.replaceAll(" ", "");
             if (code.length() == 6) {
-                UnionAppUserESMap unionUserESMap = unionAppUserService.loadUserByCODE(code);
+                UnionAppUserESMap unionUserESMap = unionAppUserService.loadUserByUCode(code);
                 if (unionUserESMap != null) {
                     ResponseUtils.write(response, new ReturnMessageBean(200, "", unionUserESMap).toString());
                 } else {
@@ -186,27 +195,32 @@ public class UnionAppUserController {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         Map<String, String> params = new HashMap<>();
-        params.put("f_user_id", id);
-        if (!StringUtils.isNull(role_type)) {
-            params.put("role_id", role_type);
-        }
-        SearchHits hits = unionAppUserService.findFans(params, page, size);
-        if (hits != null) {
-            long total = hits.getTotalHits().value;
-            List<Map<String, Object>> list = new ArrayList<>();
-            SearchHit[] _hitList = hits.getHits();
-            for (int i = 0; i < _hitList.length; i++) {
-                SearchHit _hit = _hitList[i];
-                Map<String, Object> userMap = _hit.getSourceAsMap();
-                list.add(userMap);
+        UnionAppUserESMap unionAppUserESMap = unionAppUserService.loadUserByID(id);
+        if (unionAppUserESMap != null) {
+            params.put("f_code", unionAppUserESMap.getU_code());
+            if (!StringUtils.isNull(role_type)) {
+                params.put("role_id", role_type);
             }
-            Map<String, Object> returnMap = new HashMap<>();
-            returnMap.put("code", 200);
-            returnMap.put("list", list);
-            returnMap.put("total", total);
-            ResponseUtils.write(response, JSONObject.toJSONString(returnMap));
+            SearchHits hits = unionAppUserService.findFans(params, page, size);
+            if (hits != null) {
+                long total = hits.getTotalHits().value;
+                List<Map<String, Object>> list = new ArrayList<>();
+                SearchHit[] _hitList = hits.getHits();
+                for (int i = 0; i < _hitList.length; i++) {
+                    SearchHit _hit = _hitList[i];
+                    Map<String, Object> userMap = _hit.getSourceAsMap();
+                    list.add(userMap);
+                }
+                Map<String, Object> returnMap = new HashMap<>();
+                returnMap.put("code", 200);
+                returnMap.put("list", list);
+                returnMap.put("total", total);
+                ResponseUtils.write(response, JSONObject.toJSONString(returnMap));
+            } else {
+                ResponseUtils.write(response, new ReturnMessageBean(500, "服务端出现错误").toString());
+            }
         } else {
-            ResponseUtils.write(response, new ReturnMessageBean(500, "服务端出现错误").toString());
+            ResponseUtils.write(response, new ReturnMessageBean(404, "当前用户不存在").toString());
         }
     }
 
