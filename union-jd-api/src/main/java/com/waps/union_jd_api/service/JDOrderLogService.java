@@ -4,14 +4,15 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.waps.service.jd.api.bean.OrderQueryParams;
 import com.waps.service.jd.api.service.JdUnionService;
-import com.waps.service.jd.es.domain.JDCategoryESMap;
-import com.waps.service.jd.es.domain.JDMediaInfoESMap;
-import com.waps.service.jd.es.domain.JDOrderInfoESMap;
-import com.waps.service.jd.es.domain.SkuInfoESMap;
+import com.waps.service.jd.es.domain.*;
 import com.waps.service.jd.es.service.JDOrderESService;
 import com.robot.netty.server.OnLineService;
+import com.waps.service.jd.es.service.JDSkuInfoESService;
 import com.waps.union_jd_api.utils.JDConfig;
 import com.waps.utils.StringUtils;
+import jd.union.open.goods.promotiongoodsinfo.query.response.PromotionGoodsResp;
+import jd.union.open.goods.promotiongoodsinfo.query.response.UnionOpenGoodsPromotiongoodsinfoQueryResponse;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.search.SearchHits;
 import org.jsoup.helper.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ public class JDOrderLogService {
 
     @Autowired
     private JdUnionService jdUnionService;
+
+    @Autowired
+    private JDSkuInfoESService jdSkuInfoESService;
 
     public void getOrderLogByDay(String dateStr) {
 
@@ -90,7 +94,6 @@ public class JDOrderLogService {
         if (jsonArray != null) {
             System.out.println(jsonArray.size());
             System.out.println("=============");
-
             ArrayList<Object> bulkList = new ArrayList<>();
             for (Object object : jsonArray) {
                 String objJson = JSONObject.toJSONString(object);
@@ -150,6 +153,9 @@ public class JDOrderLogService {
                 }
                 jdOrderInfoESMap.setSkuList(newSkuList);
 
+                //获取商品图
+                String skuImg = getSkuImage(jdOrderInfoESMap);
+                jdOrderInfoESMap.setSkuImg(skuImg);
                 bulkList.add(jdOrderInfoESMap);
             }
             if (bulkList.size() > 0) {
@@ -160,6 +166,48 @@ public class JDOrderLogService {
             orderQueryParams.setPageNo(orderQueryParams.getPageNo() + 1);
             getOrderLogByParams(orderQueryParams);
         }
+    }
+
+
+    public String getSkuImage(JDOrderInfoESMap jdOrderInfoESMap) {
+        String skuImage = "";
+        try {
+            JDOrderInfoESMap _oldJdOrderInfoMap = (JDOrderInfoESMap) jdOrderESService.load(jdOrderInfoESMap.getId(), JDOrderInfoESMap.class);
+            //从已有数据中获取图片
+            if (_oldJdOrderInfoMap != null && !StringUtils.isNull(_oldJdOrderInfoMap.getSkuImg())) {
+                skuImage = _oldJdOrderInfoMap.getSkuImg();
+            }
+        } catch (Exception e) {
+            System.out.println("es中无法读取图片:" + e.getLocalizedMessage());
+        }
+
+
+        //从京东获取图片
+        String sku_ID = "";
+        try {
+            if (StringUtils.isNull(skuImage)) {
+                if (jdOrderInfoESMap.getSkuList().size() > 0) {
+                    SkuInfoESMap skuInfoESMap = jdOrderInfoESMap.getSkuList().get(0);
+                    String skuID = skuInfoESMap.getSkuId();
+                    sku_ID = skuID;
+
+                    UnionOpenGoodsPromotiongoodsinfoQueryResponse goodsResponse = jdUnionService.getGoodsQueryPromotionInfoResponse(skuID);
+                    if (goodsResponse.getCode() == 200) {
+                        PromotionGoodsResp goodsResp = goodsResponse.getData()[0];
+                        skuImage = goodsResp.getImgUrl();
+                    } else {
+                        System.out.println("获取图片错误:" + skuID + " 图片:" + goodsResponse.getCode() + " " + goodsResponse.getMessage());
+                        JDSkuInfoESMap jdSkuInfoESMap = (JDSkuInfoESMap) jdSkuInfoESService.load(skuID, JDSkuInfoESMap.class);
+                        if (jdSkuInfoESMap != null) {
+                            skuImage = jdSkuInfoESMap.getImageInfo().getImageList()[0].getUrl();
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("无法从JD获取商品图片:" + sku_ID + " ERROR:" + e.getLocalizedMessage());
+        }
+        return skuImage;
     }
 
     public String timeTmp2DateStr(String tmp) {

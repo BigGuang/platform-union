@@ -38,8 +38,8 @@ import org.springframework.stereotype.Component;
 public class JdUnionService {
 
     public final static String SERVER_URL = "https://router.jd.com/api";
-    public final static String appKey = "909ec3e9866348689c157767f61ac654";
-    public final static String appSecret = "83f717fc51fd40ffb04d5b30e0a88d53";
+    public final static String appKey = "733c0c9c35f344fc5071172c4bc148fe";
+    public final static String appSecret = "96bd02a7de4b425bb724fb56e7c66a84";
     public final static String accessToken = "";  //第三方授权用
     public final static String UNION_ID = "1000440357";
 
@@ -238,6 +238,19 @@ public class JdUnionService {
         } catch (JdException e) {
             System.out.println(e.getLocalizedMessage());
             return ErrorBean.returnErrorJson(500, e.getLocalizedMessage());
+        }
+    }
+
+
+    public UnionOpenGoodsPromotiongoodsinfoQueryResponse getGoodsQueryPromotionInfoResponse(String skuIds) {
+        JdClient client = new DefaultJdClient(SERVER_URL, accessToken, appKey, appSecret);
+        UnionOpenGoodsPromotiongoodsinfoQueryRequest request = new UnionOpenGoodsPromotiongoodsinfoQueryRequest();
+        request.setSkuIds(skuIds);
+        try {
+            return client.execute(request);
+        } catch (JdException e) {
+            System.out.println(e.getLocalizedMessage());
+            return null;
         }
     }
 

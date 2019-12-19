@@ -66,10 +66,10 @@
     <task:annotation-driven executor="executor" scheduler="scheduler"/>
 
     <!--    每分钟-->
-    <!--    <task:scheduler id="jdOrderLogService_getOrderLogByDay_1min"/>-->
-    <!--    <task:scheduled-tasks scheduler="jdOrderLogService_getOrderLogByDay_1min">-->
-    <!--        <task:scheduled ref="syncJdOrderJob" method="doSomething" cron="0 */1 * * * ?"/>-->
-    <!--    </task:scheduled-tasks>-->
+<!--        <task:scheduler id="jdOrderLogService_getOrderLogByDay_1min"/>-->
+<!--        <task:scheduled-tasks scheduler="jdOrderLogService_getOrderLogByDay_1min">-->
+<!--            <task:scheduled ref="syncJdOrderJob" method="doSomething" cron="0 */1 * * * ?"/>-->
+<!--        </task:scheduled-tasks>-->
 
 <!--    <task:scheduler id="jdSkuInfoService_syncSkuInfo"/>-->
 <!--    <task:scheduled-tasks scheduler="jdSkuInfoService_syncSkuInfo">-->

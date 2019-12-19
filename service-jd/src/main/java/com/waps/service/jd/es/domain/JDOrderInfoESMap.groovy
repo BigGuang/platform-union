@@ -18,6 +18,7 @@ class JDOrderInfoESMap extends ESBaseBean{
     String ext1_positionId
     String ext1_user
     String orderEmt
+    String skuImg
     List<SkuInfoESMap> skuList = new ArrayList<>()
     String createtime
 }
@@ -30,6 +31,7 @@ class SkuInfoESMap {
     double estimateFee
     String pid
     String skuName
+    String skuImg
     String popId
     String payMonth
     double price

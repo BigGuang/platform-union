@@ -50,6 +50,9 @@
     "orderEmt": {
       "type": "keyword"
     },
+    "skuImg": {
+      "type": "keyword"
+    },
     "skuList": {
       "properties": {
         "commissionRate": {
@@ -152,6 +155,9 @@
           "type": "double"
         },
         "siteId": {
+          "type": "keyword"
+        },
+        "skuImg": {
           "type": "keyword"
         },
         "frozenSkuNum": {
