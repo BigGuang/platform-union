@@ -836,14 +836,12 @@ public class ESClient {
     private Long searchCount(SearchRequest request) {
         try {
 
-            SearchResponse response = client.search(request, RequestOptions.DEFAULT);
+            SearchResponse _response = client.search(request, RequestOptions.DEFAULT);
 
-            if (response.getHits() == null) {
+            if (_response.getHits() == null) {
                 return 0L;
             }
-
-            long total = response.getHits().getTotalHits().value;
-            return total;
+            return _response.getHits().getTotalHits().value;
         } catch (Exception e) {
             e.printStackTrace();
         }
