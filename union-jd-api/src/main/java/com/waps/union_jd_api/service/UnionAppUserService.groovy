@@ -6,7 +6,6 @@ import com.waps.service.jd.es.domain.JDMediaInfoESMap
 import com.waps.service.jd.es.domain.UnionAppUserESMap
 import com.waps.service.jd.es.service.UnionAppUserESService
 import com.waps.tools.security.MD5
-import com.waps.tools.test.TestUtils
 import com.waps.union_jd_api.utils.Config
 import com.waps.union_jd_api.utils.DateUtils
 import com.waps.utils.StringUtils
@@ -62,7 +61,6 @@ class UnionAppUserService {
      */
     public DocWriteResponse saveAppUser(UnionAppUserESMap unionAppUserESMap) {
         println "===收到 saveAppUser==="
-        TestUtils.outPrint(unionAppUserESMap)
         try {
             //id如果为空,将根据如下规则来生成ID
             if (StringUtils.isNull(unionAppUserESMap.getId())) {
@@ -87,6 +85,15 @@ class UnionAppUserService {
                 } else if (!StringUtils.isNull(_loadAppUserMap.getF_user_id())) {
                     unionAppUserESMap.setF_code(makeInviteCode(_loadAppUserMap.getF_user_id()))
                 }
+
+                if (StringUtils.isNull(unionAppUserESMap.getChannel_name())) {
+                    unionAppUserESMap.setChannel_name(_loadAppUserMap.getChannel_name())
+                }
+
+                //解决小程序上丢失phone的bug
+                if (!StringUtils.isNull(_loadAppUserMap.getPhone())) {
+                    unionAppUserESMap.setPhone(_loadAppUserMap.getPhone())
+                }
                 println "f_code:" + unionAppUserESMap.getF_code()
             }
 
@@ -94,10 +101,6 @@ class UnionAppUserService {
 
             //有邀请码的情况
             if (!StringUtils.isNull(unionAppUserESMap.getF_code())) {
-                //邀请码为ROOT将会直接设置为导师
-                if ("ROOT" == unionAppUserESMap.getF_code()) {
-                    unionAppUserESMap.setRole_id(Config.USER_ROLE_LEVEL_2)
-                }
                 //找到上级用户信息
                 UnionAppUserESMap f_userMap = loadUserByUCode(unionAppUserESMap.getF_code())
                 if (f_userMap != null) {
@@ -127,19 +130,24 @@ class UnionAppUserService {
                 JDMediaInfoESMap jdMediaInfoESMap = jdMediaService.getMediaInfoByChannelName(unionAppUserESMap.getChannel_name())
                 if (jdMediaInfoESMap != null) {
                     unionAppUserESMap.setChannel_id(jdMediaInfoESMap.getChannel_id())
-                    unionAppUserESMap.setRole_id(Config.USER_ROLE_LEVEL_1)   //已有群主，直接设置成超级用户
-                } else {
-                    unionAppUserESMap.setChannel_id("")
                 }
+
 
                 //有channel_name是超级用户, 同步上级关系到自己信息中
                 UnionAppUserTreeBean unionAppUserTreeBean = getUnionAppUserTree(unionAppUserESMap.getChannel_name())
                 if (unionAppUserTreeBean != null) {
-                    if (!StringUtils.isNull(unionAppUserTreeBean.getFather_id())) {
+                    if ("0" == unionAppUserTreeBean.getFather_id() && "0" == unionAppUserTreeBean.getRoot_id()) {
+                        unionAppUserESMap.setF_code("ROOT")
+                        unionAppUserESMap.setInvite_user_id("ROOT")
+                        unionAppUserESMap.setA_user_id("")
+                        unionAppUserESMap.setS_user_id("")
+                        unionAppUserESMap.setT_user_id("")
+                    }
+                    if (!StringUtils.isNull(unionAppUserTreeBean.getFather_id()) && "0" != unionAppUserTreeBean.getFather_id()) {
                         unionAppUserESMap.setF_name(unionAppUserTreeBean.getFather_id())
                         unionAppUserESMap.setF_id("")
                     }
-                    if (!StringUtils.isNull(unionAppUserTreeBean.getRoot_id())) {
+                    if (!StringUtils.isNull(unionAppUserTreeBean.getRoot_id()) && "0" != unionAppUserTreeBean.getRoot_id()) {
                         unionAppUserESMap.setG_name(unionAppUserTreeBean.getRoot_id())
                         unionAppUserESMap.setG_id("")
                     }
@@ -170,7 +178,7 @@ class UnionAppUserService {
                         String agent_sid_phone = new MD5().getMD5(unionAppUserTreeBean.getAgent_sid_phone())
                         unionAppUserESMap.setS_user_id(agent_sid_phone)
                     }
-                }else{
+                } else {
                     unionAppUserESMap.setF_id("")
                     unionAppUserESMap.setF_name("")
                     unionAppUserESMap.setG_id("")
@@ -180,6 +188,7 @@ class UnionAppUserService {
                     unionAppUserESMap.setT_user_id("")
                 }
             }
+
 
             //补完上级信息
             if (!StringUtils.isNull(unionAppUserESMap.getF_name()) && StringUtils.isNull(unionAppUserESMap.getF_id())) {
@@ -195,22 +204,20 @@ class UnionAppUserService {
                     unionAppUserESMap.setG_id(jdMediaInfoESMap.getChannel_id())
             }
 
-            //设置会员级别
-            if (!StringUtils.isNull(unionAppUserESMap.getChannel_id()) && !StringUtils.isNull(unionAppUserESMap.getChannel_name())) {
-                unionAppUserESMap.setRole_id(Config.USER_ROLE_LEVEL_1)
-            } else {
-                unionAppUserESMap.setRole_id(Config.USER_ROLE_LEVEL_0)  //普通会员
+            //设置会员级别, rols_id不存在的时候，自动判断级别
+            if (StringUtils.isNull(unionAppUserESMap.getRole_id())) {
+                if (!StringUtils.isNull(unionAppUserESMap.getChannel_id()) && !StringUtils.isNull(unionAppUserESMap.getChannel_name())) {
+                    unionAppUserESMap.setRole_id(Config.USER_ROLE_LEVEL_1)
+                } else {
+                    unionAppUserESMap.setRole_id(Config.USER_ROLE_LEVEL_0)  //普通会员
+                }
             }
 
             if (!StringUtils.isNull(unionAppUserESMap.getId())) {
 
-                println "===保存1  saveAppUser==="
-                TestUtils.outPrint(unionAppUserESMap)
+                println "===保存  saveAppUser==="
                 if (_loadAppUserMap != null && !StringUtils.isNull(_loadAppUserMap.getId())) {
-                    unionAppUserESMap.setModifytime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ''))
-                    JSONObject newJsonObj = (JSONObject) JSONObject.toJSON(unionAppUserESMap)
-                    Map<String, Object> newMap = (Map<String, Object>) newJsonObj
-                    UpdateResponse updateResponse = unionAppUserESService.update(unionAppUserESMap.getId(), newMap)
+                    UpdateResponse updateResponse = updateUserInfo(unionAppUserESMap)
                     return updateResponse
                 } else {
                     unionAppUserESMap.setModifytime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ''))
@@ -225,6 +232,63 @@ class UnionAppUserService {
         }
     }
 
+
+    /**
+     * 多参数读取用户信息
+     * @param id
+     * @param phone
+     * @param open_id
+     * @return
+     */
+    public UnionAppUserESMap loadUser(String id, String phone, String open_id) {
+        UnionAppUserESMap unionAppUserESMap = new UnionAppUserESMap()
+        if (!StringUtils.isNull(id)) {
+            unionAppUserESMap = loadUserByID(id);
+        } else if (!StringUtils.isNull(phone)) {
+            unionAppUserESMap = loadUserByPhone(phone);
+        } else if (!StringUtils.isNull(open_id)) {
+            unionAppUserESMap = loadUserByOpenID(open_id);
+        }
+
+        if (unionAppUserESMap != null && StringUtils.isNull(unionAppUserESMap.getU_code())) {
+            String u_code = getUCode(unionAppUserESMap);
+            unionAppUserESMap.setU_code(u_code);
+        }
+        boolean isUpdate = false
+        if (unionAppUserESMap && !StringUtils.isNull(unionAppUserESMap.getChannel_name())) {
+            UnionAppUserTreeBean unionAppUserTreeBean = getUnionAppUserTree(unionAppUserESMap.getChannel_name())
+            println "unionAppUserTreeBean.getU_type():" + unionAppUserTreeBean.getU_type()
+            if (!unionAppUserESMap.getRole_id().equals(unionAppUserTreeBean.getU_type())) {
+                unionAppUserESMap.setRole_id(unionAppUserTreeBean.getU_type())
+                isUpdate = true
+                updateUserInfo(unionAppUserESMap)
+            }
+        }
+
+
+        if (unionAppUserESMap && StringUtils.isNull(unionAppUserESMap.getF_id()) && StringUtils.isNull(unionAppUserESMap.getChannel_id())) {
+            ChannelInfo channelInfo = findCommissionPositionID(unionAppUserESMap, true)
+            if (channelInfo.getChannel_id() > 0) {
+                unionAppUserESMap.setF_id(channelInfo.getChannel_id() + "")
+                unionAppUserESMap.setF_name(channelInfo.getChannel_name())
+                isUpdate = true
+            }
+        }
+
+        //暂不对f_id和f_name更新，实时查找
+        if (false) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    updateUserInfo(unionAppUserESMap)
+                }
+            }).start();
+        }
+
+
+        return unionAppUserESMap
+    }
+
     /**
      * 从接口读取用户层级关系
      * @param uid
@@ -236,13 +300,11 @@ class UnionAppUserService {
             String url = Config.UNION_USER_TREE_URL.replace("[RNUM]", r_num).replace("[MD5]", md5).replace("[UID]", uid)
             println url
             String json = StringUtils.getUrlTxt(url)
+            println json
             JSONObject retObj = JSONObject.parseObject(json)
             if (retObj.getInteger("code") == 200) {
                 JSONObject jsonObject = retObj.get("data") as JSONObject
                 UnionAppUserTreeBean unionUserTreeBean = jsonObject.toJavaObject(UnionAppUserTreeBean.class)
-                if ("0".equalsIgnoreCase(unionUserTreeBean.getFather_id())) unionUserTreeBean.setFather_id("")
-                if ("0".equalsIgnoreCase(unionUserTreeBean.getRoot_id())) unionUserTreeBean.setRoot_id("")
-                if ("0".equalsIgnoreCase(unionUserTreeBean.getF_phone())) unionUserTreeBean.setF_phone("")
                 return unionUserTreeBean
             }
         }
@@ -325,8 +387,17 @@ class UnionAppUserService {
         return loadUserByRequest(kvMap)
     }
 
-    public long countFans(Map<String,String> kvMap){
-        SearchHits hits=findFans(kvMap,1,1)
+    public UpdateResponse updateUserInfo(UnionAppUserESMap unionAppUserESMap) {
+        if (unionAppUserESMap && !StringUtils.isNull(unionAppUserESMap.getId())) {
+            JSONObject newJsonObj = (JSONObject) JSONObject.toJSON(unionAppUserESMap)
+            Map<String, Object> newMap = (Map<String, Object>) newJsonObj
+            UpdateResponse response = unionAppUserESService.update(unionAppUserESMap.getId(), newMap)
+            return response
+        }
+    }
+
+    public long countFans(Map<String, String> kvMap) {
+        SearchHits hits = findFans(kvMap, 1, 1)
         return hits.getTotalHits().value
     }
 
@@ -475,22 +546,27 @@ class UnionAppUserService {
      * 找出直接购买的佣金受益pid
      * @return
      */
-    public Long findCommissionPositionID(UnionAppUserESMap unionAppUserESMap, boolean isLoopFindPid) {
+    public ChannelInfo findCommissionPositionID(UnionAppUserESMap unionAppUserESMap, boolean isLoopFindPid) {
         long pid = 0
+        ChannelInfo channelInfo = new ChannelInfo()
         if (unionAppUserESMap != null) {
             if (!StringUtils.isNull(unionAppUserESMap.getChannel_id())) {
                 pid = Long.parseLong(unionAppUserESMap.getChannel_id());
+                channelInfo.setChannel_name(unionAppUserESMap.getChannel_name())
+                channelInfo.setChannel_id(pid)
             } else if (!StringUtils.isNull(unionAppUserESMap.getF_id())) {
-                pid = Long.parseLong(unionAppUserESMap.getF_id());
+                pid = Long.parseLong(unionAppUserESMap.getF_id())
+                channelInfo.setChannel_name(unionAppUserESMap.getF_name())
+                channelInfo.setChannel_id(pid)
             }
         }
         if (isLoopFindPid) {
             //如果本人没有channel_id,找上级
             if (pid == 0) {
-                pid = findPositionIDLoop(unionAppUserESMap, 0)
+                channelInfo = findPositionIDLoop(unionAppUserESMap, 0)
             }
         }
-        return pid
+        return channelInfo
     }
 
 
@@ -499,16 +575,16 @@ class UnionAppUserService {
      * @param unionAppUserESMap
      * @return
      */
-    public Long findPositionIDLoop(UnionAppUserESMap unionAppUserESMap, int level) {
+    public ChannelInfo findPositionIDLoop(UnionAppUserESMap unionAppUserESMap, int level) {
         level = level + 1
-        println "findPositionIDLoop level:" + level
+//        println "findPositionIDLoop level:" + level
         //防止死循环
         if (level > 100) return 0
         String f_code = unionAppUserESMap.getF_code()
         if (StringUtils.isNull(f_code)) {
             f_code = makeInviteCode(unionAppUserESMap.getF_user_id())
         }
-        println "上级邀请码:" + f_code
+//        println "上级邀请码:" + f_code
         if (true) {
             UnionAppUserESMap f_userMap = loadUserByUCode(f_code)
 
@@ -516,8 +592,12 @@ class UnionAppUserService {
                 if (f_userMap.getChannel_id()) {
                     println "找到佣金收益 channel_id:" + f_userMap.getChannel_id() + "  channel_name:" + f_userMap.getChannel_name() + "  " +
                             "user_name:" + f_userMap.getUser_name() + "  " + f_userMap.getId()
+                    String f_channel_name = f_userMap.getChannel_name()
                     Long pid = Long.parseLong(f_userMap.getChannel_id())
-                    return pid
+                    ChannelInfo channelInfo = new ChannelInfo()
+                    channelInfo.setChannel_name(f_channel_name)
+                    channelInfo.setChannel_id(pid)
+                    return channelInfo
                 } else {
                     return findPositionIDLoop(f_userMap, level)
                 }
@@ -527,7 +607,12 @@ class UnionAppUserService {
         }
     }
 
-
+    public void logError(String str) {
+        if (str) {
+            str = com.waps.utils.DateUtils.getNow() + " " + str + "\n" + "==============="
+            new File("/home/logs/error.log").append(str + "\n")
+        }
+    }
 }
 
 class UnionAppUserTreeBean {
@@ -536,6 +621,7 @@ class UnionAppUserTreeBean {
     String father_id
     String f_phone
     String t_phone    //导师手机号
+    String u_type
     String three_id
     String two_id
     String agent_fid //合伙人
@@ -561,5 +647,9 @@ class BuildLinkBean {
     String channel_id
     String f_id
     String place
+}
 
+class ChannelInfo {
+    String channel_name
+    Long channel_id = 0L;
 }

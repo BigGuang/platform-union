@@ -1,10 +1,14 @@
 package com.waps.union_jd_api.controller
 
+import com.alibaba.fastjson.JSONObject
+import com.waps.union_jd_api.bean.ReturnMessageBean
 import com.waps.union_jd_api.service.WeChatService
+import com.waps.union_jd_api.utils.HttpUtils
 import com.waps.utils.ResponseUtils
 import com.waps.utils.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 
@@ -45,5 +49,21 @@ class WeChatController {
         String url = "http://wx.wapg.cn/qr?site=wpjx&channel=" + fid
         String result = StringUtils.getUrlTxt(url)
         ResponseUtils.write(response, result)
+    }
+
+    @RequestMapping(value = "/send_account")
+    public void sendAccountMessage(
+            @RequestBody Map<String, String> paramsMap,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        if (paramsMap != null) {
+            String paramJson = JSONObject.toJSONString(paramsMap)
+            String url = "http://wx.wapg.cn/send/account_message"
+            println paramJson
+            String result = HttpUtils.postJsonString(url, paramJson)
+            ResponseUtils.write(response, new ReturnMessageBean(200, "").toString());
+        } else {
+            ResponseUtils.write(response, new ReturnMessageBean(500, "缺少参数").toString());
+        }
     }
 }

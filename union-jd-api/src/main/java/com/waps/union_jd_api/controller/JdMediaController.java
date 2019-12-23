@@ -29,7 +29,7 @@ public class JdMediaController {
     public void getMediaInfo(
             @RequestParam(value = "channel_name", required = true) String channelName,
             HttpServletRequest request,
-                             HttpServletResponse response) throws Exception {
+            HttpServletResponse response) throws Exception {
         HashMap paramsMap = new HashMap();
         paramsMap.put("from", 0);
         paramsMap.put("size", 1);
@@ -75,27 +75,29 @@ public class JdMediaController {
         }
         int from = 0;
         from = (page - 1) * size;
-
         HashMap paramsMap = new HashMap();
         paramsMap.put("media_id", media_id);
         paramsMap.put("channel_name", channel_name);
         paramsMap.put("from", from);
         paramsMap.put("size", size);
+        Map map = new HashMap();
         List<JDMediaInfoESMap> arrayList = new ArrayList<>();
         SearchHits hits = jdMediaService.findMediaChannelToHits(paramsMap);
-        SearchHit[] hitList = hits.getHits();
-        for (SearchHit hit : hitList) {
-            String json = hit.getSourceAsString();
-            JDMediaInfoESMap jdMediaInfoESMap = JSONObject.parseObject(json, JDMediaInfoESMap.class);
-            arrayList.add(jdMediaInfoESMap);
+        if (hits != null) {
+            SearchHit[] hitList = hits.getHits();
+            for (SearchHit hit : hitList) {
+                String json = hit.getSourceAsString();
+                JDMediaInfoESMap jdMediaInfoESMap = JSONObject.parseObject(json, JDMediaInfoESMap.class);
+                arrayList.add(jdMediaInfoESMap);
+            }
+
+
+            map.put("total", hits.getTotalHits().value);
+        } else {
+            map.put("total", 0);
         }
-        Map map = new HashMap();
         map.put("data", arrayList);
-        map.put("total", hits.getTotalHits().value);
-
-
         String json = JSONObject.toJSONString(map);
-
         ResponseUtils.write(response, json);
 
     }

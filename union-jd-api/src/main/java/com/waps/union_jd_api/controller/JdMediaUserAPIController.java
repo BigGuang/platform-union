@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/media_user")
-public class JsMediaUserAPIController {
+public class JdMediaUserAPIController {
 
 //    @Autowired
 //    private JDMediaUserService jdMediaUserService;

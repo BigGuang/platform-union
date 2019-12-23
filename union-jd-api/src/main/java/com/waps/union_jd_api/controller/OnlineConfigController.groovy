@@ -3,7 +3,6 @@ package com.waps.union_jd_api.controller
 import com.alibaba.fastjson.JSONObject
 import com.waps.union_jd_api.bean.ReturnMessageBean
 import com.waps.utils.ResponseUtils
-import com.waps.utils.StringUtils
 import com.waps.utils.TemplateUtils
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.PathVariable

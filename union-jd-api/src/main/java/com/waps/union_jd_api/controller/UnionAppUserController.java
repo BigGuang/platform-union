@@ -10,6 +10,7 @@ import com.waps.tools.security.MD5;
 import com.waps.union_jd_api.bean.ReturnMessageBean;
 import com.waps.union_jd_api.service.*;
 import com.waps.union_jd_api.utils.JDConfig;
+import com.waps.utils.DateUtils;
 import com.waps.utils.ResponseUtils;
 import com.waps.utils.StringUtils;
 import org.elasticsearch.action.DocWriteResponse;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -95,20 +97,7 @@ public class UnionAppUserController {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         try {
-            UnionAppUserESMap unionAppUserESMap = new UnionAppUserESMap();
-            if (!StringUtils.isNull(id)) {
-                unionAppUserESMap = unionAppUserService.loadUserByID(id);
-            } else if (!StringUtils.isNull(phone)) {
-                unionAppUserESMap = unionAppUserService.loadUserByPhone(phone);
-            } else if (!StringUtils.isNull(open_id)) {
-                unionAppUserESMap = unionAppUserService.loadUserByOpenID(open_id);
-            }
-
-            if (unionAppUserESMap != null && StringUtils.isNull(unionAppUserESMap.getU_code())) {
-                String u_code = unionAppUserService.getUCode(unionAppUserESMap);
-                unionAppUserESMap.setU_code(u_code);
-            }
-
+            UnionAppUserESMap unionAppUserESMap = unionAppUserService.loadUser(id, phone, open_id);
 
             if (unionAppUserESMap != null && !StringUtils.isNull(unionAppUserESMap.getId())) {
                 ResponseUtils.write(response, new ReturnMessageBean(200, "", unionAppUserESMap).toString());
@@ -138,7 +127,7 @@ public class UnionAppUserController {
         if (unionAppUserESMap != null && !StringUtils.isNull(unionAppUserESMap.getU_code())) {
             params.put("f_code", unionAppUserESMap.getU_code());
         } else {
-            params.put("f_code", "");
+            params.put("f_code", "ROOT");
         }
 
         SearchHits hits = unionAppUserService.findFans(params, page, size);
@@ -256,7 +245,8 @@ public class UnionAppUserController {
                 resultString = new String(cipher.doFinal(encrypData), "UTF-8");
             }
         } catch (Exception e) {
-            System.out.println("getPhoneNumber ERROR:" + e.getLocalizedMessage());
+            System.out.println(DateUtils.getNow() + " getPhoneNumber ERROR:" + e.getLocalizedMessage());
+            System.out.println(DateUtils.getNow() + " getPhoneNumber ERROR JSON:" + JSONObject.toJSONString(param));
         }
 
 //        try {
@@ -298,6 +288,8 @@ public class UnionAppUserController {
             HttpServletResponse response) throws Exception {
         String key = "Waps_jd_MD5key";
         //md5=new MD5(phone+channel_name+channel_id+key)   key="Waps_jd_MD5key"
+        System.out.println("==收到升级超级会员==");
+        System.out.println(JSONObject.toJSONString(unionAppUserSetChannel));
         if (unionAppUserSetChannel != null && !StringUtils.isNull(unionAppUserSetChannel.getPhone())) {
             UnionAppUserESMap unionAppUserESMap = new UnionAppUserESMap();
             unionAppUserESMap.setPhone(unionAppUserSetChannel.getPhone());
@@ -360,7 +352,8 @@ public class UnionAppUserController {
 
                     //超级用户直接算佣金订单，非超级用户走通用
                     if (StringUtils.isNull(buildLinkBean.getPlace())) {
-                        long pid = unionAppUserService.findCommissionPositionID(unionAppUserESMap, true);
+                        ChannelInfo channelInfo = unionAppUserService.findCommissionPositionID(unionAppUserESMap, true);
+                        long pid = channelInfo.getChannel_id();
                         PromotionCodeParams promotionCodeParams = new PromotionCodeParams();
                         promotionCodeParams.setApp_key(JDConfig.APP_KEY);
                         promotionCodeParams.setApp_secret(JDConfig.SECRET_KEY);
@@ -380,7 +373,8 @@ public class UnionAppUserController {
                             ResponseUtils.write(response, new ReturnMessageBean(code, message));
                         }
                     } else {
-                        long pid = unionAppUserService.findCommissionPositionID(unionAppUserESMap, true);
+                        ChannelInfo channelInfo = unionAppUserService.findCommissionPositionID(unionAppUserESMap, true);
+                        long pid = channelInfo.getChannel_id();
                         PromotionCodeCommonParams promotionCodeCommonParams = new PromotionCodeCommonParams();
                         promotionCodeCommonParams.setApp_key(JDConfig.APP_KEY);
                         promotionCodeCommonParams.setApp_secret(JDConfig.SECRET_KEY);
