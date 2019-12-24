@@ -27,4 +27,17 @@ class Config {
     //订阅消息下发接口
     final static String SEND_SUBSCRIBE_MESSAGE_URL = "https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=ACCESS_TOKEN"
 
+
+
+    //京推宝API
+    final static String JTB_LOGIN_ACCOUNT_NAME="13801205108"
+    final static String JTB_LOGIN_ACCOUNT_PWD="744ba1ad5020cb4a60b68ea28cf63cf9"
+    final static String JTB_LOGIN_ACCOUNT_URL="https://jingtuibao.ixiaocong.net/api/login"
+    final static String JTB_LOGIN_SESSION_ID_URL="https://jingtuibao.ixiaocong.net/api/loginBySessionId"
+    final static String JTB_UPLOAD_IMG_URL="https://jingtuibao.ixiaocong.net/api/upload/robot/image"
+    final static String JTB_ADD_SEND_URL="https://jingtuibao.ixiaocong.net/api/robotMessage/add"
+    final static String JTB_SEND_WAITING_URL="https://jingtuibao.ixiaocong.net/api/robotMessage/findSendWating"
+    final static String JTB_SEND_ED_URL="https://jingtuibao.ixiaocong.net/api/robotMessage/findSended"
+
+
 }

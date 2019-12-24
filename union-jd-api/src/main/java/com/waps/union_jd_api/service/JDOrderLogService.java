@@ -75,7 +75,6 @@ public class JDOrderLogService {
                 Thread.sleep(500);
             }
 
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -96,71 +95,80 @@ public class JDOrderLogService {
             System.out.println("=============");
             ArrayList<Object> bulkList = new ArrayList<>();
             for (Object object : jsonArray) {
-                String objJson = JSONObject.toJSONString(object);
-                JDOrderInfoESMap jdOrderInfoESMap = JSONObject.parseObject(objJson, JDOrderInfoESMap.class);
-                jdOrderInfoESMap.setId(jdOrderInfoESMap.getOrderId());
-                jdOrderInfoESMap.setCreatetime(timeTmp2DateStr(System.currentTimeMillis() + ""));
-                if (!jdOrderInfoESMap.getFinishTime().equals("0")) {
-                    jdOrderInfoESMap.setFinishTime_Date(timeTmp2DateStr(jdOrderInfoESMap.getFinishTime()));
-                }
-                if (!jdOrderInfoESMap.getOrderTime().equals("0")) {
-                    jdOrderInfoESMap.setOrderTime_Date(timeTmp2DateStr(jdOrderInfoESMap.getOrderTime()));
-                }
-                if (!StringUtils.isNull(jdOrderInfoESMap.getExt1()) && jdOrderInfoESMap.getExt1().contains("_")) {
-                    String[] group = jdOrderInfoESMap.getExt1().split("_");
-                    jdOrderInfoESMap.setExt1_positionId(group[0]);
-                    jdOrderInfoESMap.setExt1_user(group[1]);
-                }
-
-                List<SkuInfoESMap> newSkuList = new ArrayList<>();
-                List<SkuInfoESMap> skuInfoESMapList = jdOrderInfoESMap.getSkuList();
-                for (SkuInfoESMap skuInfoESMap : skuInfoESMapList) {
-                    String cid1 = skuInfoESMap.getCid1();
-                    String cid2 = skuInfoESMap.getCid2();
-                    String cid3 = skuInfoESMap.getCid3();
-                    String positionId = skuInfoESMap.getPositionId();
-                    skuInfoESMap.setCid1_name(cid1);
-                    skuInfoESMap.setCid2_name(cid2);
-                    skuInfoESMap.setCid3_name(cid3);
-                    skuInfoESMap.setPositionName(positionId);
-                    if (!StringUtils.isNull(cid1)) {
-                        JDCategoryESMap jdCategoryESMap1 = OnLineService.getJdCategory(cid1);
-                        if (jdCategoryESMap1 != null)
-                            skuInfoESMap.setCid1_name(jdCategoryESMap1.getName());
+                try {
+                    String objJson = JSONObject.toJSONString(object);
+                    JDOrderInfoESMap jdOrderInfoESMap = JSONObject.parseObject(objJson, JDOrderInfoESMap.class);
+                    jdOrderInfoESMap.setId(jdOrderInfoESMap.getOrderId());
+                    jdOrderInfoESMap.setCreatetime(timeTmp2DateStr(System.currentTimeMillis() + ""));
+                    if (!jdOrderInfoESMap.getFinishTime().equals("0")) {
+                        jdOrderInfoESMap.setFinishTime_Date(timeTmp2DateStr(jdOrderInfoESMap.getFinishTime()));
                     }
-                    if (!StringUtils.isNull(cid2)) {
-                        JDCategoryESMap jdCategoryESMap2 = OnLineService.getJdCategory(cid2);
-                        if (jdCategoryESMap2 != null)
-                            skuInfoESMap.setCid2_name(jdCategoryESMap2.getName());
+                    if (!jdOrderInfoESMap.getOrderTime().equals("0")) {
+                        jdOrderInfoESMap.setOrderTime_Date(timeTmp2DateStr(jdOrderInfoESMap.getOrderTime()));
                     }
-                    if (!StringUtils.isNull(cid3)) {
-                        JDCategoryESMap jdCategoryESMap3 = OnLineService.getJdCategory(cid3);
-                        if (jdCategoryESMap3 != null)
-                            skuInfoESMap.setCid3_name(jdCategoryESMap3.getName());
+                    if (!StringUtils.isNull(jdOrderInfoESMap.getExt1()) && jdOrderInfoESMap.getExt1().contains("_")) {
+                        String[] group = jdOrderInfoESMap.getExt1().split("_");
+                        if (group.length == 2) {
+                            jdOrderInfoESMap.setExt1_positionId(group[0]);
+                            jdOrderInfoESMap.setExt1_user(group[1]);
+                        } else {
+                            jdOrderInfoESMap.setExt1_positionId(jdOrderInfoESMap.getExt1());
+                        }
                     }
 
-                    if (!StringUtils.isNull(positionId)) {
-                        JDMediaInfoESMap jdMediaInfoESMap = OnLineService.getChennelInfo(positionId);
-                        if (jdMediaInfoESMap != null)
-                            skuInfoESMap.setPositionName(jdMediaInfoESMap.getChannel_name());
-                    }
-                    if (!StringUtils.isNull(skuInfoESMap.getExt1()) && skuInfoESMap.getExt1().contains("_")) {
-                        String[] group = skuInfoESMap.getExt1().split("_");
-                        skuInfoESMap.setExt1_positionId(group[0]);
-                        skuInfoESMap.setExt1_user(group[1]);
-                    }
-                    newSkuList.add(skuInfoESMap);
-                }
-                jdOrderInfoESMap.setSkuList(newSkuList);
+                    List<SkuInfoESMap> newSkuList = new ArrayList<>();
+                    List<SkuInfoESMap> skuInfoESMapList = jdOrderInfoESMap.getSkuList();
+                    for (SkuInfoESMap skuInfoESMap : skuInfoESMapList) {
+                        String cid1 = skuInfoESMap.getCid1();
+                        String cid2 = skuInfoESMap.getCid2();
+                        String cid3 = skuInfoESMap.getCid3();
+                        String positionId = skuInfoESMap.getPositionId();
+                        skuInfoESMap.setCid1_name(cid1);
+                        skuInfoESMap.setCid2_name(cid2);
+                        skuInfoESMap.setCid3_name(cid3);
+                        skuInfoESMap.setPositionName(positionId);
+                        if (!StringUtils.isNull(cid1)) {
+                            JDCategoryESMap jdCategoryESMap1 = OnLineService.getJdCategory(cid1);
+                            if (jdCategoryESMap1 != null)
+                                skuInfoESMap.setCid1_name(jdCategoryESMap1.getName());
+                        }
+                        if (!StringUtils.isNull(cid2)) {
+                            JDCategoryESMap jdCategoryESMap2 = OnLineService.getJdCategory(cid2);
+                            if (jdCategoryESMap2 != null)
+                                skuInfoESMap.setCid2_name(jdCategoryESMap2.getName());
+                        }
+                        if (!StringUtils.isNull(cid3)) {
+                            JDCategoryESMap jdCategoryESMap3 = OnLineService.getJdCategory(cid3);
+                            if (jdCategoryESMap3 != null)
+                                skuInfoESMap.setCid3_name(jdCategoryESMap3.getName());
+                        }
 
-                //获取商品图
-                String skuImg = getSkuImage(jdOrderInfoESMap);
-                jdOrderInfoESMap.setSkuImg(skuImg);
-                bulkList.add(jdOrderInfoESMap);
+                        if (!StringUtils.isNull(positionId)) {
+                            JDMediaInfoESMap jdMediaInfoESMap = OnLineService.getChennelInfo(positionId);
+                            if (jdMediaInfoESMap != null)
+                                skuInfoESMap.setPositionName(jdMediaInfoESMap.getChannel_name());
+                        }
+                        if (!StringUtils.isNull(skuInfoESMap.getExt1()) && skuInfoESMap.getExt1().contains("_")) {
+                            String[] group = skuInfoESMap.getExt1().split("_");
+                            skuInfoESMap.setExt1_positionId(group[0]);
+                            skuInfoESMap.setExt1_user(group[1]);
+                        }
+                        newSkuList.add(skuInfoESMap);
+                    }
+                    jdOrderInfoESMap.setSkuList(newSkuList);
+
+                    //获取商品图
+                    String skuImg = getSkuImage(jdOrderInfoESMap);
+                    jdOrderInfoESMap.setSkuImg(skuImg);
+                    bulkList.add(jdOrderInfoESMap);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             if (bulkList.size() > 0) {
                 jdOrderESService.saveBulk(bulkList);
             }
+
         }
         if (hasMore) {
             orderQueryParams.setPageNo(orderQueryParams.getPageNo() + 1);
@@ -199,7 +207,11 @@ public class JDOrderLogService {
                         System.out.println("获取图片错误:" + skuID + " 图片:" + goodsResponse.getCode() + " " + goodsResponse.getMessage());
                         JDSkuInfoESMap jdSkuInfoESMap = (JDSkuInfoESMap) jdSkuInfoESService.load(skuID, JDSkuInfoESMap.class);
                         if (jdSkuInfoESMap != null) {
-                            skuImage = jdSkuInfoESMap.getImageInfo().getImageList()[0].getUrl();
+                            try {
+                                skuImage = jdSkuInfoESMap.getImageInfo().getImageList()[0].getUrl();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }

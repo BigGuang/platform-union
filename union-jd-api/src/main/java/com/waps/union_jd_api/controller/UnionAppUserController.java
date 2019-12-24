@@ -224,29 +224,31 @@ public class UnionAppUserController {
     public void getPhoneNumber(
             @RequestBody PhoneParam param,
             HttpServletResponse response) throws Exception {
-
-        byte[] encrypData = Base64.decode(param.getEncryp_data());
-        byte[] ivData = Base64.decode(param.getIv_data());
-        byte[] sessionKey = Base64.decode(param.getSession_key());
-
         String resultString = null;
-        AlgorithmParameterSpec ivSpec = new IvParameterSpec(ivData);
-        SecretKeySpec keySpec = new SecretKeySpec(sessionKey, "AES");
-        try {
+        if (param != null) {
+            byte[] encrypData = Base64.decode(param.getEncryp_data());
+            byte[] ivData = Base64.decode(param.getIv_data());
+            byte[] sessionKey = Base64.decode(param.getSession_key());
+
+
+            AlgorithmParameterSpec ivSpec = new IvParameterSpec(ivData);
+            SecretKeySpec keySpec = new SecretKeySpec(sessionKey, "AES");
             try {
-                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                try {
+                    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 //                Cipher cipher = Cipher.getInstance("DES/ECB/NoPadding");
-                cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
-                resultString = new String(cipher.doFinal(encrypData), "UTF-8");
+                    cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+                    resultString = new String(cipher.doFinal(encrypData), "UTF-8");
+                } catch (Exception e) {
+                    System.out.println("getPhoneNumber ERROR:" + e.getLocalizedMessage());
+                    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
+                    cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
+                    resultString = new String(cipher.doFinal(encrypData), "UTF-8");
+                }
             } catch (Exception e) {
-                System.out.println("getPhoneNumber ERROR:" + e.getLocalizedMessage());
-                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
-                cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
-                resultString = new String(cipher.doFinal(encrypData), "UTF-8");
+                System.out.println(DateUtils.getNow() + " getPhoneNumber ERROR:" + e.getLocalizedMessage());
+                System.out.println(DateUtils.getNow() + " getPhoneNumber ERROR JSON:" + JSONObject.toJSONString(param));
             }
-        } catch (Exception e) {
-            System.out.println(DateUtils.getNow() + " getPhoneNumber ERROR:" + e.getLocalizedMessage());
-            System.out.println(DateUtils.getNow() + " getPhoneNumber ERROR JSON:" + JSONObject.toJSONString(param));
         }
 
 //        try {
@@ -353,7 +355,10 @@ public class UnionAppUserController {
                     //超级用户直接算佣金订单，非超级用户走通用
                     if (StringUtils.isNull(buildLinkBean.getPlace())) {
                         ChannelInfo channelInfo = unionAppUserService.findCommissionPositionID(unionAppUserESMap, true);
-                        long pid = channelInfo.getChannel_id();
+                        long pid = 0;
+                        if (channelInfo != null) {
+                            pid = channelInfo.getChannel_id();
+                        }
                         PromotionCodeParams promotionCodeParams = new PromotionCodeParams();
                         promotionCodeParams.setApp_key(JDConfig.APP_KEY);
                         promotionCodeParams.setApp_secret(JDConfig.SECRET_KEY);
@@ -374,7 +379,10 @@ public class UnionAppUserController {
                         }
                     } else {
                         ChannelInfo channelInfo = unionAppUserService.findCommissionPositionID(unionAppUserESMap, true);
-                        long pid = channelInfo.getChannel_id();
+                        long pid = 0;
+                        if (channelInfo != null) {
+                            pid = channelInfo.getChannel_id();
+                        }
                         PromotionCodeCommonParams promotionCodeCommonParams = new PromotionCodeCommonParams();
                         promotionCodeCommonParams.setApp_key(JDConfig.APP_KEY);
                         promotionCodeCommonParams.setApp_secret(JDConfig.SECRET_KEY);

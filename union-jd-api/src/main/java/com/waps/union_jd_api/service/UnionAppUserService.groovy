@@ -81,7 +81,7 @@ class UnionAppUserService {
             if (_loadAppUserMap) {
                 println "用户已存在:" + _loadAppUserMap.getUser_name() + " id:" + _loadAppUserMap.getId()
                 if (!StringUtils.isNull(_loadAppUserMap.getF_code())) {
-                    unionAppUserESMap.setF_code(_loadAppUserMap.getF_code())
+                    unionAppUserESMap.setF_code(_loadAppUserMap.getF_code().replaceAll(" ", ""))
                 } else if (!StringUtils.isNull(_loadAppUserMap.getF_user_id())) {
                     unionAppUserESMap.setF_code(makeInviteCode(_loadAppUserMap.getF_user_id()))
                 }
@@ -101,6 +101,7 @@ class UnionAppUserService {
 
             //有邀请码的情况
             if (!StringUtils.isNull(unionAppUserESMap.getF_code())) {
+                unionAppUserESMap.setF_code(unionAppUserESMap.getF_code().replaceAll(" ", ""))
                 //找到上级用户信息
                 UnionAppUserESMap f_userMap = loadUserByUCode(unionAppUserESMap.getF_code())
                 if (f_userMap != null) {
@@ -268,7 +269,7 @@ class UnionAppUserService {
 
         if (unionAppUserESMap && StringUtils.isNull(unionAppUserESMap.getF_id()) && StringUtils.isNull(unionAppUserESMap.getChannel_id())) {
             ChannelInfo channelInfo = findCommissionPositionID(unionAppUserESMap, true)
-            if (channelInfo.getChannel_id() > 0) {
+            if (channelInfo != null && channelInfo.getChannel_id() > 0) {
                 unionAppUserESMap.setF_id(channelInfo.getChannel_id() + "")
                 unionAppUserESMap.setF_name(channelInfo.getChannel_name())
                 isUpdate = true
@@ -587,7 +588,6 @@ class UnionAppUserService {
 //        println "上级邀请码:" + f_code
         if (true) {
             UnionAppUserESMap f_userMap = loadUserByUCode(f_code)
-
             if (f_userMap) {
                 if (f_userMap.getChannel_id()) {
                     println "找到佣金收益 channel_id:" + f_userMap.getChannel_id() + "  channel_name:" + f_userMap.getChannel_name() + "  " +

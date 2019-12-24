@@ -3,6 +3,10 @@ package com.waps.union_jd_api.utils;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.Map;
 
 public class HttpUtils {
     public static String postJsonInputStream(String urlString, String jsonString, String savePath) {
@@ -101,8 +105,8 @@ public class HttpUtils {
                 result.append(line);
             }
         } catch (Exception e) {
-            System.out.println("getUrl ERROR:"+e.getLocalizedMessage());
-            System.out.println("getUrl ERROR:"+urlString);
+            System.out.println("getUrl ERROR:" + e.getLocalizedMessage());
+            System.out.println("getUrl ERROR:" + urlString);
 //            e.printStackTrace();
         }
         //关闭输入流
@@ -146,7 +150,6 @@ public class HttpUtils {
             while ((lines = reader.readLine()) != null) {
                 sb.append(lines);
             }
-            System.out.println("ret:" + sb);
             reader.close();
             // 断开连接
             connection.disconnect();
@@ -160,5 +163,54 @@ public class HttpUtils {
             }
         }
         return sb.toString();
+    }
+
+    public static String postFormParams(String urlString, Map<String, String> params) {
+        StringBuilder returnContent = new StringBuilder();
+        HttpURLConnection connection = null;
+        try {
+            // 创建连接
+            URL url = new URL(urlString);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.setUseCaches(false);
+            connection.setInstanceFollowRedirects(true);
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            connection.connect();
+            DataOutputStream out = new DataOutputStream(
+                    connection.getOutputStream());
+            Iterator it = params.keySet().iterator();
+            StringBuilder content = new StringBuilder();
+            while (it.hasNext()) {
+                String key = (String) it.next();
+                String value = params.get(key);
+                content.append(key).append("=").append(URLEncoder.encode(value, "UTF-8")).append("&");
+            }
+            out.writeBytes(content.toString());
+            out.flush();
+            out.close();
+            // 读取响应
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    connection.getInputStream(), StandardCharsets.UTF_8));//**注意点3**，需要此格式
+            String lines;
+
+            while ((lines = reader.readLine()) != null) {
+                returnContent.append(lines);
+            }
+            reader.close();
+            // 断开连接
+            connection.disconnect();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            System.out.println("postJsonString ERROR:" + e.getLocalizedMessage());
+            return null;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+        return returnContent.toString();
     }
 }
