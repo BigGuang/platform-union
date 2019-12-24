@@ -33,7 +33,7 @@ class JtbApiService {
     public String loginBySessionID(String sessionId) {
         Map<String, String> params = new HashMap<>()
         params.put("sessionId", sessionId)
-        String jsonStr = HttpUtils.postFormParams(Config.JTB_LOGIN_ACCOUNT_URL, params)
+        String jsonStr = HttpUtils.postFormParams(Config.JTB_LOGIN_SESSION_ID_URL, params)
         println jsonStr
         JSONObject jsonObject = JSONObject.parseObject(jsonStr)
         String new_sessionId = jsonObject.getJSONObject("data").get("sessionId")
