@@ -150,8 +150,12 @@ public class JDOrderLogService {
                         }
                         if (!StringUtils.isNull(skuInfoESMap.getExt1()) && skuInfoESMap.getExt1().contains("_")) {
                             String[] group = skuInfoESMap.getExt1().split("_");
-                            skuInfoESMap.setExt1_positionId(group[0]);
-                            skuInfoESMap.setExt1_user(group[1]);
+                            if (group.length == 2) {
+                                skuInfoESMap.setExt1_positionId(group[0]);
+                                skuInfoESMap.setExt1_user(group[1]);
+                            } else {
+                                skuInfoESMap.setExt1_positionId(skuInfoESMap.getExt1());
+                            }
                         }
                         newSkuList.add(skuInfoESMap);
                     }
