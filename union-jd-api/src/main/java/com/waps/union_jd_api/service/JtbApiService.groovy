@@ -1,14 +1,29 @@
 package com.waps.union_jd_api.service
 
+import com.alibaba.fastjson.JSONArray
 import com.alibaba.fastjson.JSONObject
 import com.waps.tools.security.MD5
 import com.waps.union_jd_api.utils.Config
 import com.waps.union_jd_api.utils.HttpUtils
+import com.waps.utils.StringUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
 class JtbApiService {
 
+    @Autowired
+    private JDConvertLinkService jdConvertLinkService
+
+    /**
+     * 自动login
+     * @return
+     */
+    public String autoLogin() {
+        String _sessionID = loginByAccount()
+        String sessionID = loginBySessionID(_sessionID)
+        return sessionID
+    }
     /**
      * 京推宝 登录第一步接口
      * @return
@@ -59,7 +74,7 @@ class JtbApiService {
             try {
                 String fileName = new MD5().getMD5(imgUrl) + ".jpg"
                 String path = "/Users/xguang/temp06/" + fileName
-                byte[] imgByte= HttpUtils.getImageFromNetByUrl(imgUrl)
+                byte[] imgByte = HttpUtils.getImageFromNetByUrl(imgUrl)
                 params.put("file", imgByte)
 
 //                URL url = new URL(imgUrl)
@@ -155,7 +170,41 @@ class JtbApiService {
     }
 
 
-    public void syncSendDoneJob(){
+    public void syncSendDoneJob() {
+        String jd_host = "u.jd.com"
+        int page = 1
+        int size = 100
+        //先login 拿sessionID
+        String sessionId = null
+        if (StringUtils.isNull(sessionId)) {
+            sessionId = autoLogin()
+        }
+        JSONObject jsonObject = findSended(sessionId, page, size)
+        JSONObject dataObj = jsonObject.getJSONObject('data')
+        if (dataObj) {
+            JSONArray array = dataObj.getJSONArray('list')
+            for (int i = 0; i < array.size(); i++) {
+                JSONObject obj = array.getJSONObject(i)
+                SendDoneBean sendDoneBean=JSONObject.parseObject(obj.toString(),SendDoneBean.class) as SendDoneBean
+                //todo 找到内容中的链接，反向找skuID
+                List<String> urlList=jdConvertLinkService.getUrlList(sendDoneBean.getText(),jd_host)
+                Map<String,String> map=SeleniumService.threadGetCurrentUrl(urlList)
 
+            }
+        }
     }
+}
+
+class SendDoneBean {
+    int imageCount
+    int videoCount
+    int accountId
+    String images
+    int messageType
+    int weight
+    int robotMessageId
+    String videos
+    String text
+    String sendtime
+    int status
 }
