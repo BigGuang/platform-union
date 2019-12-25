@@ -185,11 +185,17 @@ class JtbApiService {
             JSONArray array = dataObj.getJSONArray('list')
             for (int i = 0; i < array.size(); i++) {
                 JSONObject obj = array.getJSONObject(i)
-                SendDoneBean sendDoneBean=JSONObject.parseObject(obj.toString(),SendDoneBean.class) as SendDoneBean
+                SendDoneBean sendDoneBean = JSONObject.parseObject(obj.toString(), SendDoneBean.class) as SendDoneBean
                 //todo 找到内容中的链接，反向找skuID
-                List<String> urlList=jdConvertLinkService.getUrlList(sendDoneBean.getText(),jd_host)
-                Map<String,String> map=SeleniumService.threadGetCurrentUrl(urlList)
-
+                List<String> urlList = jdConvertLinkService.getUrlList(sendDoneBean.getText(), jd_host)
+                Map<String, String> urlMap = SeleniumService.threadGetCurrentUrl(urlList)
+                Iterator it = urlMap.keySet().iterator()
+                while (it.hasNext()) {
+                    String key = it.next()
+                    String value = urlMap.get(key)
+                    String skuId = jdConvertLinkService.getSukIdFromUrl(value)
+                    println skuId
+                }
             }
         }
     }
