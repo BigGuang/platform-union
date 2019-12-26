@@ -47,42 +47,46 @@
         <property name="elasticSearchClusterNodes" value="10.1.0.8:9200"/>
     </bean>
 
+    <!-- 上传文件拦截，设置最大上传文件大小   10M=10*1024*1024(B)=10485760 bytes -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="10485760"/>
+    </bean>
 
 
-<!--    <context:component-scan base-package="com.waps.**"/>-->
-<!--    Netty相关配置-->
-<!--    <bean id="annotationPropertyConfigurerNetty"-->
-<!--          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
-<!--        <property name="order" value="1"/>-->
-<!--        <property name="ignoreUnresolvablePlaceholders" value="true"/>-->
-<!--        <property name="locations">-->
-<!--            <list>-->
-<!--                <value>classpath:netty.properties</value>-->
-<!--            </list>-->
-<!--        </property>-->
-<!--    </bean>-->
+    <!--    <context:component-scan base-package="com.waps.**"/>-->
+    <!--    Netty相关配置-->
+    <!--    <bean id="annotationPropertyConfigurerNetty"-->
+    <!--          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
+    <!--        <property name="order" value="1"/>-->
+    <!--        <property name="ignoreUnresolvablePlaceholders" value="true"/>-->
+    <!--        <property name="locations">-->
+    <!--            <list>-->
+    <!--                <value>classpath:netty.properties</value>-->
+    <!--            </list>-->
+    <!--        </property>-->
+    <!--    </bean>-->
 
-<!--    <bean id="nettyDemoServer" class="com.robot.server.NettyServer" init-method="init"-->
-<!--          destroy-method="destory">-->
-<!--        <property name="port" value="${netty_port}"/>-->
-<!--    </bean>-->
+    <!--    <bean id="nettyDemoServer" class="com.robot.server.NettyServer" init-method="init"-->
+    <!--          destroy-method="destory">-->
+    <!--        <property name="port" value="${netty_port}"/>-->
+    <!--    </bean>-->
 
-<!--    <bean id="closeFutureHandler" class="com.robot.server.handlerImpl.CloseFutureHandler">-->
-<!--        <property name="nextHandler">-->
-<!--            <null/>-->
-<!--        </property>-->
-<!--    </bean>-->
+    <!--    <bean id="closeFutureHandler" class="com.robot.server.handlerImpl.CloseFutureHandler">-->
+    <!--        <property name="nextHandler">-->
+    <!--            <null/>-->
+    <!--        </property>-->
+    <!--    </bean>-->
 
-<!--    <bean id="exceptionFutureHandler" class="com.robot.server.handlerImpl.ExceptionFutureHandler">-->
-<!--        <property name="nextHandler">-->
-<!--            <null/>-->
-<!--        </property>-->
-<!--    </bean>-->
+    <!--    <bean id="exceptionFutureHandler" class="com.robot.server.handlerImpl.ExceptionFutureHandler">-->
+    <!--        <property name="nextHandler">-->
+    <!--            <null/>-->
+    <!--        </property>-->
+    <!--    </bean>-->
 
-<!--    <bean id="bussinessFutureHandler" class="com.robot.server.handlerImpl.BussinessFutureHandler">-->
-<!--        <property name="nextHandler">-->
-<!--            <null/>-->
-<!--        </property>-->
-<!--    </bean>-->
+    <!--    <bean id="bussinessFutureHandler" class="com.robot.server.handlerImpl.BussinessFutureHandler">-->
+    <!--        <property name="nextHandler">-->
+    <!--            <null/>-->
+    <!--        </property>-->
+    <!--    </bean>-->
 
 </beans>
