@@ -65,6 +65,12 @@
     <task:scheduler id="scheduler" pool-size="10"/>
     <task:annotation-driven executor="executor" scheduler="scheduler"/>
 
+    <!-- 更新已发送信息每天上午00:20触发-->
+    <task:scheduler id="jtbApiService_findSendDone"/>
+    <task:scheduled-tasks scheduler="jtbApiService_findSendDone">
+        <task:scheduled ref="syncJTBSendLogJob" method="doSomething" cron="0 20 0 * * ?"/>
+    </task:scheduled-tasks>
+
     <!--    每分钟-->
 <!--        <task:scheduler id="jdOrderLogService_getOrderLogByDay_1min"/>-->
 <!--        <task:scheduled-tasks scheduler="jdOrderLogService_getOrderLogByDay_1min">-->

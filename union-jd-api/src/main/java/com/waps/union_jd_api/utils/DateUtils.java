@@ -12,4 +12,16 @@ public class DateUtils {
         res = simpleDateFormat.format(date);
         return res;
     }
+
+    public static String formatStringToDateString(String timeS) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = null;
+        try {
+            date = simpleDateFormat.parse(timeS);
+            return simpleDateFormat.format(date);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return "";
+    }
 }

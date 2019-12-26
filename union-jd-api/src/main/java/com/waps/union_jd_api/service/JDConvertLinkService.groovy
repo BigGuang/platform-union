@@ -6,15 +6,10 @@ import com.waps.service.jd.api.bean.PromotionCodeParams
 import com.waps.service.jd.api.bean.SearchParams
 import com.waps.service.jd.api.service.JdUnionService
 import com.waps.service.jd.es.domain.JDMediaInfoESMap
-import com.waps.tools.security.MD5
-import com.waps.tools.test.TestUtils
 import com.waps.union_jd_api.utils.JDConfig
-import com.waps.utils.Convert
 import com.waps.utils.StringUtils
 import jd.union.open.goods.query.response.Coupon
 import jd.union.open.goods.query.response.GoodsResp
-import jd.union.open.goods.query.response.UrlInfo
-import org.jsoup.helper.StringUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -230,7 +225,7 @@ class JDConvertLinkService {
             List<LinkBean> toConvertList = new ArrayList<>()
             if (oldUrlList.size() == 1) {
                 String oldUrl = oldUrlList[0]
-                String skuId = getSukIdFromUrl(oldUrl)
+                String skuId = getSkuIdFromUrl(oldUrl)
                 println "skuId:" + skuId
                 LinkBean linkBean = new LinkBean();
                 if (!StringUtils.isNull(skuId)) {
@@ -322,7 +317,7 @@ class JDConvertLinkService {
             String info = mt.group()
             if (info) {
                 List<String> _urlList = getUrlList(info, null)
-                String _skuId = getSukIdFromInfo(info)
+                String _skuId = getSkuIdFromInfo(info)
                 if (_urlList.size() > 0 && !StringUtils.isNull(_skuId)) {
                     String _str = _skuId + ";" + _urlList.get(0)
                     infoMap.put(info, _str)
@@ -337,7 +332,7 @@ class JDConvertLinkService {
      * @param info
      * @return
      */
-    public String getSukIdFromInfo(String info) {
+    public String getSkuIdFromInfo(String info) {
         String regex = "([0-9]{6,})"  //至少6位的纯数字
         Pattern pt = Pattern.compile(regex)
         Matcher mt = pt.matcher(info)
@@ -352,7 +347,7 @@ class JDConvertLinkService {
      * @param url
      * @return
      */
-    public String getSukIdFromUrl(String url) {
+    public String getSkuIdFromUrl(String url) {
         String host = "/u.jd.com"
         println "url:" + url
         if (url) {

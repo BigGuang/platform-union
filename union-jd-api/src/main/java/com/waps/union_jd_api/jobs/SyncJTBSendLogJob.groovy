@@ -12,13 +12,12 @@ class SyncJTBSendLogJob {
     public void doSomething() {
 
         if (jtbApiService != null) {
-            println "开始执行:SyncJTBSendLogJob.findSended()"
-            jtbApiService.syncSendDoneJob()
-
+            println "开始执行:SyncJTBSendLogJob.findSendDone()"
+            jtbApiService.syncSendDoneJob(1, 100)
         } else {
             println "jdSkuInfoService is null"
         }
     }
 
-    String jobName = "jtbApiService_findSended"
+    String jobName = "jtbApiService_findSendDone"
 }

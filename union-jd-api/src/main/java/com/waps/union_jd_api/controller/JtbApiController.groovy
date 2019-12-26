@@ -80,10 +80,41 @@ class JtbApiController {
             @RequestParam(value = "pageSize", required = true) Integer pageSize,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        String retJson = jtbApiService.findSended(sessionId, pageIndex, pageSize)
+        String retJson = jtbApiService.findSendDone(sessionId, pageIndex, pageSize)
         JSONObject jsonObject = JSONObject.parseObject(retJson)
         if (jsonObject != null) {
             ResponseUtils.writeJsonObject(response, jsonObject)
+        } else {
+            ResponseUtils.write(response, new ReturnMessageBean(500, "出现错误"))
+        }
+    }
+
+    @RequestMapping(value = "/send_done_sku")
+    public void findSendDoneSku(
+            @RequestParam(value = "start_time", required = true) String start_time,
+            @RequestParam(value = "end_time", required = true) String end_time,
+            @RequestParam(value = "page", required = true) Integer page,
+            @RequestParam(value = "size", required = true) Integer size,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        JSONObject jsonObject = jtbApiService.findSendDoneSku(start_time, end_time, page, size)
+        if (jsonObject != null) {
+            ResponseUtils.writeJsonObject(response, jsonObject)
+        } else {
+            ResponseUtils.write(response, new ReturnMessageBean(500, "出现错误"))
+        }
+    }
+
+
+    @RequestMapping(value = "/sync_send_done")
+    public void syncSendDone(
+            @RequestParam(value = "page", required = true) Integer page,
+            @RequestParam(value = "size", required = true) Integer size,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        String retJson = jtbApiService.syncSendDoneJob(page, size)
+        if (retJson != null) {
+            ResponseUtils.write(response, new ReturnMessageBean(200, "", retJson))
         } else {
             ResponseUtils.write(response, new ReturnMessageBean(500, "出现错误"))
         }

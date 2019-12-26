@@ -2,10 +2,17 @@ package com.waps.union_jd_api.service
 
 import com.alibaba.fastjson.JSONArray
 import com.alibaba.fastjson.JSONObject
+import com.waps.elastic.search.utils.PageUtils
+import com.waps.service.jd.es.domain.SkuBeanESMap
+import com.waps.service.jd.es.domain.UnionEditorLogESMap
+import com.waps.service.jd.es.service.UnionEditorLogESService
 import com.waps.tools.security.MD5
 import com.waps.union_jd_api.utils.Config
+import com.waps.union_jd_api.utils.DateUtils
 import com.waps.union_jd_api.utils.HttpUtils
 import com.waps.utils.StringUtils
+import org.elasticsearch.search.SearchHit
+import org.elasticsearch.search.SearchHits
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -14,6 +21,9 @@ class JtbApiService {
 
     @Autowired
     private JDConvertLinkService jdConvertLinkService
+
+    @Autowired
+    private UnionEditorLogESService unionEditorLogESService
 
     /**
      * 自动login
@@ -154,7 +164,7 @@ class JtbApiService {
      * @param pageSize
      * @return
      */
-    public JSONObject findSended(String sessionId, Integer pageIndex, Integer pageSize) {
+    public JSONObject findSendDone(String sessionId, Integer pageIndex, Integer pageSize) {
         Map<String, String> header = new HashMap<>()
         header.put("Content-Type", "application/x-www-form-urlencoded")
         header.put("Host", "jingtuibao.ixiaocong.net")
@@ -169,42 +179,84 @@ class JtbApiService {
         return jsonObject
     }
 
+    public JSONObject findSendDoneSku(String startTime, String endTime, Integer page, Integer size) {
+        PageUtils pageUtils = new PageUtils(page, size)
+        Map<String, Object> params = new HashMap<>()
+        if (startTime && startTime.length() <= 11) {
+            startTime = startTime + " 00:00:00"
+        }
+        if (endTime && endTime.length() <= 11) {
+            endTime = endTime + " 23:59:59"
+        }
+        params.put("start_time", startTime)
+        params.put("end_time", endTime)
+        params.put("from", pageUtils.getFrom())
+        params.put("size", pageUtils.getSize())
+        SearchHits hits = unionEditorLogESService.findByFreeMarkerFromResource("es_script/jtb_send_done.json", params)
+        long total = hits.getTotalHits().value
+        SearchHit[] searchHits = hits.getHits()
+        List<UnionEditorLogESMap> list = new ArrayList<>()
+        for (SearchHit hit : searchHits) {
+            UnionEditorLogESMap unionEditorLogESMap = unionEditorLogESService.getObjectFromJson(hit.getSourceAsString(), UnionEditorLogESMap.class) as UnionEditorLogESMap
+            list.add(unionEditorLogESMap)
+        }
+        Map<String, Object> map = new HashMap<>()
+        map.put("total", total)
+        map.put("list", list)
+        return map as JSONObject
+    }
 
-    public void syncSendDoneJob() {
+
+    /**
+     * 批量同步
+     */
+    public String syncSendDoneJob(int page, int size) {
         String jd_host = "u.jd.com"
-        int page = 1
-        int size = 100
+        if (page < 1) {
+            page = 1
+        }
+        if (size < 1) {
+            size = 1
+        }
         //先login 拿sessionID
         String sessionId = null
         if (StringUtils.isNull(sessionId)) {
             sessionId = autoLogin()
         }
-        JSONObject jsonObject = findSended(sessionId, page, size)
+        JSONObject jsonObject = findSendDone(sessionId, page, size)
         JSONObject dataObj = jsonObject.getJSONObject('data')
+
         if (dataObj) {
             JSONArray array = dataObj.getJSONArray('list')
             for (int i = 0; i < array.size(); i++) {
                 JSONObject obj = array.getJSONObject(i)
-                SendDoneBean sendDoneBean=JSONObject.parseObject(obj.toString(),SendDoneBean.class) as SendDoneBean
+                UnionEditorLogESMap unionEditorLogESMap = JSONObject.parseObject(obj.toString(), UnionEditorLogESMap.class) as UnionEditorLogESMap
                 //todo 找到内容中的链接，反向找skuID
-                List<String> urlList=jdConvertLinkService.getUrlList(sendDoneBean.getText(),jd_host)
-                Map<String,String> map=SeleniumService.threadGetCurrentUrl(urlList)
-
+                List<SkuBeanESMap> skuList = new ArrayList<>()
+                List<String> urlList = jdConvertLinkService.getUrlList(unionEditorLogESMap.getText(), jd_host)
+                for (String url : urlList) {
+                    if (url) {
+                        println "获取已发信息:" + unionEditorLogESMap.getRobotMessageId() + " " + unionEditorLogESMap.getSendtime() + " " + unionEditorLogESMap.getMessageType()
+                        String skuId = jdConvertLinkService.getSkuIdFromUrl(url)
+                        println "skuId:" + skuId
+                        if (!StringUtils.isNull(skuId)) {
+                            SkuBeanESMap skuBeanESMap = new SkuBeanESMap()
+                            skuBeanESMap.setSkuId(skuId)
+                            skuList.add(skuBeanESMap)
+                        }
+                    }
+                }
+                unionEditorLogESMap.setSkuList(skuList)
+                unionEditorLogESMap.setSendtime(unionEditorLogESMap.getSendtime() + ":00")
+                unionEditorLogESMap.setCreatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
+                String id = new MD5().getMD5(unionEditorLogESMap.getRobotMessageId() + "")
+                unionEditorLogESMap.setId(id)
+                unionEditorLogESService.save(unionEditorLogESMap.getId(), unionEditorLogESMap)
+                "已发保存:" + i + "/" + array.size()
             }
+            return array.size() + ""
+        } else {
+            return 0 + ""
         }
     }
-}
-
-class SendDoneBean {
-    int imageCount
-    int videoCount
-    int accountId
-    String images
-    int messageType
-    int weight
-    int robotMessageId
-    String videos
-    String text
-    String sendtime
-    int status
 }
