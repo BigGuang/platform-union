@@ -198,7 +198,9 @@ public class ImageUtils {
             return targetFile;
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            return null;
+
         }
     }
 }

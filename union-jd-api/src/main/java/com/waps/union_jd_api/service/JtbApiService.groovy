@@ -101,7 +101,7 @@ class JtbApiService {
 //                fileOutputStream.close();
 //                params.put("file", new File(path))
 
-                String jsonStr = HttpUtils_bak.postFormParams(Config.JTB_UPLOAD_IMG_URL, params, header)
+                String jsonStr = HttpUtils.postFormParams(Config.JTB_UPLOAD_IMG_URL, params, header)
                 JSONObject jsonObject = JSONObject.parseObject(jsonStr)
                 return jsonObject
             } catch (Exception e) {
