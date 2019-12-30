@@ -38,6 +38,8 @@ class Config {
     final static String JTB_ADD_SEND_URL="https://jingtuibao.ixiaocong.net/api/robotMessage/add"
     final static String JTB_SEND_WAITING_URL="https://jingtuibao.ixiaocong.net/api/robotMessage/findSendWating"
     final static String JTB_SEND_ED_URL="https://jingtuibao.ixiaocong.net/api/robotMessage/findSended"
+    final static String JTB_MESSAGE_DEL_URL="https://jingtuibao.ixiaocong.net/api/robotMessage/delete"
+    final static String JTB_MESSAGE_UPDATE_URL="https://jingtuibao.ixiaocong.net/api/robotMessage/update"
 
 
 }

@@ -8,6 +8,15 @@ import com.waps.service.jd.es.domain.JDSkuInfoESMap
 import com.waps.service.jd.es.service.JDSkuInfoESService
 import com.waps.union_jd_api.utils.DateUtils
 import com.waps.union_jd_api.utils.JDConfig
+import org.apache.commons.collections.map.LinkedMap
+import org.apache.lucene.queryparser.flexible.core.builders.QueryBuilder
+import org.elasticsearch.action.search.SearchRequest
+import org.elasticsearch.index.query.BoolQueryBuilder
+import org.elasticsearch.index.query.MatchAllQueryBuilder
+import org.elasticsearch.index.query.QueryBuilders
+import org.elasticsearch.search.SearchHit
+import org.elasticsearch.search.SearchHits
+import org.elasticsearch.search.builder.SearchSourceBuilder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -87,5 +96,39 @@ class JDSkuInfoService {
         } else {
             return null
         }
+    }
+
+    public List<Object> getSkuListBySkuIDs(String[] ids) {
+        LinkedMap idsMap = new LinkedMap()
+        for (int i = 0; i < ids.length; i++) {
+            idsMap.put(ids[i], ids[i])
+        }
+        QueryBuilder query
+        if (ids != null) {
+            query = QueryBuilders.termsQuery("skuId", ids) as QueryBuilder
+        } else {
+            query = new MatchAllQueryBuilder();
+        }
+
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.query(query as org.elasticsearch.index.query.QueryBuilder)
+        sourceBuilder.explain(true)// 设置是否按查询匹配度排序
+        sourceBuilder.from(0)
+        sourceBuilder.size(ids.length)
+        SearchRequest searchRequest = new SearchRequest()
+        searchRequest.source(sourceBuilder)
+
+        SearchHits hits = jdSkuInfoESService.find(searchRequest)
+        SearchHit[] hitList = hits.getHits()
+        for (int i = 0; i < hitList.length; i++) {
+            SearchHit hit = hitList[i]
+            Map map = hit.getSourceAsMap()
+            String _skuId = (String) map.get("skuId")
+            if (idsMap.get(_skuId) != null) {
+                idsMap.put(_skuId, map)
+            }
+        }
+        List<Object> list = idsMap.values().asList()
+        return list
     }
 }

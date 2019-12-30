@@ -135,6 +135,60 @@ class JtbApiService {
     }
 
     /**
+     * 删除消息
+     * @param sessionId
+     * @param robotMessageId
+     * @return
+     */
+    public JSONObject deleteMessage(String sessionId, Integer robotMessageId) {
+        Map<String, String> header = new HashMap<>()
+        header.put("Content-Type", "application/x-www-form-urlencoded")
+        header.put("Host", "jingtuibao.ixiaocong.net")
+        header.put("Origin", "https://jingtuibao.ixiaocong.net")
+        header.put("Cookie", "Admin-Token=" + sessionId)
+        Map<String, String> params = new HashMap<>()
+        params.put("sessionId", sessionId)
+        params.put("robotMessageId", robotMessageId)
+        String jsonStr = HttpUtils.postFormParams(Config.JTB_MESSAGE_DEL_URL, params, header)
+        JSONObject jsonObject = JSONObject.parseObject(jsonStr)
+        return jsonObject
+    }
+
+    /**
+     * 更新消息
+     * @param sessionId
+     * @param robotMessageId
+     * @param weight
+     * @return
+     */
+    public JSONObject updateMessage(String sessionId, JtbMessageBean messageBean) {
+        Map<String, String> header = new HashMap<>()
+        header.put("Content-Type", "application/x-www-form-urlencoded")
+        header.put("Host", "jingtuibao.ixiaocong.net")
+        header.put("Origin", "https://jingtuibao.ixiaocong.net")
+        header.put("Cookie", "Admin-Token=" + sessionId)
+        Map<String, String> params = new HashMap<>()
+        params.put("sessionId", sessionId)
+        params.put("robotMessageId", messageBean.getRobotMessageId())
+        if (messageBean.getWeight() > 0) {
+            params.put("weight", messageBean.getWeight())
+        }
+        if (messageBean.getText()) {
+            params.put("text", messageBean.getText())
+        }
+        if (messageBean.getImages()) {
+            params.put("images", messageBean.getImages())
+        }
+        if (messageBean.getVideos()) {
+            params.put("videos", messageBean.getVideos())
+        }
+
+        String jsonStr = HttpUtils.postFormParams(Config.JTB_MESSAGE_UPDATE_URL, params, header)
+        JSONObject jsonObject = JSONObject.parseObject(jsonStr)
+        return jsonObject
+    }
+
+    /**
      * 待发送队列
      * @param sessionId
      * @param pageIndex
@@ -259,4 +313,13 @@ class JtbApiService {
             return 0 + ""
         }
     }
+}
+
+class JtbMessageBean {
+    String sessionId
+    String images
+    int weight
+    int robotMessageId
+    String videos
+    String text
 }

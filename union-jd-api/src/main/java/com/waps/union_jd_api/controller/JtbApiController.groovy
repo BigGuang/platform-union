@@ -3,6 +3,7 @@ package com.waps.union_jd_api.controller
 import com.alibaba.fastjson.JSONObject
 import com.waps.union_jd_api.bean.ReturnMessageBean
 import com.waps.union_jd_api.service.JtbApiService
+import com.waps.union_jd_api.service.JtbMessageBean
 import com.waps.utils.ResponseUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
@@ -50,6 +51,33 @@ class JtbApiController {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         JSONObject jsonObject = jtbApiService.addSendList(params.getSessionId(), params.getText(), params.getImages(), params.getVideos(), params.getPlanTime())
+        if (jsonObject != null) {
+            ResponseUtils.writeJsonObject(response, jsonObject)
+        } else {
+            ResponseUtils.write(response, new ReturnMessageBean(500, "出现错误"))
+        }
+    }
+
+    @RequestMapping(value = "/delete_send")
+    public void deleteSend(
+            @RequestParam(value = "sessionId", required = true) String sessionId,
+            @RequestParam(value = "robotMessageId", required = true) Integer robotMessageId,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        JSONObject jsonObject = jtbApiService.deleteMessage(sessionId, robotMessageId)
+        if (jsonObject != null) {
+            ResponseUtils.writeJsonObject(response, jsonObject)
+        } else {
+            ResponseUtils.write(response, new ReturnMessageBean(500, "出现错误"))
+        }
+    }
+
+    @RequestMapping(value = "/update_send")
+    public void updateSend(
+            @RequestBody JtbMessageBean messageBean,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        JSONObject jsonObject = jtbApiService.updateMessage(messageBean.getSessionId(), messageBean)
         if (jsonObject != null) {
             ResponseUtils.writeJsonObject(response, jsonObject)
         } else {
