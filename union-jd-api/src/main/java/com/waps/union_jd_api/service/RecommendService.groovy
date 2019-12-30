@@ -1,6 +1,8 @@
 package com.waps.union_jd_api.service
 
+import com.alibaba.fastjson.JSONObject
 import com.waps.elastic.search.utils.PageUtils
+import com.waps.service.jd.es.domain.JDSkuInfoESMap
 import com.waps.service.jd.es.domain.SkuBeanESMap
 import com.waps.service.jd.es.domain.UnionEditorLogESMap
 import com.waps.service.jd.es.service.UnionEditorLogESService
@@ -19,7 +21,7 @@ class RecommendService {
     @Autowired
     private JDSkuInfoService jdSkuInfoService
 
-    public String editorRecommend(String startTime, String endTime, Integer page, Integer size) {
+    public List<JDSkuInfoESMap> editorRecommend(String startTime, String endTime, Integer page, Integer size) {
         PageUtils pageUtils = new PageUtils(page, size)
         Map<String, Object> params = new HashMap<>()
         if (startTime && startTime.length() <= 11) {
@@ -35,18 +37,22 @@ class RecommendService {
         SearchHits hits = unionEditorLogESService.findByFreeMarkerFromResource("es_script/jtb_send_done.json", params)
         long total = hits.getTotalHits().value
         SearchHit[] searchHits = hits.getHits()
-        List<String> skuIdList=new ArrayList<>()
+        List<String> skuIdList = new ArrayList<>()
         List<UnionEditorLogESMap> list = new ArrayList<>()
         for (SearchHit hit : searchHits) {
             UnionEditorLogESMap unionEditorLogESMap = unionEditorLogESService.getObjectFromJson(hit.getSourceAsString(), UnionEditorLogESMap.class) as UnionEditorLogESMap
-            if(unionEditorLogESMap.getSkuList()){
-                for(SkuBeanESMap skuBeanESMap in unionEditorLogESMap.getSkuList()){
-                    if(!StringUtils.isNull(skuBeanESMap.getSkuId())){
+            if (unionEditorLogESMap.getSkuList()) {
+                for (SkuBeanESMap skuBeanESMap in unionEditorLogESMap.getSkuList()) {
+                    if (!StringUtils.isNull(skuBeanESMap.getSkuId())) {
                         skuIdList.add(skuBeanESMap.getSkuId())
                     }
                 }
             }
-            list.add(unionEditorLogESMap)
         }
+        String[] skuList = skuIdList.toArray(String[])
+        println skuList
+
+        List<JDSkuInfoESMap> recommendList=jdSkuInfoService.getSkuListBySkuIDs(skuList)
+        return recommendList
     }
 }

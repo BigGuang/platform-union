@@ -98,11 +98,7 @@ class JDSkuInfoService {
         }
     }
 
-    public List<Object> getSkuListBySkuIDs(String[] ids) {
-        LinkedMap idsMap = new LinkedMap()
-        for (int i = 0; i < ids.length; i++) {
-            idsMap.put(ids[i], ids[i])
-        }
+    public List<JDSkuInfoESMap> getSkuListBySkuIDs(String[] ids) {
         QueryBuilder query
         if (ids != null) {
             query = QueryBuilders.termsQuery("skuId", ids) as QueryBuilder
@@ -118,17 +114,22 @@ class JDSkuInfoService {
         SearchRequest searchRequest = new SearchRequest()
         searchRequest.source(sourceBuilder)
 
+        List<JDSkuInfoESMap> list = new ArrayList()
         SearchHits hits = jdSkuInfoESService.find(searchRequest)
         SearchHit[] hitList = hits.getHits()
-        for (int i = 0; i < hitList.length; i++) {
-            SearchHit hit = hitList[i]
-            Map map = hit.getSourceAsMap()
-            String _skuId = (String) map.get("skuId")
-            if (idsMap.get(_skuId) != null) {
-                idsMap.put(_skuId, map)
+        for (int i = 0; i < ids.length; i++) {
+            String skuId = ids[i]
+            for (int k = 0; k < hitList.length; k++) {
+                SearchHit hit = hitList[k]
+                Map<String, Object> map = hit.getSourceAsMap()
+                String _skuId = (String) map.get("skuId")
+                if (skuId == _skuId) {
+                    String json=hit.getSourceAsString()
+                    JDSkuInfoESMap jdSkuInfoESMap=jdSkuInfoESService.getObjectFromJson(json,JDSkuInfoESMap.class) as JDSkuInfoESMap
+                    list.add(jdSkuInfoESMap)
+                }
             }
         }
-        List<Object> list = idsMap.values().asList()
         return list
     }
 }
