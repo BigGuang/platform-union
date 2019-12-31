@@ -3,11 +3,17 @@ package com.waps.union_jd_api.controller
 import com.waps.tools.security.MD5
 import com.waps.tools.test.TestUtils
 import com.waps.union_jd_api.bean.ReturnMessageBean
+import com.waps.union_jd_api.service.JtbMessageBean
+import com.waps.union_jd_api.utils.ImageUtils
+import com.waps.utils.ConfigUtils
 import com.waps.utils.DateUtils
 import com.waps.utils.ResponseUtils
 import com.waps.utils.StringUtils
 import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
@@ -52,8 +58,32 @@ class ImageController {
             println url
             multipartFile.transferTo(new File(saveRealPath))
             ResponseUtils.write(response, new ReturnMessageBean(200, "", url))
-        }catch(Exception e){
+        } catch (Exception e) {
             ResponseUtils.write(response, new ReturnMessageBean(500, "文件上传出现错误"))
         }
     }
+
+    @RequestMapping(value = "/puzzle", method = RequestMethod.POST)
+    public void puzzle(
+            @RequestBody ImagesBean imagesBean,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+
+        String IMG_URI = "/jd_union/send_images/"
+        if (imagesBean.getImg_list().length > 0) {
+            String path = ImageUtils.mergeImage(imagesBean.getImg_list(), 1, new ConfigUtils().getHtmlDirPath() + IMG_URI + System.currentTimeMillis() + ".jpg")
+            if (!StringUtils.isNull(path)) {
+                println "path:" + path
+                path = path.replaceAll(new ConfigUtils().getHtmlDirPath(), new ConfigUtils().getApiHost())
+                ResponseUtils.write(response, new ReturnMessageBean(200, "", path))
+            }
+        } else {
+            ResponseUtils.write(response, new ReturnMessageBean(500, "至少要有一张图片"))
+        }
+
+    }
+}
+
+class ImagesBean {
+    String[] img_list
 }
