@@ -31,6 +31,7 @@ class WeChatRobotService {
 
     final static String CMD_HELP = "帮助,help"
     final static String CMD_CREATE_CHANNEL = "建群"
+    final static String CMD_RED_PACKET = "红包"
 
     @Autowired
     JDSkuRobotService jdSkuRobotService
@@ -43,6 +44,9 @@ class WeChatRobotService {
 
     @Autowired
     UnionUserService unionUserService
+
+    @Autowired
+    JDConvertLinkService jdConvertLinkService
 
     /**
      * 收到消息
@@ -134,14 +138,18 @@ class WeChatRobotService {
 
             //匹配出搜索词
             String search = getSearchWrods(content)
+            println "===isBlack===" + isBlack + "  search:" + search + "  CMD_RED_PACKET:" + CMD_RED_PACKET
             if (!isBlack) {
                 if (!StringUtils.isNull(search)) {
                     sendMessageFlg = 1  //正常搜索回复内容
-                    if (CMD_HELP.indexOf(search) > -1) {
-                        sendMessageFlg == 3
+                    if (search.indexOf(CMD_RED_PACKET.trim()) > -1) {
+                        sendMessageFlg = 11
+                    }else if (CMD_HELP.indexOf(search) > -1) {
+                        sendMessageFlg = 3
                     } else if (CMD_CREATE_CHANNEL.indexOf(search) > -1) {
-                        sendMessageFlg == 4
+                        sendMessageFlg = 4
                     }
+                    println "===sendMessageFlg " + sendMessageFlg + "=="
 
                 } else {
                     sendMessageFlg = 2  //搜索内容不正确，回复帮助内容
@@ -182,6 +190,16 @@ class WeChatRobotService {
             //自助建群
             if (sendMessageFlg == 4) {
 //                    sendUrl(chatId, token, "http://jd.wapg.cn", "建群", "自助建群", "http://api.wapg.cn/jd_union/images/create.jpg")
+            }
+
+            if (sendMessageFlg == 11) {
+
+                println "==红包=="
+                String redUrl = "https://u.jd.com/mvTWWA"
+                String url = jdConvertLinkService.convertUrl(redUrl, channelName)
+                if (!StringUtils.isNull(url)) {
+                    sendUrl(chatId, token, url, "年货节.京享红包", "最高888元,全品类,无门槛,可叠加", "https://jd.wapg.cn/images/red.jpg")
+                }
             }
 
             if (sendMessageFlg == 5) {

@@ -475,6 +475,26 @@ class JDConvertLinkService {
         return shortUrl
     }
 
+    /**
+     * 直接转链
+     * @param url
+     * @param channel_name
+     * @return
+     */
+    public String convertUrl(String url, String channel_name) {
+        if(!StringUtils.isNull(url)) {
+            Long pid = getPositionId(channel_name)
+            if (pid > 0) {
+                String newUrl = getNewLink(url, null, pid)
+                return newUrl
+            } else {
+                return null
+            }
+        }else{
+            return null
+        }
+    }
+
 
     /**
      * 查找优惠券

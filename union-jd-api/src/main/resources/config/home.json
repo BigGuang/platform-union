@@ -1,0 +1,76 @@
+{
+  "back_img": "",
+  "back_color": "#DC0411",
+  "home_rank": "banner,news,actives,grid,hot",
+  "banner": {
+    "list": [
+      {
+        "img": "https://jd.wapg.cn/images/banner_1.jpg",
+        "url": "http://jd.wapg.cn/#/pop_activities_page"
+      },
+      {
+        "img": "http://img30.360buyimg.com/ads/jfs/t1/86408/4/8553/143620/5e05f0f7E9dc33da1/0f6532a3a1ebc2bf.jpg",
+        "url": "https://pro.m.jd.com/mall/active/2HTEp2ofgWpvUFi3xupP5vGRD7Am/index.html",
+        "title": "家电年货节"
+      },
+      {
+        "img": "http://img30.360buyimg.com/ads/jfs/t1/102492/22/8415/53606/5e046735Ef0106022/3b393ce868605fbe.jpg",
+        "url": "https://pro.m.jd.com/mall/active/4SnfiHHw22faQXJnVgS84TLhr92q/index.html",
+        "title": "手机新年好礼"
+      }
+    ]
+  },
+  "news": {
+    "list": [
+      {
+        "icon": "",
+        "url": "",
+        "title": ""
+      }
+    ]
+  },
+  "actives": {
+    "list": [
+      {
+        "img": "http://img30.360buyimg.com/ads/jfs/t1/86408/4/8553/143620/5e05f0f7E9dc33da1/0f6532a3a1ebc2bf.jpg",
+        "url": "https://pro.m.jd.com/mall/active/2HTEp2ofgWpvUFi3xupP5vGRD7Am/index.html",
+        "title": "家电年货节"
+      },
+      {
+        "img": "http://img30.360buyimg.com/ads/jfs/t1/102492/22/8415/53606/5e046735Ef0106022/3b393ce868605fbe.jpg",
+        "url": "https://pro.m.jd.com/mall/active/4SnfiHHw22faQXJnVgS84TLhr92q/index.html",
+        "title": "手机新年好礼"
+      },
+      {
+        "img": "http://img30.360buyimg.com/ads/jfs/t1/99977/30/8264/100810/5e0412f6Ec7a162e1/60f4b0f67701509c.jpg",
+        "url": "https://pro.m.jd.com/mall/active/2AHoCzKcQNxDYwg3nTWSM7eaC7UP/index.html",
+        "title": "辞旧迎新 跨新年"
+      }
+    ]
+  },
+  "grid": {
+    "list": [
+      {
+        "type": 1,
+        "img": "",
+        "url": ""
+      }
+    ]
+  },
+  "hot": {
+    "list": [
+      {
+        "url": ""
+      }
+    ]
+  },
+  "more": {
+    "tabs": [
+      {
+        "id": "",
+        "title": "",
+        "url": ""
+      }
+    ]
+  }
+}

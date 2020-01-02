@@ -9,7 +9,7 @@
 "filter": [
 {
 "prefix": {
-"channel_name": "W"
+"channel_name": "W10"
 }
 }
 ]
