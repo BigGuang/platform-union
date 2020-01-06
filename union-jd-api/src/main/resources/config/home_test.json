@@ -1,0 +1,126 @@
+{
+  "components_list": [
+    {
+      "component": "banner",
+      "props": {
+        "icon": "",
+        "title": "",
+        "round": true,
+        "auto_play": 8000,
+        "list": [
+          {
+            "type": 1,
+            "img": "https://jd.wapg.cn/images/banner_1.jpg",
+            "desc": "1.复制以下文案并微信发送给自己↵2.通过微信访问活动地址购买↵",
+            "title": "活动详情",
+            "content": "🔥赶快抢【京享红包】最高888元🎁每天抢3次，抢到就是赚到😄↵⏰1月7日红包奖池加倍！👇↵主会场👉https://u.jd.com/gczJdq↵🎉超市会场👉https://u.jd.com/CBnJ6a",
+            "share_img": "https://jd.wapg.cn/images/share_pop.jpg"
+          },
+          {
+            "type": 2,
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/86408/4/8553/143620/5e05f0f7E9dc33da1/0f6532a3a1ebc2bf.jpg",
+            "title": "家电年货节",
+            "url": "https://pro.m.jd.com/mall/active/2HTEp2ofgWpvUFi3xupP5vGRD7Am/index.html"
+          },
+          {
+            "type": 2,
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/102492/22/8415/53606/5e046735Ef0106022/3b393ce868605fbe.jpg",
+            "title": "手机新年好礼",
+            "url": "https://pro.m.jd.com/mall/active/4SnfiHHw22faQXJnVgS84TLhr92q/index.html"
+          }
+        ]
+      }
+    },
+    {
+      "component": "grid",
+      "props": {
+        "icon": "",
+        "text": "",
+        "round": false,
+        "column_num": 4,
+        "square": true,
+        "list": [
+          {
+            "type": 1,
+            "img": "https://jd.wapg.cn/images/wan_icon_2.png",
+            "desc": "1.复制以下文案并微信发送给自己↵2.通过微信访问活动地址购买↵",
+            "title": "活动详情",
+            "content": "🔥赶快抢【京享红包】最高888元🎁每天抢3次，抢到就是赚到😄↵⏰1月7日红包奖池加倍！👇↵主会场👉https://u.jd.com/gczJdq↵🎉超市会场👉https://u.jd.com/CBnJ6a",
+            "share_img": "https://jd.wapg.cn/images/share_pop.jpg"
+          },
+          {
+            "type": 2,
+            "img": "https://jd.wapg.cn/images/pin_icon_2.png",
+            "url": ""
+          },
+          {
+            "type": 2,
+            "img": "https://jd.wapg.cn/images/jing_icon_2.png",
+            "url": ""
+          },
+          {
+            "type": 2,
+            "img": "https://jd.wapg.cn/images/xuan_icon_2.png",
+            "url": ""
+          }
+        ]
+      }
+    },
+    {
+      "component": "news",
+      "props": {
+        "list": [
+          {
+            "type": 1,
+            "icon": "https://jd.wapg.cn/images/favicon.png",
+            "message": "快来领红包!",
+            "desc": "1.复制以下文案并微信发送给自己↵2.通过微信访问活动地址购买↵",
+            "title": "活动详情",
+            "content": "🔥赶快抢【京享红包】最高888元🎁每天抢3次，抢到就是赚到😄↵⏰1月7日红包奖池加倍！👇↵主会场👉https://u.jd.com/gczJdq↵🎉超市会场👉https://u.jd.com/CBnJ6a",
+            "share_img": "https://jd.wapg.cn/images/share_pop.jpg"
+          },
+          {
+            "type": 2,
+            "icon": "https://jd.wapg.cn/images/favicon.png",
+            "message": "最高888元红包",
+            "url": "https://pro.m.jd.com/mall/active/4SnfiHHw22faQXJnVgS84TLhr92q/index.html"
+          }
+        ]
+      }
+    },
+    {
+      "component": "actives",
+      "props": {
+        "round": false,
+        "auto_play": 5000,
+        "list": [
+          {
+            "type": 2,
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/86408/4/8553/143620/5e05f0f7E9dc33da1/0f6532a3a1ebc2bf.jpg",
+            "title": "家电年货节",
+            "url": "https://pro.m.jd.com/mall/active/2HTEp2ofgWpvUFi3xupP5vGRD7Am/index.html"
+          },
+          {
+            "type": 2,
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/102492/22/8415/53606/5e046735Ef0106022/3b393ce868605fbe.jpg",
+            "title": "手机新年好礼",
+            "url": "https://pro.m.jd.com/mall/active/4SnfiHHw22faQXJnVgS84TLhr92q/index.html"
+          },
+          {
+            "type": 2,
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/99977/30/8264/100810/5e0412f6Ec7a162e1/60f4b0f67701509c.jpg",
+            "title": "辞旧迎新 跨新年",
+            "url": "https://pro.m.jd.com/mall/active/2AHoCzKcQNxDYwg3nTWSM7eaC7UP/index.html"
+          }
+        ]
+      }
+    },
+    {
+      "component": "hot",
+      "props": {
+        "auto_play": 7000,
+        "url": "http://api.wapg.cn/jd_union/recommend/editor?sTime=2019-12-10&eTime=2020-01-02&page=1&size=20"
+      }
+    }
+  ]
+}

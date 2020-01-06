@@ -6,8 +6,8 @@ public class JDConfig {
 
     //通用生成链接用，用于生成返利链接
     public final static String SITE_ID = "1911198812";
-    public final static String SITE_PID = "1915047849";
-    public final static Long SITE_PID_LONG = 1915047849L;
+    public final static String SITE_PID = "1993961493";
+    public final static Long SITE_PID_LONG = 1993961493L;
 
     public final static String BAD_WORDS_PATH = "/home/dictionary.txt";
 }

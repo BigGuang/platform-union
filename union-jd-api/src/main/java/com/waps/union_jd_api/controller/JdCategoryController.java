@@ -1,5 +1,6 @@
 package com.waps.union_jd_api.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.waps.service.jd.es.domain.JDCategoryESMap;
 import com.waps.union_jd_api.service.JDCategoryService;
@@ -44,12 +45,30 @@ public class JdCategoryController {
         String config_json = "api/category_type_home.json";
         File typeJson = new File(this.getClass().getClassLoader().getResource(config_json).getFile());
         String json = StringUtils.getFileTxt(typeJson.getPath());
-        ResponseUtils.write(response, json);
+        JSONObject object = JSONObject.parseObject(json);
+        JSONArray array = object.getJSONArray("data");
+        if (!StringUtils.isNull(type) && "type_1".equals(type)) {
+            int size = array.size();
+            if (size > 8) {
+                size = 8;
+            }
+            JSONArray _jsonArray = new JSONArray();
+            for (int i = 0; i < size; i++) {
+                JSONObject _object = (JSONObject) array.get(i);
+                _jsonArray.add(_object);
+            }
+            JSONObject _jsonObject = new JSONObject();
+            _jsonObject.put("data", _jsonArray);
+            ResponseUtils.write(response, _jsonObject.toString());
+        } else {
+            ResponseUtils.write(response, json);
+        }
     }
 
 
     /**
      * 京东活动
+     *
      * @param id
      * @param channel_name
      * @param request
