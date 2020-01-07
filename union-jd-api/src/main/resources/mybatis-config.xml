@@ -15,7 +15,7 @@
     </settings>
 
     <typeAliases>
-        <typeAlias alias="WapsJdUserMapper" type="com.waps.service.jd.db.mapper.WapsJdUserMapper"/>
+        <typeAlias alias="WapsJdUser" type="com.waps.service.jd.db.model.WapsJdUser"/>
     </typeAliases>
     <!-- 如果选择了“自动扫描mapping.xml文件”，则不需要配置mappers -->
     <!--

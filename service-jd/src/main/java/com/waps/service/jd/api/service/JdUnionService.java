@@ -65,6 +65,8 @@ public class JdUnionService {
         request.setPromotionCodeReq(promotionCodeReq);
         try {
             UnionOpenPromotionBysubunionidGetResponse response = client.execute(request);
+            response.setSysOriginalMsg("");
+            response.setSysRequestUrl("");
             return response;
         } catch (Exception e) {
             return null;
@@ -90,6 +92,8 @@ public class JdUnionService {
         request.setPromotionCodeReq(promotionCodeReq);
         try {
             UnionOpenPromotionBysubunionidGetResponse response = client.execute(request);
+            response.setSysOriginalMsg("");
+            response.setSysRequestUrl("");
             return JSONObject.toJSONString(response);
         } catch (JdException e) {
             System.out.println(e.getLocalizedMessage());
@@ -117,6 +121,8 @@ public class JdUnionService {
         request.setGoodsReqDTO(goodsReq);
         try {
             UnionOpenGoodsQueryResponse response = client.execute(request);
+            response.setSysOriginalMsg("");
+            response.setSysRequestUrl("");
             return JSONObject.toJSONString(response);
         } catch (JdException e) {
             System.out.println(e.getLocalizedMessage());
@@ -139,6 +145,8 @@ public class JdUnionService {
         request.setCouponUrls(urlList);
         try {
             UnionOpenCouponQueryResponse response = client.execute(request);
+            response.setSysOriginalMsg("");
+            response.setSysRequestUrl("");
             return JSONObject.toJSONString(response);
         } catch (JdException e) {
             System.out.println(e.getLocalizedMessage());
@@ -163,6 +171,8 @@ public class JdUnionService {
         request.setGoodsReq(secKillGoodsReq);
         try {
             UnionOpenGoodsSeckillQueryResponse response = client.execute(request);
+            response.setSysOriginalMsg("");
+            response.setSysRequestUrl("");
             return JSONObject.toJSONString(response);
         } catch (JdException e) {
             System.out.println(e.getLocalizedMessage());
@@ -190,6 +200,8 @@ public class JdUnionService {
         request.setReq(categoryReq);
         try {
             UnionOpenCategoryGoodsGetResponse response = client.execute(request);
+            response.setSysOriginalMsg("");
+            response.setSysRequestUrl("");
             return JSONObject.toJSONString(response);
         } catch (JdException e) {
             System.out.println(e.getLocalizedMessage());
@@ -214,6 +226,8 @@ public class JdUnionService {
         request.setGoodsReq(goodsReq);
         try {
             UnionOpenGoodsJingfenQueryResponse response = client.execute(request);
+            response.setSysOriginalMsg("");
+            response.setSysRequestUrl("");
             return JSONObject.toJSONString(response);
         } catch (JdException e) {
             System.out.println(e.getLocalizedMessage());
@@ -234,6 +248,8 @@ public class JdUnionService {
         request.setSkuIds(skuIds);
         try {
             UnionOpenGoodsPromotiongoodsinfoQueryResponse response = client.execute(request);
+            response.setSysOriginalMsg("");
+            response.setSysRequestUrl("");
             return JSONObject.toJSONString(response);
         } catch (JdException e) {
             System.out.println(e.getLocalizedMessage());
@@ -272,6 +288,8 @@ public class JdUnionService {
         try {
             request.setPromotionCodeReq(promotionCodeReq);
             UnionOpenPromotionCommonGetResponse response = client.execute(request);
+            response.setSysOriginalMsg("");
+            response.setSysRequestUrl("");
             return JSONObject.toJSONString(response);
         } catch (JdException e) {
             System.out.println(e.getLocalizedMessage());
@@ -298,6 +316,8 @@ public class JdUnionService {
         try {
             unionOpenUserPidGetRequest.setPidReq(pidReq);
             UnionOpenUserPidGetResponse response = client.execute(unionOpenUserPidGetRequest);
+            response.setSysOriginalMsg("");
+            response.setSysRequestUrl("");
             return JSONObject.toJSONString(response);
         } catch (JdException e) {
             System.out.println(e.getLocalizedMessage());
@@ -328,6 +348,8 @@ public class JdUnionService {
         try {
             unionOpenOrderQueryRequest.setOrderReq(orderReq);
             UnionOpenOrderQueryResponse response = client.execute(unionOpenOrderQueryRequest);
+            response.setSysOriginalMsg("");
+            response.setSysRequestUrl("");
             return JSONObject.toJSONString(response);
         } catch (JdException e) {
             System.out.println(e.getLocalizedMessage());

@@ -1,9 +1,9 @@
 package com.waps.union_jd_api.service;
 
-import com.waps.elastic.search.utils.PageUtils;
-import com.waps.service.jd.db.domain.WapsJdUser;
-import com.waps.service.jd.db.example.WapsJdUserExample;
-import com.waps.service.jd.db.mapper.WapsJdUserMapper;
+//import com.waps.elastic.search.utils.PageUtils;
+//import com.waps.service.jd.db.domain.WapsJdUser;
+//import com.waps.service.jd.db.example.WapsJdUserExample;
+//import com.waps.service.jd.db.mapper.WapsJdUserMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

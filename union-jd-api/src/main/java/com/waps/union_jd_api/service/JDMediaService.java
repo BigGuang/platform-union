@@ -1,9 +1,14 @@
 package com.waps.union_jd_api.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.waps.service.jd.db.dao.WapsJdUserDao;
+import com.waps.service.jd.db.model.WapsJdUser;
+import com.waps.service.jd.db.model.WapsJdUserExample;
 import com.waps.service.jd.es.domain.JDMediaInfoESMap;
 import com.waps.service.jd.es.service.JDMediaESService;
 import com.robot.netty.server.OnLineService;
+import com.waps.tools.test.TestUtils;
+import com.waps.union_jd_api.utils.DateUtils;
 import com.waps.utils.StringUtils;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.search.SearchHit;
@@ -13,6 +18,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -23,6 +29,8 @@ public class JDMediaService {
 
     @Autowired
     JDMediaESService jdMediaESService;
+    @Autowired
+    WapsJdUserDao wapsJdUserDao;
 
     JDMediaService() {
 //        loadAllChannelInfo2Map(1);
@@ -40,9 +48,30 @@ public class JDMediaService {
         List<JDMediaInfoESMap> mediaList = findMediaChannel(paramsMap);
         if (mediaList.size() > 0) {
             JDMediaInfoESMap jdMediaInfoESMaps = mediaList.get(0);
+            if (StringUtils.isNull(jdMediaInfoESMaps.getDesc())) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        getDomain(jdMediaInfoESMaps);
+                    }
+                }).start();
+            }
             return jdMediaInfoESMaps;
         } else {
             return null;
+        }
+    }
+
+    public void getDomain(JDMediaInfoESMap jdMediaInfoESMap) {
+        WapsJdUserExample example = new WapsJdUserExample();
+        example.createCriteria().andUNameEqualTo(jdMediaInfoESMap.getChannel_name());
+        List<WapsJdUser> list = wapsJdUserDao.selectByExample(example);
+        if (list != null && !list.isEmpty()) {
+            WapsJdUser wapsJdUser = list.get(0);
+            if (wapsJdUser != null && !StringUtils.isNull(wapsJdUser.getuDomain())) {
+                jdMediaInfoESMap.setDesc(wapsJdUser.getuDomain());
+                jdMediaESService.save(jdMediaInfoESMap.getId(), jdMediaInfoESMap);
+            }
         }
     }
 
@@ -78,7 +107,7 @@ public class JDMediaService {
     public List<JDMediaInfoESMap> findMediaChannel(HashMap paramsMap) {
         List<JDMediaInfoESMap> arrayList = new ArrayList<>();
         SearchHits hits = jdMediaESService.findByFreeMarkerFromResource("es_script/jd_media_channel_search.ftl", paramsMap);
-        if (hits!=null && hits.getTotalHits().value > 0) {
+        if (hits != null && hits.getTotalHits().value > 0) {
             SearchHit[] hitList = hits.getHits();
             for (SearchHit hit : hitList) {
                 String json = hit.getSourceAsString();
@@ -86,7 +115,32 @@ public class JDMediaService {
                 arrayList.add(jdMediaInfoESMap);
             }
         }
-        return arrayList;
+        if (arrayList.size() > 0) {
+            return arrayList;
+        } else if (paramsMap.get("channel_name") != null) {
+            String channel_name = (String) paramsMap.get("channel_name");
+            WapsJdUserExample example = new WapsJdUserExample();
+            example.createCriteria().andUNameEqualTo(channel_name);
+            List<WapsJdUser> list = wapsJdUserDao.selectByExample(example);
+            if (list != null && !list.isEmpty()) {
+                WapsJdUser wapsJdUser = list.get(0);
+                if (wapsJdUser != null) {
+                    JDMediaInfoESMap jdMediaInfoESMap = new JDMediaInfoESMap();
+                    jdMediaInfoESMap.setChannel_name(wapsJdUser.getuName());
+                    jdMediaInfoESMap.setChannel_id(wapsJdUser.getuPid());
+                    jdMediaInfoESMap.setDesc(wapsJdUser.getuDomain());
+                    jdMediaInfoESMap.setCreatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""));
+                    jdMediaInfoESMap.setId("1000440357_63665_" + wapsJdUser.getuPid());
+                    jdMediaESService.save(jdMediaInfoESMap.getId(), jdMediaInfoESMap);
+
+//                    TestUtils.outPrint(jdMediaInfoESMap);
+                    arrayList.add(jdMediaInfoESMap);
+                }
+            }
+            return arrayList;
+        } else {
+            return arrayList;
+        }
     }
 
     public SearchHits findMediaChannelToHits(HashMap paramsMap) {

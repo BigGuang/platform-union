@@ -2,10 +2,13 @@ package com.waps.union_jd_api.service
 
 import com.alibaba.fastjson.JSONObject
 import com.waps.elastic.search.utils.PageUtils
+import com.waps.service.jd.api.bean.SearchParams
+import com.waps.service.jd.api.service.JdUnionService
 import com.waps.service.jd.es.domain.JDSkuInfoESMap
 import com.waps.service.jd.es.domain.SkuBeanESMap
 import com.waps.service.jd.es.domain.UnionEditorLogESMap
 import com.waps.service.jd.es.service.UnionEditorLogESService
+import com.waps.union_jd_api.utils.JDConfig
 import com.waps.utils.StringUtils
 import org.elasticsearch.search.SearchHit
 import org.elasticsearch.search.SearchHits
@@ -14,6 +17,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class RecommendService {
+    @Autowired
+    JdUnionService jdUnionService
 
     @Autowired
     private UnionEditorLogESService unionEditorLogESService
@@ -34,17 +39,20 @@ class RecommendService {
         params.put("end_time", endTime)
         params.put("from", pageUtils.getFrom())
         params.put("size", pageUtils.getSize())
-        SearchHits hits = unionEditorLogESService.findByFreeMarkerFromResource("es_script/jtb_send_done.json", params)
-        long total = hits.getTotalHits().value
-        SearchHit[] searchHits = hits.getHits()
         List<String> skuIdList = new ArrayList<>()
-        List<UnionEditorLogESMap> list = new ArrayList<>()
-        for (SearchHit hit : searchHits) {
-            UnionEditorLogESMap unionEditorLogESMap = unionEditorLogESService.getObjectFromJson(hit.getSourceAsString(), UnionEditorLogESMap.class) as UnionEditorLogESMap
-            if (unionEditorLogESMap.getSkuList()) {
-                for (SkuBeanESMap skuBeanESMap in unionEditorLogESMap.getSkuList()) {
-                    if (!StringUtils.isNull(skuBeanESMap.getSkuId())) {
-                        skuIdList.add(skuBeanESMap.getSkuId())
+        SearchHits hits = unionEditorLogESService.findByFreeMarkerFromResource("es_script/jtb_send_done.json", params)
+        if (hits != null) {
+            long total = hits.getTotalHits().value
+            SearchHit[] searchHits = hits.getHits()
+
+            List<UnionEditorLogESMap> list = new ArrayList<>()
+            for (SearchHit hit : searchHits) {
+                UnionEditorLogESMap unionEditorLogESMap = unionEditorLogESService.getObjectFromJson(hit.getSourceAsString(), UnionEditorLogESMap.class) as UnionEditorLogESMap
+                if (unionEditorLogESMap.getSkuList()) {
+                    for (SkuBeanESMap skuBeanESMap in unionEditorLogESMap.getSkuList()) {
+                        if (!StringUtils.isNull(skuBeanESMap.getSkuId())) {
+                            skuIdList.add(skuBeanESMap.getSkuId())
+                        }
                     }
                 }
             }
@@ -52,7 +60,21 @@ class RecommendService {
         String[] skuList = skuIdList.toArray(String[])
         println skuList
 
-        List<JDSkuInfoESMap> recommendList=jdSkuInfoService.getSkuListBySkuIDs(skuList)
+        List<JDSkuInfoESMap> recommendList = jdSkuInfoService.getSkuListBySkuIDs(skuList)
         return recommendList
     }
+
+
+    public String priceRecommend(Double priceTo, Integer page, Integer size) {
+        SearchParams searchParams = new SearchParams()
+        searchParams.setApp_key(JDConfig.APP_KEY)
+        searchParams.setApp_secret(JDConfig.SECRET_KEY)
+        searchParams.setPriceto(priceTo)
+        searchParams.setPageIndex(page)
+        searchParams.setPageSize(size)
+        String json = jdUnionService.getGoodsListBySearch(searchParams)
+        return json
+    }
+
+
 }

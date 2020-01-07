@@ -27,7 +27,7 @@
     <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"
           destroy-method="close">
         <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-        <property name="url" value="jdbc:mysql://10.1.0.53:3306/news_joy?useUnicode=true&amp;characterEncoding=utf8"/>
+        <property name="url" value="jdbc:mysql://10.1.0.53:3306/jd_union?useUnicode=true&amp;characterEncoding=utf8"/>
         <property name="username" value="root"/>
         <property name="password" value="$RFV5tgb"/>
     </bean>
@@ -39,8 +39,8 @@
         <!-- 自动扫描mapping.xml文件 -->
         <property name="mapperLocations">
             <list>
-<!--                <value>classpath*:com/waps/service/jd/db/mapper/xml/WapsJdUserMapper.xml</value>-->
-                <value>classpath:mybatis_mapping/WapsJdUserMapper.xml</value>
+                <value>classpath*:mybatis_mapper/WapsJdUserDao.xml</value>
+<!--                <value>classpath:mybatis_mapping/WapsJdUserDao.xml</value>-->
             </list>
         </property>
 
@@ -63,7 +63,7 @@
 
     <!-- DAO接口所在包名，Spring会自动查找其下的类 -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.waps.service.news.db.dao"/>
+        <property name="basePackage" value="com.waps.service.jd.db.dao"/>
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
     </bean>
 

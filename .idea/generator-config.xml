@@ -11,24 +11,24 @@
               <option name="daoName" value="WapsJdUserDao" />
               <option name="daoPackage" value="com.waps.service.jd.db.dao" />
               <option name="daoPostfix" value="Dao" />
-              <option name="daoTargetFolder" value="$PROJECT_DIR$" />
+              <option name="daoTargetFolder" value="$USER_HOME$/works/works_java/platform-union/service-jd/" />
               <option name="modelMvnPath" value="src/main/java" />
               <option name="modelName" value="WapsJdUser" />
               <option name="modelPackage" value="com.waps.service.jd.db.model" />
-              <option name="modelTargetFolder" value="$PROJECT_DIR$" />
+              <option name="modelTargetFolder" value="$USER_HOME$/works/works_java/platform-union/service-jd/" />
               <option name="name" value="waps_jd_user" />
               <option name="needForUpdate" value="true" />
               <option name="needToStringHashcodeEquals" value="true" />
               <option name="offsetLimit" value="true" />
               <option name="overrideXML" value="true" />
               <option name="primaryKey" value="id" />
-              <option name="projectFolder" value="$PROJECT_DIR$" />
+              <option name="projectFolder" value="$USER_HOME$/works/works_java/platform-union/service-jd/" />
               <option name="tableName" value="waps_jd_user" />
               <option name="useExample" value="true" />
               <option name="useSchemaPrefix" value="true" />
               <option name="xmlMvnPath" value="src/main/resources" />
-              <option name="xmlPackage" value="generator" />
-              <option name="xmlTargetFolder" value="$PROJECT_DIR$" />
+              <option name="xmlPackage" value="mybatis_mapper" />
+              <option name="xmlTargetFolder" value="$USER_HOME$/works/works_java/platform-union/service-jd/" />
             </Config>
           </value>
         </entry>

@@ -8,6 +8,7 @@ import com.waps.service.jd.es.domain.JDSkuInfoESMap
 import com.waps.service.jd.es.service.JDSkuInfoESService
 import com.waps.union_jd_api.utils.DateUtils
 import com.waps.union_jd_api.utils.JDConfig
+import jd.union.open.goods.query.response.Coupon
 import org.apache.commons.collections.map.LinkedMap
 import org.apache.lucene.queryparser.flexible.core.builders.QueryBuilder
 import org.elasticsearch.action.search.SearchRequest
@@ -124,12 +125,31 @@ class JDSkuInfoService {
                 Map<String, Object> map = hit.getSourceAsMap()
                 String _skuId = (String) map.get("skuId")
                 if (skuId == _skuId) {
-                    String json=hit.getSourceAsString()
-                    JDSkuInfoESMap jdSkuInfoESMap=jdSkuInfoESService.getObjectFromJson(json,JDSkuInfoESMap.class) as JDSkuInfoESMap
+                    String json = hit.getSourceAsString()
+                    JDSkuInfoESMap jdSkuInfoESMap = jdSkuInfoESService.getObjectFromJson(json, JDSkuInfoESMap.class) as JDSkuInfoESMap
+                    jdSkuInfoESMap = checkCoupon(jdSkuInfoESMap)
                     list.add(jdSkuInfoESMap)
                 }
             }
         }
         return list
+    }
+
+    public JDSkuInfoESMap checkCoupon(JDSkuInfoESMap jdSkuInfoESMap) {
+        Coupon[] couponList = jdSkuInfoESMap.getCouponInfo().getCouponList()
+        List<Coupon> _cList = new ArrayList<>()
+        if (couponList.size() > 0) {
+            for (Coupon coupon : couponList) {
+                if (coupon.isBest == 1) {
+                    long _endTime = coupon.getEndTime
+                    long _nowTime = System.currentTimeMillis()
+                    if (_endTime > _nowTime) {
+                        _cList.add(coupon)
+                    }
+                }
+            }
+            jdSkuInfoESMap.getCouponInfo().setCouponList(_cList.toArray() as Coupon[])
+        }
+        return jdSkuInfoESMap
     }
 }

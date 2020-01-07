@@ -1,4 +1,9 @@
 {
+  "header": {
+    "bg_color": "#DC0411",
+    "font_color": "#fff"
+  },
+  "style": "color:#000;background-image: url(https://jd.wapg.cn/images/back.jpg);background-color:red",
   "components_list": [
     {
       "component": "banner",
@@ -14,54 +19,22 @@
             "desc": "1.复制以下文案并微信发送给自己↵2.通过微信访问活动地址购买↵",
             "title": "活动详情",
             "content": "🔥赶快抢【京享红包】最高888元🎁每天抢3次，抢到就是赚到😄↵⏰1月7日红包奖池加倍！👇↵主会场👉https://u.jd.com/gczJdq↵🎉超市会场👉https://u.jd.com/CBnJ6a",
-            "share_img": "https://jd.wapg.cn/images/share_pop.jpg"
+            "share_img": "https://jd.wapg.cn/images/share_pop.jpg",
+            "url_type": 1
           },
           {
             "type": 2,
             "img": "http://img30.360buyimg.com/ads/jfs/t1/86408/4/8553/143620/5e05f0f7E9dc33da1/0f6532a3a1ebc2bf.jpg",
             "title": "家电年货节",
-            "url": "https://pro.m.jd.com/mall/active/2HTEp2ofgWpvUFi3xupP5vGRD7Am/index.html"
+            "url": "https://pro.m.jd.com/mall/active/2HTEp2ofgWpvUFi3xupP5vGRD7Am/index.html",
+            "url_type": 2
           },
           {
             "type": 2,
             "img": "http://img30.360buyimg.com/ads/jfs/t1/102492/22/8415/53606/5e046735Ef0106022/3b393ce868605fbe.jpg",
             "title": "手机新年好礼",
-            "url": "https://pro.m.jd.com/mall/active/4SnfiHHw22faQXJnVgS84TLhr92q/index.html"
-          }
-        ]
-      }
-    },
-    {
-      "component": "grid",
-      "props": {
-        "icon": "",
-        "text": "",
-        "round": false,
-        "column_num": 4,
-        "square": true,
-        "list": [
-          {
-            "type": 1,
-            "img": "https://jd.wapg.cn/images/wan_icon_2.png",
-            "desc": "1.复制以下文案并微信发送给自己↵2.通过微信访问活动地址购买↵",
-            "title": "活动详情",
-            "content": "🔥赶快抢【京享红包】最高888元🎁每天抢3次，抢到就是赚到😄↵⏰1月7日红包奖池加倍！👇↵主会场👉https://u.jd.com/gczJdq↵🎉超市会场👉https://u.jd.com/CBnJ6a",
-            "share_img": "https://jd.wapg.cn/images/share_pop.jpg"
-          },
-          {
-            "type": 2,
-            "img": "https://jd.wapg.cn/images/pin_icon_2.png",
-            "url": ""
-          },
-          {
-            "type": 2,
-            "img": "https://jd.wapg.cn/images/jing_icon_2.png",
-            "url": ""
-          },
-          {
-            "type": 2,
-            "img": "https://jd.wapg.cn/images/xuan_icon_2.png",
-            "url": ""
+            "url": "https://pro.m.jd.com/mall/active/4SnfiHHw22faQXJnVgS84TLhr92q/index.html",
+            "url_type": 2
           }
         ]
       }
@@ -77,40 +50,92 @@
             "desc": "1.复制以下文案并微信发送给自己↵2.通过微信访问活动地址购买↵",
             "title": "活动详情",
             "content": "🔥赶快抢【京享红包】最高888元🎁每天抢3次，抢到就是赚到😄↵⏰1月7日红包奖池加倍！👇↵主会场👉https://u.jd.com/gczJdq↵🎉超市会场👉https://u.jd.com/CBnJ6a",
-            "share_img": "https://jd.wapg.cn/images/share_pop.jpg"
+            "share_img": "https://jd.wapg.cn/images/share_pop.jpg",
+            "url_type": 1
           },
           {
             "type": 2,
             "icon": "https://jd.wapg.cn/images/favicon.png",
             "message": "最高888元红包",
-            "url": "https://pro.m.jd.com/mall/active/4SnfiHHw22faQXJnVgS84TLhr92q/index.html"
+            "url": "https://pro.m.jd.com/mall/active/4SnfiHHw22faQXJnVgS84TLhr92q/index.html",
+            "url_type": 2
           }
         ]
       }
     },
     {
-      "component": "actives",
+      "component": "grid",
       "props": {
+        "icon": "",
+        "text": "",
         "round": false,
-        "auto_play": 5000,
+        "column_num": 4,
+        "square": true,
         "list": [
           {
-            "type": 2,
-            "img": "http://img30.360buyimg.com/ads/jfs/t1/86408/4/8553/143620/5e05f0f7E9dc33da1/0f6532a3a1ebc2bf.jpg",
-            "title": "家电年货节",
-            "url": "https://pro.m.jd.com/mall/active/2HTEp2ofgWpvUFi3xupP5vGRD7Am/index.html"
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/75740/21/8366/92995/5d6634fdEd073d2c7/5b2963c21e4b217f.jpg",
+            "title": "活动详情",
+            "url": "https://u.jd.com/I4RBeS",
+            "url_type": 2
           },
           {
-            "type": 2,
-            "img": "http://img30.360buyimg.com/ads/jfs/t1/102492/22/8415/53606/5e046735Ef0106022/3b393ce868605fbe.jpg",
-            "title": "手机新年好礼",
-            "url": "https://pro.m.jd.com/mall/active/4SnfiHHw22faQXJnVgS84TLhr92q/index.html"
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/40067/23/9011/36546/5d662d4cEcd1ed7f6/780756a3493d962c.jpg",
+            "url": "https://u.jd.com/DwqYNI",
+            "url_type": 2
           },
           {
-            "type": 2,
-            "img": "http://img30.360buyimg.com/ads/jfs/t1/99977/30/8264/100810/5e0412f6Ec7a162e1/60f4b0f67701509c.jpg",
-            "title": "辞旧迎新 跨新年",
-            "url": "https://pro.m.jd.com/mall/active/2AHoCzKcQNxDYwg3nTWSM7eaC7UP/index.html"
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/79008/26/9784/22963/5d7742beE7294594b/62fd042a63980bcb.jpg",
+            "url": "https://u.jd.com/86reZj",
+            "url_type": 2
+          },
+          {
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/73009/13/11057/74263/5d88289dE22a6b68e/02c15f35122f6c7b.png",
+            "url": "https://u.jd.com/1OLllq",
+            "url_type": 2
+          },
+          {
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/56214/10/10320/115871/5d772297Eb5405bd3/be054f6473ad52b8.jpg",
+            "url": "https://u.jd.com/Vz1Yow",
+            "url_type": 2
+          },
+          {
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/64673/35/8650/56091/5d66371fEf793f46a/a6e786bc369d0fa7.jpg",
+            "url": "https://u.jd.com/CuYWCR",
+            "url_type": 2
+          },
+          {
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/41785/13/14515/38999/5d7700bbE3fa08cbb/87b3596fec47380f.jpg",
+            "url": "https://u.jd.com/0Qmdzp",
+            "url_type": 2
+          },
+          {
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/62170/1/8521/14186/5d662752E00d3659a/428ce44c3631f89e.jpg",
+            "url": "https://u.jd.com/PmrLYW",
+            "url_type": 2
+          }
+        ]
+      }
+    },
+    {
+      "component": "grid",
+      "props": {
+        "icon": "",
+        "text": "",
+        "round": false,
+        "column_num": 2,
+        "square": false,
+        "list": [
+          {
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/85655/5/8425/32531/5e046735E3b9e529d/3984fdc88af0a8e7.jpg",
+            "title": "活动详情",
+            "url": "https://u.jd.com/8HAXuH",
+            "url_type": 2
+          },
+          {
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/86169/39/8620/83144/5e05f0f6Ebe255ab1/615513b9dd65f55d.jpg",
+            "title": "活动详情",
+            "url": "https://u.jd.com/9ccfvc",
+            "url_type": 2
           }
         ]
       }
@@ -118,8 +143,23 @@
     {
       "component": "hot",
       "props": {
-        "auto_play": 7000,
-        "url": "http://api.wapg.cn/jd_union/recommend/editor?sTime=2019-12-10&eTime=2020-01-02&page=1&size=20"
+        "auto_play": 5000,
+        "url": "http://api.wapg.cn/jd_union/recommend/editor_recommend?page=1&size=40"
+      }
+    },
+    {
+      "component": "more",
+      "props": {
+        "list": [
+          {
+            "title": "编辑推荐",
+            "url": "http://api.wapg.cn/jd_union/recommend/editor_recommend?page=1&size=20"
+          },
+          {
+            "title": "9.9元抢购",
+            "url": "http://api.wapg.cn/jd_union/recommend/price_recommend?page=1&size=20"
+          }
+        ]
       }
     }
   ]
