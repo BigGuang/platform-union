@@ -1,76 +1,206 @@
 {
-  "back_img": "",
-  "back_color": "#DC0411",
-  "home_rank": "banner,news,actives,grid,hot",
-  "banner": {
-    "list": [
-      {
-        "img": "https://jd.wapg.cn/images/banner_1.jpg",
-        "url": "http://jd.wapg.cn/#/pop_activities_page"
-      },
-      {
-        "img": "http://img30.360buyimg.com/ads/jfs/t1/86408/4/8553/143620/5e05f0f7E9dc33da1/0f6532a3a1ebc2bf.jpg",
-        "url": "https://pro.m.jd.com/mall/active/2HTEp2ofgWpvUFi3xupP5vGRD7Am/index.html",
-        "title": "家电年货节"
-      },
-      {
-        "img": "http://img30.360buyimg.com/ads/jfs/t1/102492/22/8415/53606/5e046735Ef0106022/3b393ce868605fbe.jpg",
-        "url": "https://pro.m.jd.com/mall/active/4SnfiHHw22faQXJnVgS84TLhr92q/index.html",
-        "title": "手机新年好礼"
-      }
-    ]
+  "id": "c_100000",
+  "header": {
+    "bg_color": "#DC0411",
+    "font_color": "#fff"
   },
-  "news": {
-    "list": [
-      {
+  "style": "color:#000;background-image: url(https://jd.wapg.cn/images/back.jpg);background-color:red",
+  "components_list": [
+    {
+      "component": "banner",
+      "props": {
+        "id": "c_100001",
+        "style": "padding: 5px 10px;",
         "icon": "",
-        "url": "",
-        "title": ""
-      }
-    ]
-  },
-  "actives": {
-    "list": [
-      {
-        "img": "http://img30.360buyimg.com/ads/jfs/t1/86408/4/8553/143620/5e05f0f7E9dc33da1/0f6532a3a1ebc2bf.jpg",
-        "url": "https://pro.m.jd.com/mall/active/2HTEp2ofgWpvUFi3xupP5vGRD7Am/index.html",
-        "title": "家电年货节"
-      },
-      {
-        "img": "http://img30.360buyimg.com/ads/jfs/t1/102492/22/8415/53606/5e046735Ef0106022/3b393ce868605fbe.jpg",
-        "url": "https://pro.m.jd.com/mall/active/4SnfiHHw22faQXJnVgS84TLhr92q/index.html",
-        "title": "手机新年好礼"
-      },
-      {
-        "img": "http://img30.360buyimg.com/ads/jfs/t1/99977/30/8264/100810/5e0412f6Ec7a162e1/60f4b0f67701509c.jpg",
-        "url": "https://pro.m.jd.com/mall/active/2AHoCzKcQNxDYwg3nTWSM7eaC7UP/index.html",
-        "title": "辞旧迎新 跨新年"
-      }
-    ]
-  },
-  "grid": {
-    "list": [
-      {
-        "type": 1,
-        "img": "",
-        "url": ""
-      }
-    ]
-  },
-  "hot": {
-    "list": [
-      {
-        "url": ""
-      }
-    ]
-  },
-  "more": {
-    "tabs": [
-      {
-        "id": "",
         "title": "",
-        "url": ""
+        "title_style": "color: #FFFFFF",
+        "round": true,
+        "auto_play": 8000,
+        "list": [
+          {
+            "id": "c_100011",
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/86408/4/8553/143620/5e05f0f7E9dc33da1/0f6532a3a1ebc2bf.jpg",
+            "url": "https://pro.m.jd.com/mall/active/2HTEp2ofgWpvUFi3xupP5vGRD7Am/index.html",
+            "url_type": 2
+          },
+          {
+            "id": "c_100012",
+            "img": "https://jd.wapg.cn/images/banner_1.jpg",
+            "url": "https://pro.m.jd.com/mall/active/4SnfiHHw22faQXJnVgS84TLhr92q/index.html",
+            "url_type": 2
+          },
+          {
+            "id": "c_100013",
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/102492/22/8415/53606/5e046735Ef0106022/3b393ce868605fbe.jpg",
+            "url": "https://pro.m.jd.com/mall/active/4SnfiHHw22faQXJnVgS84TLhr92q/index.html",
+            "url_type": 2
+          }
+        ]
       }
-    ]
-  }
+    },
+    {
+      "component": "news",
+      "props": {
+        "id": "c_100002",
+        "style": "padding: 5px 10px;",
+        "list": [
+          {
+            "id": "c_100021",
+            "icon": "https://jd.wapg.cn/images/favicon.png",
+            "text": "快来领红包!",
+            "url": "",
+            "url_type": 1
+          },
+          {
+            "id": "c_100022",
+            "icon": "https://jd.wapg.cn/images/favicon.png",
+            "text": "最高888元红包",
+            "url": "https://pro.m.jd.com/mall/active/4SnfiHHw22faQXJnVgS84TLhr92q/index.html",
+            "url_type": 2
+          }
+        ]
+      }
+    },
+    {
+      "component": "grid",
+      "props": {
+        "id": "c_100003",
+        "style": "color:#535353;padding: 5px 10px;background-color:#fff;margin: 10px; border-radius: 10px",
+        "title": "京选年货",
+        "title_style": "color: #DC0411;font-weight: bold;",
+        "icon": "fire",
+        "round": false,
+        "column_num": 4,
+        "square": false,
+        "list": [
+          {
+            "id": "c_1000031",
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/75740/21/8366/92995/5d6634fdEd073d2c7/5b2963c21e4b217f.jpg",
+            "url": "https://u.jd.com/I4RBeS",
+            "url_type": 2,
+            "text": "活动详情",
+            "text_color": "#535353"
+          },
+          {
+            "id": "c_1000032",
+            "url": "https://u.jd.com/DwqYNI",
+            "url_type": 2,
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/75740/21/8366/92995/5d6634fdEd073d2c7/5b2963c21e4b217f.jpg",
+            "text": "年货",
+            "text_color": "#535353"
+          },
+          {
+            "id": "c_1000033",
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/79008/26/9784/22963/5d7742beE7294594b/62fd042a63980bcb.jpg",
+            "url": "https://u.jd.com/86reZj",
+            "url_type": 2,
+            "text": "",
+            "text_color": "#535353"
+          },
+          {
+            "id": "c_1000034",
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/73009/13/11057/74263/5d88289dE22a6b68e/02c15f35122f6c7b.png",
+            "url": "https://u.jd.com/1OLllq",
+            "url_type": 2,
+            "text": "",
+            "text_color": "#535353"
+          },
+          {
+            "id": "c_1000035",
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/56214/10/10320/115871/5d772297Eb5405bd3/be054f6473ad52b8.jpg",
+            "url": "https://u.jd.com/Vz1Yow",
+            "url_type": 2,
+            "text": "",
+            "text_color": "#535353"
+          },
+          {
+            "id": "c_1000036",
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/64673/35/8650/56091/5d66371fEf793f46a/a6e786bc369d0fa7.jpg",
+            "url": "https://u.jd.com/CuYWCR",
+            "url_type": 2,
+            "text": "",
+            "text_color": "#535353"
+          },
+          {
+            "id": "c_1000037",
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/41785/13/14515/38999/5d7700bbE3fa08cbb/87b3596fec47380f.jpg",
+            "url": "https://u.jd.com/0Qmdzp",
+            "url_type": 2,
+            "text": "",
+            "text_color": "#535353"
+          },
+          {
+            "id": "c_1000038",
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/62170/1/8521/14186/5d662752E00d3659a/428ce44c3631f89e.jpg",
+            "url": "https://u.jd.com/PmrLYW",
+            "url_type": 2,
+            "text": "",
+            "text_color": "#535353"
+          }
+        ]
+      }
+    },
+    {
+      "component": "grid",
+      "props": {
+        "id": "c_100004",
+        "title": "年底大促",
+        "title_style": "color: #DC0411;font-weight: bold;",
+        "icon": "fire",
+        "style": "color:#535353;padding: 5px 10px;background-color:#fff;margin: 10px; border-radius: 10px",
+        "round": false,
+        "column_num": 2,
+        "square": false,
+        "list": [
+          {
+            "id": "c_1000041",
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/85655/5/8425/32531/5e046735E3b9e529d/3984fdc88af0a8e7.jpg",
+            "url": "https://u.jd.com/8HAXuH",
+            "url_type": 2,
+            "text": "",
+            "text_color": "#535353"
+          },
+          {
+            "id": "c_1000042",
+            "img": "http://img30.360buyimg.com/ads/jfs/t1/86169/39/8620/83144/5e05f0f6Ebe255ab1/615513b9dd65f55d.jpg",
+            "url": "https://u.jd.com/9ccfvc",
+            "url_type": 2,
+            "text": "",
+            "text_color": "#535353"
+          }
+        ]
+      }
+    },
+    {
+      "component": "hot",
+      "props": {
+        "id": "c_100005",
+        "style": "padding: 5px 10px; background-color: #fff; margin: 10px; border-radius: 10px",
+        "auto_play": 5000,
+        "icon": "fire",
+        "title": "热卖爆品",
+        "title_style": "color: #DC0411;font-weight: bold;",
+        "url": "http://api.wapg.cn/jd_union/recommend/editor_recommend?page=1&size=40"
+      }
+    },
+    {
+      "component": "more",
+      "props": {
+        "id": "c_100006",
+        "style": "",
+        "list": [
+          {
+            "id": "c_1000061",
+            "text": "编辑推荐",
+            "url": "http://api.wapg.cn/jd_union/recommend/editor_recommend?page=1&size=20"
+          },
+          {
+            "id": "c_1000062",
+            "text": "9.9元抢购",
+            "url": "http://api.wapg.cn/jd_union/recommend/price_recommend?page=1&size=20"
+          }
+        ]
+      }
+    }
+  ]
 }
