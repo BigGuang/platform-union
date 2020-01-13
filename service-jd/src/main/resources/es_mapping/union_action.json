@@ -1,0 +1,43 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "act_name": {
+      "type": "keyword"
+    },
+    "act_content": {
+      "type": "keyword"
+    },
+    "act_desc": {
+      "type": "keyword"
+    },
+    "act_share_img": {
+      "type": "keyword"
+    },
+    "pop_img": {
+      "type": "keyword"
+    },
+    "banner_img": {
+      "type": "keyword"
+    },
+    "show": {
+      "type": "integer"
+    },
+    "start_time": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    },
+    "end_time": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    },
+    "createtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}
