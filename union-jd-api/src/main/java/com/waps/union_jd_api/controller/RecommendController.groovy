@@ -88,4 +88,24 @@ class RecommendController {
         String json = recommendService.priceRecommend(priceTo, page, size)
         ResponseUtils.write(response, json);
     }
+
+    /**
+     *
+     * @param priceTo
+     * @param page
+     * @param size
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    @RequestMapping(value = "/sku_recommend")
+    public void skuListRecommend(
+            @RequestParam(value = "sku", required = true) String[] skuList,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        println skuList
+        String json = recommendService.skuListRecommend(skuList)
+        ResponseUtils.write(response, json);
+    }
+
 }

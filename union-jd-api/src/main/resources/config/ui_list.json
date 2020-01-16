@@ -1,0 +1,23 @@
+[
+  {
+    "name": "H5首页UI配置",
+    "value": "home_config",
+    "test_value": "home_config_test",
+    "desc": "H5网站首页线上配置",
+    "review_url": "http://test.wapg.cn/#/select?sub_path=home_config_test"
+  },
+  {
+    "name": "小程序首页UI配置",
+    "value": "home_mini",
+    "test_value": "home_mini_test",
+    "desc": "小程序首页线上配置",
+    "review_url": "http://test.wapg.cn/#/select?sub_path=home_mini_test"
+  },
+  {
+    "name": "群主首页UI配置",
+    "value": "home_group",
+    "test_value": "home_group_test",
+    "desc": "群主二级域名首页线上配置",
+    "review_url": "http://test.wapg.cn/#/select?sub_path=home_group_test"
+  }
+]

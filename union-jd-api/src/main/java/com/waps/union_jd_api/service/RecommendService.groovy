@@ -1,6 +1,5 @@
 package com.waps.union_jd_api.service
 
-import com.alibaba.fastjson.JSONObject
 import com.waps.elastic.search.utils.PageUtils
 import com.waps.service.jd.api.bean.SearchParams
 import com.waps.service.jd.api.service.JdUnionService
@@ -10,6 +9,7 @@ import com.waps.service.jd.es.domain.UnionEditorLogESMap
 import com.waps.service.jd.es.service.UnionEditorLogESService
 import com.waps.union_jd_api.utils.JDConfig
 import com.waps.utils.StringUtils
+import org.apache.commons.beanutils.ConvertUtils
 import org.elasticsearch.search.SearchHit
 import org.elasticsearch.search.SearchHits
 import org.springframework.beans.factory.annotation.Autowired
@@ -72,6 +72,17 @@ class RecommendService {
         searchParams.setPriceto(priceTo)
         searchParams.setPageIndex(page)
         searchParams.setPageSize(size)
+        String json = jdUnionService.getGoodsListBySearch(searchParams)
+        return json
+    }
+
+
+    public String skuListRecommend(String[] skuIDs) {
+        Long[] longSkuIDs = (Long[]) ConvertUtils.convert(skuIDs, long.class);
+        SearchParams searchParams = new SearchParams()
+        searchParams.setApp_key(JDConfig.APP_KEY)
+        searchParams.setApp_secret(JDConfig.SECRET_KEY)
+        searchParams.setSkuIds(longSkuIDs)
         String json = jdUnionService.getGoodsListBySearch(searchParams)
         return json
     }

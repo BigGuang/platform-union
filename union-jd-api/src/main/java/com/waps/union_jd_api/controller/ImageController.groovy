@@ -3,17 +3,15 @@ package com.waps.union_jd_api.controller
 import com.waps.tools.security.MD5
 import com.waps.tools.test.TestUtils
 import com.waps.union_jd_api.bean.ReturnMessageBean
-import com.waps.union_jd_api.service.JtbMessageBean
+import com.waps.union_jd_api.utils.FileMD5
 import com.waps.union_jd_api.utils.ImageUtils
 import com.waps.utils.ConfigUtils
-import com.waps.utils.DateUtils
 import com.waps.utils.ResponseUtils
 import com.waps.utils.StringUtils
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
@@ -47,7 +45,8 @@ class ImageController {
             String dateDir = format0.format(new Date())
             String uriDir = "/images/" + dateDir + "/"
 
-            String fileName = new MD5().getMD5(multipartFile.getOriginalFilename()).toLowerCase() + type
+            String fileName = FileMD5.getInputStreamMD5(multipartFile.getInputStream()).toLowerCase() + type
+
             String uri = uriDir + fileName
 
             String saveRealDir = StringUtils.getRealPath(uriDir)
@@ -82,6 +81,8 @@ class ImageController {
         }
 
     }
+
+
 }
 
 class ImagesBean {
