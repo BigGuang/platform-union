@@ -939,4 +939,18 @@ public class ESClient {
         return null;
     }
 
+    public Map<String, Object> searchHits2Map(SearchHits searchHits) {
+        Map<String, Object> map = new HashMap<>();
+        long total = 0;
+        List<Map<String, Object>> list = new ArrayList<>();
+        if (searchHits != null) {
+            total = searchHits.getTotalHits().value;
+            for (SearchHit hit : searchHits) {
+                list.add(hit.getSourceAsMap());
+            }
+        }
+        map.put("total", total);
+        map.put("list", list);
+        return map;
+    }
 }

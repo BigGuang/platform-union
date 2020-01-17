@@ -1,0 +1,262 @@
+{
+  "component": "root",
+  "id": "c_100000",
+  "list": [
+    {
+      "component": "banner",
+      "id": "c_100001",
+      "list": [
+        {
+          "component": "image",
+          "id": "c_100011",
+          "props": {
+            "id": "c_100011",
+            "img": "http://api.wapg.cn/jd_union/images/20200114/0f0a580bf578046db2fde3cc1412facc.jpg",
+            "url_type": 2,
+            "url": "https://u.jd.com/Jc3ikq"
+          }
+        },
+        {
+          "component": "image",
+          "id": "c_100013",
+          "props": {
+            "id": "c_100013",
+            "img": "http://api.wapg.cn/jd_union/images/20200114/85ab8bfa469e78b509b8041f007acda8.jpg",
+            "url_type": 2,
+            "url": "https://u.jd.com/2cl0Qz"
+          }
+        }
+      ],
+      "props": {
+        "title_style": "color: #FFFFFF",
+        "auto_play": 8000,
+        "icon": [
+          ""
+        ],
+        "style": "padding: 5px 10px;",
+        "id": "c_100001",
+        "title": "",
+        "radius": 8
+      }
+    },
+    {
+      "component": "grid",
+      "id": "c_100003",
+      "list": [
+        {
+          "component": "grid_cell",
+          "id": "c_1000031",
+          "props": {
+            "img": "http://api.wapg.cn/jd_union/images/20200113/929f3ec632b9fba3856e1a66129cb42c.png",
+            "url_type": 2,
+            "id": "c_1000031",
+            "text": "京东配送",
+            "url": "https://u.jd.com/I4RBeS"
+          }
+        },
+        {
+          "component": "grid_cell",
+          "id": "C_1578901143000",
+          "props": {
+            "img": "http://api.wapg.cn/jd_union/images/20200113/929f3ec632b9fba3856e1a66129cb42c.png",
+            "url_type": 1,
+            "id": "C_1578901143000",
+            "text": "品牌专区",
+            "url": ""
+          }
+        },
+        {
+          "component": "grid_cell",
+          "id": "c_1000033",
+          "props": {
+            "img": "http://api.wapg.cn/jd_union/images/20200113/929f3ec632b9fba3856e1a66129cb42c.png",
+            "url_type": 2,
+            "id": "c_1000033",
+            "text": "领券专区",
+            "url": "https://u.jd.com/86reZj"
+          }
+        },
+        {
+          "component": "grid_cell",
+          "id": "c_1000034",
+          "props": {
+            "img": "http://api.wapg.cn/jd_union/images/20200113/929f3ec632b9fba3856e1a66129cb42c.png",
+            "url_type": 2,
+            "id": "c_1000034",
+            "text": "发圈必推",
+            "url": "https://u.jd.com/1OLllq"
+          }
+        },
+        {
+          "component": "grid_cell",
+          "id": "c_1000035",
+          "props": {
+            "img": "http://api.wapg.cn/jd_union/images/20200113/929f3ec632b9fba3856e1a66129cb42c.png",
+            "url_type": 2,
+            "id": "c_1000035",
+            "text": "热卖年货",
+            "url": "https://u.jd.com/Vz1Yow"
+          }
+        },
+        {
+          "component": "grid_cell",
+          "id": "c_1000037",
+          "props": {
+            "img": "http://api.wapg.cn/jd_union/images/20200113/929f3ec632b9fba3856e1a66129cb42c.png",
+            "url_type": 2,
+            "id": "c_1000037",
+            "text": "食品生鲜",
+            "url": "https://u.jd.com/0Qmdzp"
+          }
+        },
+        {
+          "component": "grid_cell",
+          "id": "c_1000036",
+          "props": {
+            "img": "http://api.wapg.cn/jd_union/images/20200113/929f3ec632b9fba3856e1a66129cb42c.png",
+            "url_type": 2,
+            "id": "c_1000036",
+            "text": "数码家电",
+            "url": "https://u.jd.com/CuYWCR"
+          }
+        },
+        {
+          "component": "grid_cell",
+          "id": "c_1000038",
+          "props": {
+            "img": "http://api.wapg.cn/jd_union/images/20200113/929f3ec632b9fba3856e1a66129cb42c.png",
+            "url_type": 2,
+            "id": "c_1000038",
+            "text": "美妆个护",
+            "url": "https://u.jd.com/PmrLYW"
+          }
+        }
+      ],
+      "props": {
+        "square": true,
+        "title_style": "color: #DC0411;font-weight: bold;",
+        "icon": "fire",
+        "style": "color:#535353;\npadding: 5px 10px;\nbackground-color:#fff;\nmargin: 10px; \nborder-radius: 10px",
+        "id": "c_100003",
+        "column_num": 4,
+        "title": "京选年货",
+        "radius": 8
+      }
+    },
+    {
+      "component": "news",
+      "id": "c_100002",
+      "list": [
+        {
+          "component": "info",
+          "id": "c_100021",
+          "props": {
+            "id": "c_100021",
+            "url_type": 1,
+            "icon": "http://api.wapg.cn/jd_union/images/20200114/5315aec6f2e2dd8252f067b7d1fdac8b.jpg",
+            "text": "荣耀V30系列新品上市!5G双模 低至3299",
+            "url": "https://u.jd.com/pRW1vi"
+          }
+        }
+      ],
+      "props": {
+        "style": "padding: 5px 10px;"
+      }
+    },
+    {
+      "component": "grid",
+      "id": "c_100004",
+      "list": [
+        {
+          "component": "grid_cell",
+          "id": "c_1000041",
+          "props": {
+            "id": "c_1000041",
+            "img": "http://api.wapg.cn/jd_union/images/20200114/7eb79f6374ff567198b8114c6d2f9d90.jpg",
+            "url_type": 2,
+            "text": "三只松鼠京东超级品牌日",
+            "url": "https://u.jd.com/KqXxmB"
+          }
+        },
+        {
+          "component": "grid_cell",
+          "id": "c_1000042",
+          "props": {
+            "id": "c_1000042",
+            "img": "http://api.wapg.cn/jd_union/images/20200114/ba0f064e7f06c1b028335dbde19b6601.jpg",
+            "url_type": 2,
+            "text": "文具年货节 满99减20元",
+            "url": "https://u.jd.com/baV694"
+          }
+        }
+      ],
+      "props": {
+        "square": false,
+        "title_style": "color: #fff;\nfont-weight: bold;",
+        "icon": [
+          [
+            [
+              "fire"
+            ]
+          ]
+        ],
+        "style": "color:#fff;\npadding: 5px 10px;\nbackground-color:#DC0411;\nmargin: 10px; \nborder-radius: 10px",
+        "id": "c_100004",
+        "column_num": 2,
+        "title": "年底大促",
+        "radius": 10
+      }
+    },
+    {
+      "component": "hot",
+      "id": "c_100005",
+      "list": [],
+      "props": {
+        "title_style": "color: #DC0411;\nfont-weight: bold;",
+        "auto_play": 5000,
+        "icon": [
+          [
+            [
+              [
+                "fire"
+              ]
+            ]
+          ]
+        ],
+        "style": "padding: 5px 10px; \nbackground-color:#fff;\nmargin: 10px; \nborder-radius: 10px;\nborder-style: dashed;\nborder-width:1px;\nborder-color:#DC0411;",
+        "id": "c_100005",
+        "title": "热卖爆品",
+        "url": "http://api.wapg.cn/jd_union/recommend/editor_recommend?page=1&size=40"
+      }
+    },
+    {
+      "component": "more",
+      "id": "c_100006",
+      "list": [
+        {
+          "id": "c_1000062",
+          "props": {
+            "text": "9.9元抢购",
+            "url": "http://api.wapg.cn/jd_union/recommend/price_recommend?page=1&size=20"
+          }
+        },
+        {
+          "id": "c_1000061",
+          "props": {
+            "text": "编辑推荐",
+            "url": "http://api.wapg.cn/jd_union/recommend/editor_recommend?page=1&size=20"
+          }
+        }
+      ],
+      "props": {
+        "style": ""
+      }
+    }
+  ],
+  "props": {
+    "header_bg_color": "#DC0411",
+    "header_font_color": "#fff",
+    "style": "color:#000;\nbackground-image: url(https://jd.wapg.cn/images/back.jpg);\nbackground-repeat: no-repeat;\nbackground-size:100%;",
+    "id": "c_100000"
+  }
+}

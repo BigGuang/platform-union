@@ -24,6 +24,15 @@
     "show": {
       "type": "integer"
     },
+    "act_type": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
     "start_time": {
       "type": "date",
       "format": "yyyy-MM-dd HH:mm:ss"

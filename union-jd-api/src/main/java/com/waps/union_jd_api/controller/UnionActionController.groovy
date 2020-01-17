@@ -33,6 +33,8 @@ class UnionActionController {
 
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public void actionList(
+            @RequestParam(value = "type", required = false) String act_type,
+            @RequestParam(value = "show", required = false) String show,
             @RequestParam(value = "end_time", required = false) String end_time,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size,
@@ -44,6 +46,21 @@ class UnionActionController {
             HashMap<String, Object> params = new HashMap<>()
             params.put("from", pageUtils.getFrom())
             params.put("size", pageUtils.getSize())
+            if (!StringUtils.isNull(act_type)) {
+                String _type = "*" + act_type + "*"
+                params.put("act_type", _type)
+            }
+            if (StringUtils.isNull(show)) {
+                show = "0"
+            }
+            int _show = 0
+            try {
+                _show = Integer.parseInt(show)
+            } catch (Exception e) {
+            }
+            if (_show > -1) {
+                params.put("show", _show)
+            }
             if (StringUtils.isNull(end_time)) {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                 end_time = simpleDateFormat.format(new Date())

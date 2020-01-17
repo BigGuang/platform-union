@@ -1,0 +1,32 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "page_name": {
+      "type": "keyword"
+    },
+    "page_config": {
+      "type": "keyword"
+    },
+    "page_config_test": {
+      "type": "keyword"
+    },
+    "page_review_url": {
+      "type": "keyword"
+    },
+    "page_online_url": {
+      "type": "keyword"
+    },
+    "type": {
+      "type": "keyword"
+    },
+    "createtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

@@ -5,9 +5,25 @@
   "query": {
     "bool": {
       "must": [
+        <#if act_type??>
         {
-          "match_all": {}
+          "wildcard": {
+            "act_type": {
+              "value": "${act_type}",
+              "boost": 2
+            }
+          }
         },
+        </#if>
+        <#if show??>
+        {
+          "match": {
+            "show": {
+              "query": "${show}"
+            }
+          }
+        },
+        </#if>
         {
           "range": {
             "end_time": {

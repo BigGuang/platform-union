@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletResponse
 @Controller
 @RequestMapping("/config")
 class OnlineConfigController {
-
     /**
      * 读取在线配置
      * @param configName
@@ -40,6 +39,10 @@ class OnlineConfigController {
 
         Map<String, String> params = new HashMap<>()
         String app_config = "config/" + configName + ".json"
+        if (configName.startsWith("page")) {
+            app_config = "config/pages/" + configName + ".json"
+        }
+        println "读取在线配置:" + app_config
         try {
             String str = new TemplateUtils().getFreeMarkerFromResource(app_config, params, "UTF-8")
 
@@ -67,9 +70,12 @@ class OnlineConfigController {
             HttpServletResponse response) throws Exception {
 
         String app_config = "config/" + configName + ".json"
+        if (configName.startsWith("page")) {
+            app_config = "config/pages/" + configName + ".json"
+        }
         try {
             String configPath = StringUtils.getRealPath("/WEB-INF/classes/" + app_config)
-            println "保存在线配置:"+configPath
+            println "保存在线配置:" + configPath
             File configFile = new File(configPath)
             if (!StringUtils.isNull(configParam.getContent())) {
                 configFile.write(configParam.getContent())

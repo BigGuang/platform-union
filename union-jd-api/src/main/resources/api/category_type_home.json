@@ -72,6 +72,20 @@
     },
     {
       "grade": "0",
+      "id": "1713",
+      "name": "图书",
+      "parentId": "0",
+      "img": "http://api.wapg.cn/jd_union/images/group/图书.png"
+    },
+    {
+      "grade": "2",
+      "id": "3842",
+      "name": "高中通用",
+      "parentId": "3289",
+      "img": "http://api.wapg.cn/jd_union/images/group/图书.png"
+    },
+    {
+      "grade": "0",
       "id": "9847",
       "name": "家具",
       "parentId": "0",

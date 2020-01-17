@@ -12,5 +12,6 @@ class UnionActionESMap extends ESBaseBean {
     String start_time
     String end_time
     int show
+    String act_type
     String createtime
 }
