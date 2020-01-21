@@ -29,11 +29,12 @@ public class JdConvertController {
 
         String content = paramsMap.get("content");
         String pid = paramsMap.get("pid");
+        String hard = paramsMap.get("hard");
 
         System.out.println(content);
         System.out.println(pid);
 
-        ResultBean resultBean = jdConvertLinkService.convertLink(content, pid);
+        ResultBean resultBean = jdConvertLinkService.convertLink(content, pid, hard);
         String json = JSONObject.toJSONString(resultBean);
         ResponseUtils.write(response, json);
     }
@@ -48,14 +49,15 @@ public class JdConvertController {
         String content = paramsMap.get("content");
         String pid = paramsMap.get("pid");
         String url = paramsMap.get("url");
+        String hard = paramsMap.get("hard");
 
         System.out.println(content);
         System.out.println(pid);
         System.out.println(url);
-        ResultBean resultBean = jdConvertLinkService.convertLink(content, pid);
+        ResultBean resultBean = jdConvertLinkService.convertLink(content, pid, hard);
 
-        String _u=jdConvertLinkService.getCouponUrl(url);
-        
+        String _u = jdConvertLinkService.getCouponUrl(url);
+
 
         System.out.println(_u);
 

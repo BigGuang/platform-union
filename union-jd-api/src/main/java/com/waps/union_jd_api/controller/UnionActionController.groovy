@@ -10,6 +10,7 @@ import com.waps.union_jd_api.service.UniformMessageParams
 import com.waps.utils.DateUtils
 import com.waps.utils.ResponseUtils
 import com.waps.utils.StringUtils
+import org.elasticsearch.action.update.UpdateResponse
 import org.elasticsearch.search.SearchHit
 import org.elasticsearch.search.SearchHits
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,6 +32,17 @@ class UnionActionController {
     private UnionActionESService unionActionESService
 
 
+    /**
+     * 活动列表
+     * @param act_type
+     * @param show
+     * @param end_time
+     * @param page
+     * @param size
+     * @param request
+     * @param response
+     * @throws Exception
+     */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public void actionList(
             @RequestParam(value = "type", required = false) String act_type,
@@ -85,6 +97,13 @@ class UnionActionController {
         }
     }
 
+    /**
+     * 保存
+     * @param unionActionESMap
+     * @param request
+     * @param response
+     * @throws Exception
+     */
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public void actionSave(
             @RequestBody UnionActionESMap unionActionESMap,
@@ -103,7 +122,38 @@ class UnionActionController {
         }
     }
 
+    /**
+     * 更新排序
+     * @param id
+     * @param order_num
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    @RequestMapping(value = "/update_order", method = RequestMethod.GET)
+    public void actionUpdate(
+            @RequestParam(value = "id", required = true) String id,
+            @RequestParam(value = "order_num", required = true) Integer order_num,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        try {
 
+            UpdateResponse updateResponse=unionActionESService.update(id, "order_num",order_num)
+            ResponseUtils.write(response, new ReturnMessageBean(200, "",).toString())
+
+        } catch (Exception e) {
+            ResponseUtils.write(response, new ReturnMessageBean(500, "更新失败:" + e.getLocalizedMessage()).toString());
+        }
+    }
+
+
+    /**
+     * 删除
+     * @param id
+     * @param request
+     * @param response
+     * @throws Exception
+     */
     @RequestMapping(value = "/delete", method = RequestMethod.GET)
     public void actionDelete(
             @RequestParam(value = "id", required = true) String id,
@@ -118,6 +168,13 @@ class UnionActionController {
         }
     }
 
+    /**
+     * 查询
+     * @param id
+     * @param request
+     * @param response
+     * @throws Exception
+     */
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     public void actionInfo(
             @RequestParam(value = "id", required = true) String id,

@@ -38,7 +38,7 @@ class JDConvertLinkService {
      * @param content
      * @return
      */
-    public ResultBean convertLink(String content, String channelName) {
+    public ResultBean convertLink(String content, String channelName,String hard) {
         long pid = getPositionId(channelName)
         int code = 0
         ArrayList<String> imgList = new ArrayList<>()
@@ -51,7 +51,7 @@ class JDConvertLinkService {
             Map<String, String> infoMap = getInfoList(content)   //券地址+skuId 列表
 
             if (urlList != null && urlList.size() > 0) {
-                Map<String, LinkBean> _map = convertLinkList(urlList, pid)
+                Map<String, LinkBean> _map = convertLinkList(urlList, pid,hard)
                 if (_map.size() > 0) {
                     linkMap.putAll(_map)
                 }
@@ -198,7 +198,6 @@ class JDConvertLinkService {
                             commission = linkBean.getCommission()
                         }
                     }
-
                 }
                 code = 200
             }
@@ -220,10 +219,17 @@ class JDConvertLinkService {
     }
 
 
-    public Map<String, LinkBean> convertLinkList(List<String> oldUrlList, long pid) {
+    /**
+     * 文案中的链接列表，pid,
+     * @param oldUrlList
+     * @param pid
+     * @param hard 直接转
+     * @return
+     */
+    public Map<String, LinkBean> convertLinkList(List<String> oldUrlList, long pid,hard) {
         if (oldUrlList.size() > 0) {
             List<LinkBean> toConvertList = new ArrayList<>()
-            if (oldUrlList.size() == 1) {
+            if (oldUrlList.size() == 1 && StringUtils.isNull(hard)) {
                 String oldUrl = oldUrlList[0]
                 String skuId = getSkuIdFromUrl(oldUrl)
                 println "skuId:" + skuId

@@ -24,6 +24,9 @@
     "show": {
       "type": "integer"
     },
+    "order_num": {
+      "type": "integer"
+    },
     "act_type": {
       "type": "text",
       "fields": {
