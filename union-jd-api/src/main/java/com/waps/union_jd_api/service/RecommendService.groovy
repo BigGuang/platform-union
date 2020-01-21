@@ -51,6 +51,8 @@ class RecommendService {
                 if (unionEditorLogESMap.getSkuList()) {
                     for (SkuBeanESMap skuBeanESMap in unionEditorLogESMap.getSkuList()) {
                         if (!StringUtils.isNull(skuBeanESMap.getSkuId())) {
+                            //先remove，再add 滤重
+                            skuIdList.remove(skuBeanESMap.getSkuId())
                             skuIdList.add(skuBeanESMap.getSkuId())
                         }
                     }
