@@ -1,6 +1,7 @@
 package com.waps.union_jd_api.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.waps.union_jd_api.bean.ReturnMessageBean;
 import com.waps.union_jd_api.service.JDMediaService;
 import com.waps.service.jd.es.domain.JDMediaInfoESMap;
 import com.waps.utils.ResponseUtils;
@@ -9,6 +10,7 @@ import org.elasticsearch.search.SearchHits;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +26,16 @@ public class JdMediaController {
 
     @Autowired
     JDMediaService jdMediaService;
+
+    @RequestMapping(value = "/get_pid", method = RequestMethod.GET)
+    public void getPid(@RequestParam(value = "channel_name", required = false) String channel_name,
+                       HttpServletRequest request,
+                       HttpServletResponse response) throws Exception {
+
+        JDMediaInfoESMap jdMediaInfoESMap = jdMediaService.getMediaInfoByChannelName(channel_name);
+
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", jdMediaInfoESMap).toString());
+    }
 
     @RequestMapping(value = "/info")
     public void getMediaInfo(
