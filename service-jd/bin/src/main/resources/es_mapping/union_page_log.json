@@ -1,0 +1,83 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "user_id": {
+      "type": "keyword"
+    },
+    "host": {
+      "type": "keyword"
+    },
+    "channel_name": {
+      "type": "keyword"
+    },
+    "user_agent": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "referer": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "area": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "isp": {
+      "type": "keyword"
+    },
+    "ip": {
+      "type": "keyword"
+    },
+    "page": {
+      "type": "keyword"
+    },
+    "from": {
+      "type": "keyword"
+    },
+    "osVersion": {
+      "type": "keyword"
+    },
+    "deviceVandor": {
+      "type": "keyword"
+    },
+    "osName": {
+      "type": "keyword"
+    },
+    "browserName": {
+      "type": "keyword"
+    },
+    "search": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "createtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

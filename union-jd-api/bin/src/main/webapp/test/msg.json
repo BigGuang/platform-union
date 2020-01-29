@@ -1,0 +1,34 @@
+{
+  "chatId": "5d5a7882bd6faa1c4ee09940",
+  "contactId": "wxid_4082290823111",
+  "contactName": "老陈醋",
+  "messageId": "1079936080",
+  "payload": {
+    "mention": [
+      "wxid_pior7yy35mw512"
+    ],
+    "text": "@京东助手 养生壶"
+  },
+  "roomID": "17625669501@chatroom",
+  "roomTopic": "京东VIP内V017",
+  "timestamp": 1.5667815E12,
+  "token": "5d55fffb1fb2c366fc8b8bda",
+  "type": 7
+},
+{
+  "chatId": "5d5a4754bd6faa1c4edfe3cc",
+  "contactId": "wxid_1f0pttr8reyd11",
+  "contactName": "凤梨罐头",
+  "messageId": "1079936331",
+  "payload": {
+    "mention": [
+      "wxid_pior7yy35mw512"
+    ],
+    "text": "@京东助手 口疮"
+  },
+  "roomID": "18094678040@chatroom",
+  "roomTopic": "测试群S012",
+  "timestamp": 1.566783298E12,
+  "token": "5d55fffb1fb2c366fc8b8bda",
+  "type": 7
+}

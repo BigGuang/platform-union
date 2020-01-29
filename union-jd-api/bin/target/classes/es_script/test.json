@@ -1,0 +1,29 @@
+{
+  "from": "0",
+  "size": "20",
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "match": {
+            "media_id.raw": {
+              "query": "63665",
+              "boost": 2
+            }
+          }
+        },
+        {
+          "match": {
+            "channel_name": {
+              "query": "A002",
+              "boost": 2
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+
+
+

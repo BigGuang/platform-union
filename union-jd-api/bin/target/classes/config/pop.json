@@ -1,0 +1,13 @@
+{
+  "pop_title": "活动详情",
+  "pop_desc": "1.复制以下文案并微信发送给自己\n2.通过微信访问活动地址购买\n",
+  "pop_list": [
+    {
+      "pop_content": "\uD83D\uDD25赶快抢【京享红包】最高888元\uD83C\uDF81每天抢3次，抢到就是赚到\uD83D\uDE04\n\uD83D\uDED1记得抢完分享给身边人一起抢！\uD83D\uDC47\n主会场\uD83D\uDC49https://u.jd.com/gczJdq\n\uD83C\uDF89超市会场\uD83D\uDC49https://u.jd.com/CBnJ6a",
+      "pop_share_img": "https://jd.wapg.cn/images/share_pop.jpg"
+    }
+  ],
+  "pop_img": "https://jd.wapg.cn/images/pop.png",
+  "banner_img": "https://jd.wapg.cn/images/banner_1.jpg",
+  "show": 1
+}

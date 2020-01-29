@@ -1,0 +1,72 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "media_id": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "media_name": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "channel_id": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "channel_name": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "click_num": {
+      "type": "integer"
+    },
+    "in_order_num": {
+      "type": "integer"
+    },
+    "in_order_price": {
+      "type": "double"
+    },
+    "complete_order_num": {
+      "type": "integer"
+    },
+    "complete_order_price": {
+      "type": "double"
+    },
+    "estimate_price": {
+      "type": "double"
+    },
+    "log_time": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    },
+    "createtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

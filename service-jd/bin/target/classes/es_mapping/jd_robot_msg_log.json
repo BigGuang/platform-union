@@ -1,0 +1,62 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "search": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "room_name": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "channel_id": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "channel_name": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "contact_name": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "type": {
+      "type": "keyword"
+    },
+    "createtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

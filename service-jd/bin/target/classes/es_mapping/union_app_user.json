@@ -1,0 +1,117 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "open_id": {
+      "type": "keyword"
+    },
+    "wx_id": {
+      "type": "keyword"
+    },
+    "user_name": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "user_icon": {
+      "type": "keyword"
+    },
+    "user_sex": {
+      "type": "keyword"
+    },
+    "user_type": {
+      "type": "keyword"
+    },
+    "user_pwd_md5": {
+      "type": "keyword"
+    },
+    "points": {
+      "type": "double"
+    },
+    "channel_id": {
+      "type": "keyword"
+    },
+    "channel_name": {
+      "type": "keyword"
+    },
+    "country": {
+      "type": "keyword"
+    },
+    "province": {
+      "type": "keyword"
+    },
+    "city": {
+      "type": "keyword"
+    },
+    "phone": {
+      "type": "keyword"
+    },
+    "ip": {
+      "type": "keyword"
+    },
+    "location": {
+      "type": "geo_point"
+    },
+    "invite_code": {
+      "type": "keyword"
+    },
+    "f_name": {
+      "type": "keyword"
+    },
+    "f_id": {
+      "type": "keyword"
+    },
+    "g_name": {
+      "type": "keyword"
+    },
+    "g_id": {
+      "type": "keyword"
+    },
+    "from_type": {
+      "type": "keyword"
+    },
+    "status": {
+      "type": "keyword"
+    },
+    "u_code": {
+      "type": "keyword"
+    },
+    "f_code": {
+      "type": "keyword"
+    },
+    "invite_user_id": {
+      "type": "keyword"
+    },
+    "f_user_id": {
+      "type": "keyword"
+    },
+    "t_user_id": {
+      "type": "keyword"
+    },
+    "a_user_id": {
+      "type": "keyword"
+    },
+    "s_user_id": {
+      "type": "keyword"
+    },
+    "role_id": {
+      "type": "keyword"
+    },
+    "createtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    },
+    "modifytime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "from": "${from}",
+  "size": "${size}",
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        },
+        {
+          "range": {
+            "sendtime": {
+              "gte": "${start_time}",
+              "lte": "${end_time}"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "sort": [
+    {
+      "sendtime": {
+        "order": "desc"
+      }
+    }
+  ]
+}
