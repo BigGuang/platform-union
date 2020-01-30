@@ -1,0 +1,25 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "name": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "grade": {
+      "type": "keyword"
+    },
+    "parentId": {
+      "type": "keyword"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

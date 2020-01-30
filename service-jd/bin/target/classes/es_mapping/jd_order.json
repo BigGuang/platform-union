@@ -1,0 +1,182 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "finishTime": {
+      "type": "keyword"
+    },
+    "finishTime_Date": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    },
+    "popId": {
+      "type": "keyword"
+    },
+    "orderTime": {
+      "type": "keyword"
+    },
+    "orderTime_Date": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    },
+    "payMonth": {
+      "type": "keyword"
+    },
+    "unionId": {
+      "type": "keyword"
+    },
+    "orderId": {
+      "type": "keyword"
+    },
+    "validCode": {
+      "type": "keyword"
+    },
+    "parentId": {
+      "type": "keyword"
+    },
+    "plus": {
+      "type": "keyword"
+    },
+    "ext1": {
+      "type": "keyword"
+    },
+    "ext1_positionId": {
+      "type": "keyword"
+    },
+    "ext1_user": {
+      "type": "keyword"
+    },
+    "orderEmt": {
+      "type": "keyword"
+    },
+    "skuImg": {
+      "type": "keyword"
+    },
+    "skuList": {
+      "properties": {
+        "commissionRate": {
+          "type": "double"
+        },
+        "estimateCosPrice": {
+          "type": "double"
+        },
+        "unionTrafficGroup": {
+          "type": "keyword"
+        },
+        "validCode": {
+          "type": "keyword"
+        },
+        "estimateFee": {
+          "type": "double"
+        },
+        "pid": {
+          "type": "keyword"
+        },
+        "skuName": {
+          "type": "text",
+          "fields": {
+            "raw": {
+              "type": "keyword"
+            }
+          },
+          "store": true
+        },
+        "popId": {
+          "type": "keyword"
+        },
+        "payMonth": {
+          "type": "keyword"
+        },
+        "price": {
+          "type": "double"
+        },
+        "unionTag": {
+          "type": "keyword"
+        },
+        "cid1": {
+          "type": "keyword"
+        },
+        "cid1_name": {
+          "type": "keyword"
+        },
+        "cid2": {
+          "type": "keyword"
+        },
+        "cid2_name": {
+          "type": "keyword"
+        },
+        "cid3": {
+          "type": "keyword"
+        },
+        "cid3_name": {
+          "type": "keyword"
+        },
+        "actualFee": {
+          "type": "double"
+        },
+        "finalRate": {
+          "type": "double"
+        },
+        "skuId": {
+          "type": "keyword"
+        },
+        "ext1": {
+          "type": "keyword"
+        },
+        "ext1_positionId": {
+          "type": "keyword"
+        },
+        "ext1_user": {
+          "type": "keyword"
+        },
+        "subsidyRate": {
+          "type": "double"
+        },
+        "unionAlias": {
+          "type": "keyword"
+        },
+        "subUnionId": {
+          "type": "keyword"
+        },
+        "skuReturnNum": {
+          "type": "keyword"
+        },
+        "positionId": {
+          "type": "keyword"
+        },
+        "positionName": {
+          "type": "keyword"
+        },
+        "traceType": {
+          "type": "keyword"
+        },
+        "actualCosPrice": {
+          "type": "double"
+        },
+        "siteId": {
+          "type": "keyword"
+        },
+        "skuImg": {
+          "type": "keyword"
+        },
+        "frozenSkuNum": {
+          "type": "keyword"
+        },
+        "skuNum": {
+          "type": "keyword"
+        },
+        "subSideRate": {
+          "type": "double"
+        }
+      }
+    },
+    "createtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

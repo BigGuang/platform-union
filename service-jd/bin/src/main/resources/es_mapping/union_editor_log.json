@@ -1,0 +1,61 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "skuList": {
+      "properties": {
+        "skuId": {
+          "type": "keyword"
+        }
+      }
+    },
+    "text": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
+    "images": {
+      "type": "keyword"
+    },
+    "videos": {
+      "type": "keyword"
+    },
+    "accountId": {
+      "type": "integer"
+    },
+    "status": {
+      "type": "integer"
+    },
+    "imageCount": {
+      "type": "integer"
+    },
+    "videoCount": {
+      "type": "integer"
+    },
+    "messageType": {
+      "type": "integer"
+    },
+    "robotMessageId": {
+      "type": "integer"
+    },
+    "weight": {
+      "type": "integer"
+    },
+    "sendtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    },
+    "createtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

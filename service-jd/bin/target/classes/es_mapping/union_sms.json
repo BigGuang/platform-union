@@ -1,0 +1,23 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "phone": {
+      "type": "keyword"
+    },
+    "code": {
+      "type": "keyword"
+    },
+    "expiretime": {
+      "type": "long"
+    },
+    "createtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

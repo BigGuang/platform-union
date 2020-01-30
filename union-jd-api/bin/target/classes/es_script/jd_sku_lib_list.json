@@ -1,0 +1,11 @@
+{
+  "from": 0,
+  "size": 50,
+  "query": {
+    "range": {
+      "couponInfo.couponList.getEndTime": {
+        "gte": 1571123696676
+      }
+    }
+  }
+}

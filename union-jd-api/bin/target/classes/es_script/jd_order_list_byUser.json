@@ -1,0 +1,61 @@
+{
+  "from": "${from}",
+  "size": "${size}",
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "bool": {
+            "should": [
+              {
+                "match": {
+                  "skuList.positionId": "${pid!'nil'}"
+                }
+              },
+              {
+                "match": {
+                  "skuList.ext1_positionId": "${pid!'nil'}"
+                }
+              },
+              {
+                "match": {
+                  "skuList.ext1_user": "${phone!'nil'}"
+                }
+              },
+              {
+                "match": {
+                  "orderId": "${orderId!'nil'}"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "bool": {
+            "should": [
+              {
+                "terms": {
+                  "validCode": ["${validCode!'nil'}"]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "range": {
+            "orderTime_Date": {
+              "gte": "${stime}",
+              "lte": "${etime}"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "sort": {
+    "orderTime_Date": {
+      "order": "${sort!'desc'}"
+    }
+  }
+}

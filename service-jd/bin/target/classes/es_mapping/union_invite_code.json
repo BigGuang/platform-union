@@ -1,0 +1,29 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "invite_code": {
+      "type": "keyword"
+    },
+    "channel_id": {
+      "type": "keyword"
+    },
+    "channel_name": {
+      "type": "keyword"
+    },
+    "f_open_id": {
+      "type": "keyword"
+    },
+    "t_open_id": {
+      "type": "keyword"
+    },
+    "createtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}
