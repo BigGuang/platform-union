@@ -1,4 +1,6 @@
 # Project exclude paths
+.DS_Store
+
 /commons-esclient/target/
 /service-jd/target/
 /union-jd-api/target/
