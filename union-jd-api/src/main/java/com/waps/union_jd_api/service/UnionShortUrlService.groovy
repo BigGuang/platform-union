@@ -2,7 +2,7 @@ package com.waps.union_jd_api.service
 
 import com.waps.service.jd.es.domain.UnionShortUrlESMap
 import com.waps.service.jd.es.service.UnionShortUrlESService
-import com.waps.utils.DateUtils
+import com.waps.union_jd_api.utils.DateUtils
 import com.waps.utils.StringUtils
 import org.elasticsearch.action.index.IndexResponse
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,7 +16,7 @@ class UnionShortUrlService {
 
     public IndexResponse saveShortUrl(UnionShortUrlESMap unionShortUrlESMap) {
         if (!StringUtils.isNull(unionShortUrlESMap.getId())) {
-            unionShortUrlESMap.setCreatetime(DateUtils.getNow())
+            unionShortUrlESMap.setCreatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
             return unionShortUrlESService.save(unionShortUrlESMap.getId(),unionShortUrlESMap)
         }
     }

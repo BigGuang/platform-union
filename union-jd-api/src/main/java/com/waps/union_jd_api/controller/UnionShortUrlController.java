@@ -44,7 +44,7 @@ public class UnionShortUrlController {
     }
 
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
     public void getUrl(@PathVariable("id") String id,
                        HttpServletRequest request,
                        HttpServletResponse response) throws Exception {
