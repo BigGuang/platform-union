@@ -1,1 +1,0 @@
-<#if contactName?default("")?trim?length gt 1>@${contactName}</#if> 出现参数错误(群编号无法匹配),请@京东小妹 协助解决

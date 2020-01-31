@@ -50,10 +50,7 @@ class ConvertLinkService {
                             params.setCouponUrl(couponUrl)
                             params.setPositionId(pid)
                             params.setChainType(2)
-                            println "===链接参数==="
-                            TestUtils.outPrint(linkBean)
-                            println "===转链参数==="
-                            TestUtils.outPrint(params)
+
                             UnionOpenPromotionBysubunionidGetResponse response = jdUnionService.getGoodsUnionLinkResponse(params)
                             println "===转链结果==="
                             TestUtils.outPrint(response)
@@ -64,6 +61,7 @@ class ConvertLinkService {
                                 newUrl = linkBean.getOldUrl()
                             }
                             linkBean.setNewUrl(newUrl)
+                            linkBean.setMessage(response.getMessage())
                             println "oldUrl:" + linkBean.getOldUrl() + "  newUrl:" + newUrl
                             convertedMap.put(linkBean.getOldUrl(), linkBean);
                         } catch (Exception e) {

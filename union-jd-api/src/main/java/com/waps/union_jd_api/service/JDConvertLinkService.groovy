@@ -10,6 +10,7 @@ import com.waps.union_jd_api.utils.JDConfig
 import com.waps.utils.StringUtils
 import jd.union.open.goods.query.response.Coupon
 import jd.union.open.goods.query.response.GoodsResp
+import jd.union.open.promotion.bysubunionid.get.response.PromotionCodeResp
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -38,7 +39,7 @@ class JDConvertLinkService {
      * @param content
      * @return
      */
-    public ResultBean convertLink(String content, String channelName,String hard) {
+    public ResultBean convertLink(String content, String channelName, String hard) {
         long pid = getPositionId(channelName)
         int code = 0
         ArrayList<String> imgList = new ArrayList<>()
@@ -51,7 +52,7 @@ class JDConvertLinkService {
             Map<String, String> infoMap = getInfoList(content)   //券地址+skuId 列表
 
             if (urlList != null && urlList.size() > 0) {
-                Map<String, LinkBean> _map = convertLinkList(urlList, pid,hard)
+                Map<String, LinkBean> _map = convertLinkList(urlList, pid, hard)
                 if (_map.size() > 0) {
                     linkMap.putAll(_map)
                 }
@@ -142,13 +143,15 @@ class JDConvertLinkService {
                         if (linkBean) {
                             String materiaUrl = linkBean.getMateriaUrl()
                             materiaUrl = removeParams(materiaUrl)
-                            String newUrl = getNewLink(materiaUrl, null, pid)
+                            ReturnBean returnBean = getNewLinkReturn(materiaUrl, null, pid)
                             println "materiaUrl:" + materiaUrl
-                            println "newUrl:" + newUrl
-                            if (!StringUtils.isNull(newUrl)) {
-                                linkBean.setNewUrl(newUrl)
-                                linkMap.put(id, linkBean)
+                            println "newUrl:" + returnBean.getShortURL()
+                            if (!StringUtils.isNull(returnBean.getShortURL())) {
+                                linkBean.setNewUrl(returnBean.getShortURL())
+                            } else {
+                                linkBean.setMessage(returnBean.getMessage())
                             }
+                            linkMap.put(id, linkBean)
                         }
                     }
                 }
@@ -174,6 +177,9 @@ class JDConvertLinkService {
                         }
                         if (!isSuccess) {
                             newStr = "转链失败"
+                            if (!StringUtils.isNull(linkBean.getMessage())) {
+                                newStr = linkBean.getMessage()
+                            }
                         } else {
                             if (!StringUtils.isNull(linkBean.getImgUrl())) {
                                 imgList.add(linkBean.getImgUrl())
@@ -226,7 +232,7 @@ class JDConvertLinkService {
      * @param hard 直接转
      * @return
      */
-    public Map<String, LinkBean> convertLinkList(List<String> oldUrlList, long pid,hard) {
+    public Map<String, LinkBean> convertLinkList(List<String> oldUrlList, long pid, hard) {
         if (oldUrlList.size() > 0) {
             List<LinkBean> toConvertList = new ArrayList<>()
             if (oldUrlList.size() == 1 && StringUtils.isNull(hard)) {
@@ -481,6 +487,37 @@ class JDConvertLinkService {
         return shortUrl
     }
 
+    public ReturnBean getNewLinkReturn(String materialUrl, String couponUrl, Long positionId) {
+        PromotionCodeParams params = new PromotionCodeParams()
+        params.setApp_key(JDConfig.APP_KEY)
+        params.setApp_secret(JDConfig.SECRET_KEY)
+        params.setMaterialId(materialUrl)
+        params.setPositionId(positionId)
+        params.setChainType(2)
+        if (!StringUtils.isNull(couponUrl)) {
+            params.setCouponUrl(couponUrl)
+        }
+        ReturnBean returnBean = getUnionLink(params)
+        return returnBean
+    }
+
+    public ReturnBean getUnionLink(PromotionCodeParams promotionCodeParams) {
+        String jsonStr = jdUnionService.getGoodsUnionLink(promotionCodeParams)
+        JSONObject jsonObjec = (JSONObject) JSONObject.parse(jsonStr)
+        String code = jsonObjec.get("code")
+        String message = jsonObjec.get("message")
+        println code + ' ' + message
+        ReturnBean returnBean = new ReturnBean()
+        if (code.equals('200')) {
+            JSONObject jsonObject = jsonObjec.get('data')
+            PromotionCodeResp promotionCodeResp = jsonObject.toJavaObject(PromotionCodeResp.class)
+            returnBean.setShortURL(promotionCodeResp.getShortURL())
+        }
+        returnBean.setCode(code)
+        returnBean.setMessage(message)
+        return returnBean
+    }
+
     /**
      * 直接转链
      * @param url
@@ -488,7 +525,7 @@ class JDConvertLinkService {
      * @return
      */
     public String convertUrl(String url, String channel_name) {
-        if(!StringUtils.isNull(url)) {
+        if (!StringUtils.isNull(url)) {
             Long pid = getPositionId(channel_name)
             if (pid > 0) {
                 String newUrl = getNewLink(url, null, pid)
@@ -496,7 +533,7 @@ class JDConvertLinkService {
             } else {
                 return null
             }
-        }else{
+        } else {
             return null
         }
     }
@@ -669,6 +706,7 @@ class LinkBean {
     double price
     double couponPrice
     double buyPrice
+    String message
 }
 
 class ResultBean {
@@ -678,4 +716,11 @@ class ResultBean {
     String positionId
     double commission
     ArrayList<String> imgList = new ArrayList<>()
+}
+
+class ReturnBean {
+    String code
+    String message
+    String shortURL
+
 }
