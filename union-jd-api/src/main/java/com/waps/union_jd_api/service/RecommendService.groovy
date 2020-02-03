@@ -1,5 +1,6 @@
 package com.waps.union_jd_api.service
 
+import com.alibaba.fastjson.JSONObject
 import com.waps.elastic.search.utils.PageUtils
 import com.waps.service.jd.api.bean.SearchParams
 import com.waps.service.jd.api.service.JdUnionService
@@ -80,12 +81,20 @@ class RecommendService {
 
 
     public String skuListRecommend(String[] skuIDs) {
-        Long[] longSkuIDs = (Long[]) ConvertUtils.convert(skuIDs, long.class);
-        SearchParams searchParams = new SearchParams()
-        searchParams.setApp_key(JDConfig.APP_KEY)
-        searchParams.setApp_secret(JDConfig.SECRET_KEY)
-        searchParams.setSkuIds(longSkuIDs)
-        String json = jdUnionService.getGoodsListBySearch(searchParams)
+        String json=""
+        if(skuIDs.size()>0) {
+            Long[] longSkuIDs = (Long[]) ConvertUtils.convert(skuIDs, long.class);
+            SearchParams searchParams = new SearchParams()
+            searchParams.setApp_key(JDConfig.APP_KEY)
+            searchParams.setApp_secret(JDConfig.SECRET_KEY)
+            searchParams.setSkuIds(longSkuIDs)
+            json = jdUnionService.getGoodsListBySearch(searchParams)
+        }else{
+            Map map=new HashMap()
+            map.put("code",200)
+            map.put("message","success")
+            json=JSONObject.toJSONString(map)
+        }
         return json
     }
 

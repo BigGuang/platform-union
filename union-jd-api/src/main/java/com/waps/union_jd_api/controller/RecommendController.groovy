@@ -101,11 +101,33 @@ class RecommendController {
     @RequestMapping(value = "/sku_recommend")
     public void skuListRecommend(
             @RequestParam(value = "sku", required = true) String[] skuList,
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "size", required = false) Integer size,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         println skuList
-        String json = recommendService.skuListRecommend(skuList)
-        ResponseUtils.write(response, json);
+
+        if (page != null && size != null) {
+            if (page < 1) page = 1
+            List<String> list = new ArrayList<>()
+            int start = (page - 1) * size;
+            int end = start + size;
+            if (start < skuList.length && start < end) {
+                if (end > skuList.length) {
+                    end = skuList.length
+                }
+                for (int i = start; i < end; i++) {
+                    String _sku=skuList[i]
+                    list.add(_sku)
+                }
+            }
+            String[] _list = new String[list.size()]
+            String json = recommendService.skuListRecommend(list.toArray(_list))
+            ResponseUtils.write(response, json);
+        } else {
+            String json = recommendService.skuListRecommend(skuList)
+            ResponseUtils.write(response, json);
+        }
     }
 
 }
