@@ -62,6 +62,7 @@ class TSCallBackService {
 
         switch (nType) {
             case 1006:
+
                 break;
             case 3001:
                 break;
