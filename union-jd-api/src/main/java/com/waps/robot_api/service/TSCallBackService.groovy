@@ -1,23 +1,36 @@
 package com.waps.robot_api.service
 
+import com.alibaba.fastjson.JSONObject
+import com.waps.robot_api.bean.callback.TSCallBackBaseBean
+import com.waps.service.jd.es.domain.TSCallBackLogESMap
+import com.waps.service.jd.es.service.TSCallBackLogESService
+import com.waps.tools.test.TestUtils
+import com.waps.union_jd_api.utils.DateUtils
 import com.waps.utils.StringUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 import java.text.SimpleDateFormat
 
-/**
- * 回调接收类
- */
-
 @Component
 class TSCallBackService {
 
+    @Autowired
+    TSCallBackLogESService tsCallBackLogESService
+
     public Boolean callBack(int nType, String strContext) {
+
+        println "==strContext=="
+        println strContext
 
         if (!StringUtils.isNull(strContext)) {
             strContext = URLDecoder.decode(strContext, "UTF-8")
         }
+
+        println "==保存callback=="
+        saveCallBackLog2ES(strContext)
         saveCallBackLog(nType, strContext)
+
         //1006  修改机器人信息回调  http://docs.op.opsdns.cc:8081/Personal-number-msg/Personal-msg-callback/
         //3001  机器人登录后，回调给商家一次全量好友列表, 每24小时推送一次
         //3002  【直接回调】 主动添加好友结果回调接口（还未成为好友）
@@ -47,7 +60,7 @@ class TSCallBackService {
         //5003  群内实时消息回调
         //5004  私聊消息发送结果回调接口
 
-        switch (nType){
+        switch (nType) {
             case 1006:
                 break;
             case 3001:
@@ -104,10 +117,7 @@ class TSCallBackService {
                 break;
             case 5004:
                 break;
-
-
         }
-
 
 
         return true
@@ -116,16 +126,33 @@ class TSCallBackService {
     public void saveCallBackLog(int nType, String strContext) {
         try {
             Date nowTime = new Date();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_ms");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
             String time = simpleDateFormat.format(nowTime)
             String path = "/home/robot_logs/" + time + "_" + nType + ".log"
+            println "path:" + path
             if (!StringUtils.isNull(strContext)) {
                 new File(path).write(strContext)
             }
             println "nType:" + nType
             println "strContext:" + strContext
         } catch (Exception e) {
-            e.printStackTrace()
+            println "saveCallBackLog ERROR:" + e.getLocalizedMessage()
+        }
+
+    }
+
+    public void saveCallBackLog2ES(String strContext) {
+        try {
+            TSCallBackLogESMap tsCallBackLogESMap = JSONObject.parseObject(strContext, TSCallBackLogESMap.class) as TSCallBackLogESMap
+            if (tsCallBackLogESMap != null) {
+                tsCallBackLogESMap.setCreatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
+                println "===tsCallBackLogESMap====="
+                TestUtils.outPrint(tsCallBackLogESMap)
+                String id = UUID.randomUUID().toString()
+                tsCallBackLogESService.save(id, tsCallBackLogESMap)
+            }
+        } catch (Exception e) {
+            println "saveCallBackLog2ES ERROR:" + e.getLocalizedMessage()
         }
     }
 }

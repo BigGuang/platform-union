@@ -6,24 +6,23 @@ import com.waps.robot_api.utils.TestRequest
 import com.waps.robot_api.utils.UrlUtil
 import com.waps.union_jd_api.bean.ReturnMessageBean
 import com.waps.utils.ResponseUtils
-import com.waps.utils.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import java.text.SimpleDateFormat
 
 @Controller
 @RequestMapping("/ts/robot")
-class TuSeRobotController {
+class TSRobotController {
     @Autowired
     private TSAuthService tuSeAuthService
+
+    @Autowired
     private TSCallBackService tsCallBackService
 
     @RequestMapping(value = "/token")
@@ -44,9 +43,6 @@ class TuSeRobotController {
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         String retString = "SUCCESS"
-        println "ContentType:" + request.getHeader("content-type")
-        println request.getParameterMap()
-
         if (nType != null) {
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(request.getInputStream()));
@@ -58,12 +54,13 @@ class TuSeRobotController {
             System.out.println(buffer.toString());
             String body = buffer.toString()
 
-            TestRequest.outPrintRequest(request, response);
+            TestRequest.outPrintRequest(request);
 
             Map<String, String> params = UrlUtil.parseBody(body)
             String strContext = params.get("strContext")
             String strSign = params.get("strSign")
 
+            println "==save=="
 
             boolean flg = tsCallBackService.callBack(nType, strContext)
             if (!flg) {

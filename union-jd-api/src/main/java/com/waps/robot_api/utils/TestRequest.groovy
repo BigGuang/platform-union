@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 class TestRequest {
-    public static void outPrintRequest(HttpServletRequest request, HttpServletResponse response) {
+    public static void outPrintRequest(HttpServletRequest request) {
         StringBuffer buff = new StringBuffer();
         buff.append("ip:" + request.getRemoteHost() + "\r\n");
         Enumeration param_names = request.getParameterNames();
@@ -55,10 +55,6 @@ class TestRequest {
         buff.append("getLocalAddr=" + request.getLocalAddr() + "\r\n");
         buff.append("getCharacterEncoding=" + request.getCharacterEncoding() + "\r\n");
         buff.append("getLocalName=" + request.getLocalName() + "\r\n");
-        buff.append("============response============\r\n");
-        buff.append("getCharacterEncoding=" + response.getCharacterEncoding() + "\r\n");
-        buff.append("getContentType=" + response.getContentType() + "\r\n");
-        buff.append("getBufferSize=" + response.getBufferSize() + "\r\n");
         System.out.println(buff.toString());
     }
 }

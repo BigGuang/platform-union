@@ -8,5 +8,5 @@ class TSCallBackBaseBean {
     String vcSerialNo
     String nResult
     String vcResult
-    Map<String, Object> Data = new HashMap<>()
+    Map<String, Object> data = new HashMap<>()
 }

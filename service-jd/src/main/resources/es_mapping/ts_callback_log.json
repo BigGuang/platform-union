@@ -24,7 +24,7 @@
     "vcResult": {
       "type": "keyword"
     },
-    "DataStr": {
+    "data": {
       "type": "keyword"
     },
     "createtime": {
