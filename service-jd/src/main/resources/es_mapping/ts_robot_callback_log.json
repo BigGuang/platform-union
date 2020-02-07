@@ -1,0 +1,38 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "nType": {
+      "type": "integer"
+    },
+    "vcMerchantNo": {
+      "type": "keyword"
+    },
+    "vcRobotWxId": {
+      "type": "keyword"
+    },
+    "vcRobotSerialNo": {
+      "type": "keyword"
+    },
+    "vcSerialNo": {
+      "type": "keyword"
+    },
+    "nResult": {
+      "type": "integer"
+    },
+    "vcResult": {
+      "type": "keyword"
+    },
+    "DataStr": {
+      "type": "keyword"
+    },
+    "createtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

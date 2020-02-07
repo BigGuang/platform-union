@@ -65,7 +65,7 @@
     buff.append("getCharacterEncoding=" + response.getCharacterEncoding() + "\r\n");
     buff.append("getContentType=" + response.getContentType() + "\r\n");
     buff.append("getBufferSize=" + response.getBufferSize() + "\r\n");
-
+    System.out.println(buff.toString());
     out.println(buff.toString().replaceAll("\r\n","</br>"));
 
 %>

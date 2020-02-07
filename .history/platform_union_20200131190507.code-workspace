@@ -16,7 +16,7 @@
 			"**/.settings": true,
 			"**/.factorypath": true,
 			".idea": true,
-			".history": true,
+			".history": false,
 			"bin": false,
 			"**/bin": true
 		},

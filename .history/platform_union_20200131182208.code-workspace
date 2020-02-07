@@ -16,9 +16,7 @@
 			"**/.settings": true,
 			"**/.factorypath": true,
 			".idea": true,
-			".history": true,
-			"bin": false,
-			"**/bin": true
+			".history": true
 		},
 		"explorerExclude.backup": null
 	}

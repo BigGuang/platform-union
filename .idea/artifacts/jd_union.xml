@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact name="jd_union">
+    <output-path>$PROJECT_DIR$/out/artifacts/jd_union</output-path>
+    <root id="root">
+      <element id="dir-copy" path="$PROJECT_DIR$/union-jd-api/target/union-jd-api-2.0" />
+    </root>
+  </artifact>
+</component>
