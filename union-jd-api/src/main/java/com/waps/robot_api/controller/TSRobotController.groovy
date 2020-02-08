@@ -1,7 +1,9 @@
 package com.waps.robot_api.controller
 
+import com.waps.robot_api.bean.response.TSResponseRobotInfoBean
 import com.waps.robot_api.service.TSAuthService
 import com.waps.robot_api.service.TSCallBackService
+import com.waps.robot_api.service.TSRobotConfigService
 import com.waps.robot_api.utils.TestRequest
 import com.waps.robot_api.utils.UrlUtil
 import com.waps.union_jd_api.bean.ReturnMessageBean
@@ -25,6 +27,9 @@ class TSRobotController {
     @Autowired
     private TSCallBackService tsCallBackService
 
+    @Autowired
+    private TSRobotConfigService tsRobotConfigService
+
     @RequestMapping(value = "/token")
     public void getToken(
             HttpServletRequest request,
@@ -33,6 +38,16 @@ class TSRobotController {
         String token = tuSeAuthService.getToken()
         ResponseUtils.write(response, new ReturnMessageBean(200, "", token))
     }
+
+    @RequestMapping(value = "/list")
+    public void getRobotList(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        TSResponseRobotInfoBean responseRobotInfoBean=tsRobotConfigService.getRobotInfoListBean()
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", responseRobotInfoBean))
+    }
+
 
     @RequestMapping(value = "/callback",
             method = RequestMethod.POST,

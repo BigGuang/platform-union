@@ -1,7 +1,7 @@
 package com.waps.robot_api.service
 
 import com.alibaba.fastjson.JSONObject
-import com.waps.robot_api.utils.APIConfig
+import com.waps.robot_api.utils.TSApiConfig
 import com.waps.union_jd_api.utils.HttpUtils
 import com.waps.utils.StringUtils
 import org.springframework.stereotype.Component
@@ -27,10 +27,10 @@ class TSAuthService {
                 && nowTime < (tokenReturnBean.getCreateTime() + _2h)) {
         } else {
             tokenReturnBean = new TSTokenBean()
-            String url = APIConfig.AUTH_TOKEN_URL
+            String url = TSApiConfig.AUTH_TOKEN_URL
             Map params = new HashMap()
-            params.put("merchant", APIConfig.merchant_ID)
-            params.put("secret", APIConfig.merchant_KEY)
+            params.put("merchant", TSApiConfig.merchant_ID)
+            params.put("secret", TSApiConfig.merchant_KEY)
             println url
             String retJson = HttpUtils.postJsonString(url, JSONObject.toJSONString(params))
             println retJson

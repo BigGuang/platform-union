@@ -1,7 +1,7 @@
 package com.waps.robot_api.bean.request
 
-import com.waps.robot_api.utils.APIConfig
+import com.waps.robot_api.utils.TSApiConfig
 
 class TSPostBaseBean {
-    String vcMerchantNo= APIConfig.merchant_ID
+    String vcMerchantNo= TSApiConfig.merchant_ID
 }
