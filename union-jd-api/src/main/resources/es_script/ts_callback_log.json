@@ -1,0 +1,20 @@
+{
+  "from": "${from}",
+  "size": "${size}",
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        }
+      ]
+    }
+  },
+  "sort": [
+    {
+      "createtime": {
+        "order": "desc"
+      }
+    }
+  ]
+}

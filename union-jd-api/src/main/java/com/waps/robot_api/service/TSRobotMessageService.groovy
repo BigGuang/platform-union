@@ -7,10 +7,14 @@ import com.waps.robot_api.bean.request.TSPostPrivateMessageBean
 import com.waps.robot_api.utils.TSApiConfig
 import com.waps.union_jd_api.utils.HttpUtils
 import com.waps.utils.StringUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
 class TSRobotMessageService {
+
+    @Autowired
+    TSAuthService tsAuthService
 
     /**
      * 发送私聊消息,一次单条

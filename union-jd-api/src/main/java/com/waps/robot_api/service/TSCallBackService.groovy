@@ -17,6 +17,8 @@ class TSCallBackService {
     @Autowired
     TSCallBackLogESService tsCallBackLogESService
     @Autowired
+    TSRobotFriendService tsRobotFriendService
+    @Autowired
     TSRobotChatRoomService tsChatRoomService
     @Autowired
     TSRobotConfigService tsRobotConfigService
@@ -72,23 +74,23 @@ class TSCallBackService {
                 break;
             case 3001:
                 //3001  机器人登录后，回调给商家一次全量好友列表, 每24小时推送一次
-                tsRobotConfigService.callBackAllFriendList(strContext)
+                tsRobotFriendService.callBackAllFriendList(strContext)
                 break;
             case 3002:
                 //3002  【直接回调】 主动添加好友结果回调接口（还未成为好友）
-                tsRobotConfigService.callBackPushAddFriendRequest(strContext)
+                tsRobotFriendService.callBackPushAddFriendRequest(strContext)
                 break;
             case 3003:
                 //3003  【直接回调】 新好友请求回调接口  http://docs.op.opsdns.cc:8081/Personal-number-function/NewFriendRq-callback/
-                tsRobotConfigService.callBackAddFriendRequest(strContext)
+                tsRobotFriendService.callBackAddFriendRequest(strContext)
                 break;
             case 3004:
                 //3004   删除联系人好友结果回调
-                tsRobotConfigService.callBackDeleteFriend(strContext)
+                tsRobotFriendService.callBackDeleteFriend(strContext)
                 break;
             case 3005:
                 //3005  【直接回调】 机器人被加/主动加好友（成为好友）回调接口
-                tsRobotConfigService.callBackAddFriendSuccess(strContext)
+                tsRobotFriendService.callBackAddFriendSuccess(strContext)
                 break;
             case 3006:
                 //3006  机器邀请好友入群回调接口
@@ -104,7 +106,7 @@ class TSCallBackService {
                 break;
             case 3011:
                 //3011  【直接回调】 通过好友请求回调接口
-                tsRobotConfigService.callBackAddFriendThrough(strContext)
+                tsRobotFriendService.callBackAddFriendThrough(strContext)
                 break;
             case 3015:
                 //3015   好友信息变动回调
@@ -178,8 +180,6 @@ class TSCallBackService {
                 tsRobotMessageService.callBackSendPrivateMessageResult(strContext)
                 break;
         }
-
-
         return true
     }
 
@@ -198,7 +198,6 @@ class TSCallBackService {
         } catch (Exception e) {
             println "saveCallBackLog ERROR:" + e.getLocalizedMessage()
         }
-
     }
 
     public void saveCallBackLog2ES(String strContext) {
