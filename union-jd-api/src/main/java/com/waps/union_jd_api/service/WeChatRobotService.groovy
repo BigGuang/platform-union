@@ -309,9 +309,7 @@ class WeChatRobotService {
     public static String getAssignChannelName(String content) {
         String _assignChannelName = null
         if (!StringUtils.isNull(content) && content.length() > 4) {
-            String last = content.substring(content.length() - 1, content.length())
             try {
-                int num = Integer.parseInt(last)
                 _assignChannelName = getChannelName(content)
             } catch (Exception e) {
                 _assignChannelName = null

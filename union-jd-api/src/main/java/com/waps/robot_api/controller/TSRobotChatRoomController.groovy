@@ -20,37 +20,43 @@ import javax.servlet.http.HttpServletResponse
 @RequestMapping("/ts/robot/chat_room")
 class TSRobotChatRoomController {
     @Autowired
-    TSRobotConfigService tsRobotConfigService
-    @Autowired
     TSRobotChatRoomService tsRobotChatRoomService
     @Autowired
     TSRobotMessageService tsRobotMessageService
 
     @RequestMapping(value = "/list")
     public void chat_room_ist(
-            @RequestParam(value = "robot_id", required = true) String vcRobotSerialNo,
-            @RequestParam(value = "room_id", required = false) String vcChatRoomSerialNo,
-            @RequestParam(value = "is_open", required = false) Integer isOpenMessage,
+            @RequestBody ListParams params,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        if (isOpenMessage == null) {
-            isOpenMessage = 0
+        if (params.getIs_open() == null) {
+            params.setIs_open(0)
         }
-        String retJson = tsRobotChatRoomService.getChatRoomInfoList(vcRobotSerialNo, vcChatRoomSerialNo, isOpenMessage)
+        String retJson = tsRobotChatRoomService.getChatRoomInfoList(params.getRobot_id(), params.getRoom_id(), params.getIs_open())
         ResponseUtils.write(response, new ReturnMessageBean(200, "", JSONObject.parseObject(retJson)))
     }
 
     @RequestMapping(value = "/send_message")
     public void sendMessage(
-            @RequestParam(value = "robot_id", required = true) String vcRobotSerialNo,
-            @RequestParam(value = "serial_no", required = true) String vcRelaSerialNo,
-            @RequestParam(value = "serial_no", required = false) String vcToWxSerialNo,
-            @RequestBody TSMessageBean tsMessageBean,
+            @RequestBody SendMessageParams params,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        String retJson = tsRobotMessageService.sendChatRoomMessage(vcRobotSerialNo, vcRelaSerialNo, vcToWxSerialNo, tsMessageBean)
+        String retJson = tsRobotMessageService.sendChatRoomMessage(params.getRobot_id(), params.getSerial_no(), params.getWx_id(), params.getTsMessageBean())
         ResponseUtils.write(response, new ReturnMessageBean(200, "", JSONObject.parseObject(retJson)))
     }
+}
+
+class ListParams {
+    String robot_id
+    String room_id
+    Integer is_open
+}
+
+class SendMessageParams {
+    String robot_id
+    String serial_no
+    String wx_id
+    TSMessageBean tsMessageBean
 }

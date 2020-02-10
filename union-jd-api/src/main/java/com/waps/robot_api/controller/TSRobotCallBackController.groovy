@@ -13,6 +13,7 @@ import org.elasticsearch.search.SearchHits
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
@@ -67,15 +68,14 @@ class TSRobotCallBackController {
 
     @RequestMapping(value = "/callback_log")
     public void callBackLog(
-            @RequestParam(value = "nType", required = false) Integer nType,
-            @RequestParam(value = "page", required = false) Integer page,
-            @RequestParam(value = "size", required = false) Integer size,
+            @RequestBody FindLogParams findLogParams,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         Map params = new HashMap()
-        PageUtils pageUtils = new PageUtils(page, size)
+        PageUtils pageUtils = new PageUtils(findLogParams.getPage(), findLogParams.getSize())
         params.put("from", pageUtils.getFrom())
         params.put("size", pageUtils.getSize())
+        params.put("nType", findLogParams.getnType())
         SearchHits hits = tsCallBackLogESService.findByFreeMarkerFromResource("es_script/ts_callback_log.json", params);
         long total = hits.getTotalHits().value
         SearchHit[] list = hits.getHits()
@@ -88,4 +88,10 @@ class TSRobotCallBackController {
         retMap.put("list", _list)
         ResponseUtils.write(response, new ReturnMessageBean(200, "", retMap))
     }
+}
+
+class FindLogParams{
+    Integer nType
+    Integer page
+    Integer size
 }

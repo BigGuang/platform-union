@@ -7,6 +7,7 @@ import com.waps.utils.ResponseUtils
 import com.waps.utils.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 
@@ -21,50 +22,57 @@ class TSRobotConfigController {
 
     @RequestMapping(value = "/autoAddFriend")
     public void autoAddFriend(
-            @RequestParam(value = "robot_id", required = true) String vcRobotSerialNo,
-            @RequestParam(value = "isAuto", required = true) boolean isAuto,
+            @RequestBody ConfigAutoParams params,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        String retStr = tsRobotConfigService.setAutoAddFriendSetup(vcRobotSerialNo, isAuto)
+        String retStr = tsRobotConfigService.setAutoAddFriendSetup(params.getRobot_id(), params.getIsAuto())
         ResponseUtils.write(response, new ReturnMessageBean(200, "", retStr))
     }
 
     @RequestMapping(value = "/autoJoinChatRoom")
     public void autoJoinChatRoom(
-            @RequestParam(value = "robot_id", required = true) String vcRobotSerialNo,
-            @RequestParam(value = "isAuto", required = true) boolean isAuto,
+            @RequestBody ConfigAutoParams params,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        String retStr = tsRobotConfigService.setAutoJoinChatRoomSetup(vcRobotSerialNo, isAuto)
+        String retStr = tsRobotConfigService.setAutoJoinChatRoomSetup(params.getRobot_id(), params.getIsAuto())
         ResponseUtils.write(response, new ReturnMessageBean(200, "", retStr))
     }
 
     @RequestMapping(value = "/set_profile_info")
     public void profile_info(
-            @RequestParam(value = "robot_id", required = true) String vcRobotSerialNo,
-            @RequestParam(value = "whatsup", required = false) String whats_up,
-            @RequestParam(value = "nick_name", required = false) String nick_name,
-            @RequestParam(value = "head_img", required = false) String head_img,
-            @RequestParam(value = "sex", required = false) Integer sex,
+            @RequestBody ConfigProfileParams params,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
         String retStr = ""
-        if (!StringUtils.isNull(whats_up)) {
-            retStr = tsRobotConfigService.setProfileWhatsUp(vcRobotSerialNo, whats_up)
+        if (!StringUtils.isNull(params.getWhats_up())) {
+            retStr = tsRobotConfigService.setProfileWhatsUp(params.getRobot_id(), params.getWhats_up())
         }
-        if (!StringUtils.isNull(nick_name)) {
-            retStr = tsRobotConfigService.setProfileName(vcRobotSerialNo, nick_name)
+        if (!StringUtils.isNull(params.getNick_name())) {
+            retStr = tsRobotConfigService.setProfileName(params.getRobot_id(), params.getNick_name())
         }
-        if (!StringUtils.isNull(head_img)) {
-            retStr = tsRobotConfigService.setProfileHeadImg(vcRobotSerialNo, head_img)
+        if (!StringUtils.isNull(params.getHead_img())) {
+            retStr = tsRobotConfigService.setProfileHeadImg(params.getRobot_id(), params.getHead_img())
         }
-        if (sex != null) {
-            retStr = tsRobotConfigService.setProfileGender(vcRobotSerialNo, sex)
+        if (params.getSex() != null) {
+            retStr = tsRobotConfigService.setProfileGender(params.getRobot_id(), params.getSex())
         }
         ResponseUtils.write(response, new ReturnMessageBean(200, "", retStr))
     }
 
+}
+
+class ConfigAutoParams {
+    String robot_id
+    boolean isAuto
+}
+
+class ConfigProfileParams {
+    String robot_id
+    String whats_up
+    String nick_name
+    String head_img
+    Integer sex
 }

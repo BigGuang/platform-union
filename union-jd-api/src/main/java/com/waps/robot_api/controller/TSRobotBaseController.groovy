@@ -36,7 +36,7 @@ class TSRobotBaseController {
         ResponseUtils.write(response, new ReturnMessageBean(200, "", token))
     }
 
-    @RequestMapping(value = "/list")
+    @RequestMapping(value = "/list", method = RequestMethod.POST)
     public void getRobotList(
             @RequestBody RobotListParams params,
             HttpServletRequest request,
