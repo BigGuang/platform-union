@@ -43,7 +43,7 @@ class TSApiConfig {
 
 
     //机器人通过好友群邀请接口
-    final static String ROBOT_SETTING_RobotPullGroupAdopt=SERVICE_HOST+"/api/ChatRoom/RobotPullGroupAdopt?vcToken={TOKEN}"
+    final static String ROBOT_CHATROOM_RobotPullGroupAdopt=SERVICE_HOST+"/api/ChatRoom/RobotPullGroupAdopt?vcToken={TOKEN}"
     //【异步调用】获取群成员信息列表接口
-    final static String ROBOT_SETTING_GetChatRoomUserInfo=SERVICE_HOST+"/api/ChatRoom/GetChatRoomUserInfo?vcToken={TOKEN}"
+    final static String ROBOT_CHATROOM_GetChatRoomUserInfo=SERVICE_HOST+"/api/ChatRoom/GetChatRoomUserInfo?vcToken={TOKEN}"
 }

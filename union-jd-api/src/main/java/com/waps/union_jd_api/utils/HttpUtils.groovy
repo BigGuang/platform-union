@@ -128,6 +128,8 @@ class HttpUtils {
     }
 
     public static String postJsonString(String urlString, String jsonString) {
+        println "POST_URL:"+urlString
+        println "POST_JSON:"+jsonString
         StringBuffer sb = new StringBuffer();
         HttpURLConnection connection = null;
         try {

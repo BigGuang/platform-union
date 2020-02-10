@@ -71,7 +71,7 @@ class TSRobotMessageService {
      * @return
      */
     public sendChatRoomMessage(String vcRobotSerialNo, String vcRelaSerialNo, String vcToWxSerialNo, TSMessageBean messageBean) {
-        String url = TSApiConfig.ROBOT_MESSAGE_SendPrivateChatMessages.replace("{TOKEN}", tsAuthService.getToken())
+        String url = TSApiConfig.ROBOT_MESSAGE_SendGroupChatMessages.replace("{TOKEN}", tsAuthService.getToken())
         TSPostGroupMessageBean postMessageBean = new TSPostGroupMessageBean()
         postMessageBean.setVcRobotSerialNo(vcRobotSerialNo)
         postMessageBean.setVcRelaSerialNo(vcRelaSerialNo)
@@ -99,7 +99,7 @@ class TSRobotMessageService {
      * @return
      */
     public String sendChatRoomMessageList(String vcRobotSerialNo, String vcRelaSerialNo, String vcToWxSerialNo, TSMessageBean... messageBeans) {
-        String url = TSApiConfig.ROBOT_MESSAGE_SendPrivateChatMessages.replace("{TOKEN}", tsAuthService.getToken())
+        String url = TSApiConfig.ROBOT_MESSAGE_SendGroupChatMessages.replace("{TOKEN}", tsAuthService.getToken())
         TSPostGroupMessageBean postMessageBean = new TSPostGroupMessageBean()
         postMessageBean.setVcRobotSerialNo(vcRobotSerialNo)
         postMessageBean.setVcRelaSerialNo(vcRelaSerialNo)

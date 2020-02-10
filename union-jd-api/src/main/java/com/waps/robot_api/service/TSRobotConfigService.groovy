@@ -109,7 +109,7 @@ class TSRobotConfigService {
      * @return
      */
     public String setProfileName(String vcRobotSerialNo, String vcNickName) {
-        String url = TSApiConfig.ROBOT_SETTING_ModifyProfileWhatsUp.replace("{TOKEN}", tsAuthService.getToken())
+        String url = TSApiConfig.ROBOT_SETTING_ModifyProfileName.replace("{TOKEN}", tsAuthService.getToken())
         TSPostModifyInfoBean postModifyInfoBean = new TSPostModifyInfoBean()
         postModifyInfoBean.setVcRobotSerialNo(vcRobotSerialNo)
         postModifyInfoBean.setVcNickName(vcNickName)
@@ -123,7 +123,7 @@ class TSRobotConfigService {
      * @return
      */
     public String setProfileHeadImg(String vcRobotSerialNo, String vcHeadImgUrl) {
-        String url = TSApiConfig.ROBOT_SETTING_ModifyProfileWhatsUp.replace("{TOKEN}", tsAuthService.getToken())
+        String url = TSApiConfig.ROBOT_SETTING_ModifyProfileHeadImg.replace("{TOKEN}", tsAuthService.getToken())
         TSPostModifyInfoBean postModifyInfoBean = new TSPostModifyInfoBean()
         postModifyInfoBean.setVcRobotSerialNo(vcRobotSerialNo)
         postModifyInfoBean.setVcHeadImgUrl(vcHeadImgUrl)
@@ -138,7 +138,7 @@ class TSRobotConfigService {
      * @return
      */
     public String setProfileGender(String vcRobotSerialNo, int nSex) {
-        String url = TSApiConfig.ROBOT_SETTING_ModifyProfileWhatsUp.replace("{TOKEN}", tsAuthService.getToken())
+        String url = TSApiConfig.ROBOT_SETTING_ModifyProfileGender.replace("{TOKEN}", tsAuthService.getToken())
         TSPostModifyInfoBean postModifyInfoBean = new TSPostModifyInfoBean()
         postModifyInfoBean.setVcRobotSerialNo(vcRobotSerialNo)
         postModifyInfoBean.setnSex(nSex)
