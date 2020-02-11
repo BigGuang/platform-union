@@ -169,6 +169,7 @@ class HttpUtils {
                 connection.disconnect();
             }
         }
+        println "POST_RETURN:"+sb.toString()
         return sb.toString();
     }
 

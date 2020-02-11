@@ -37,6 +37,20 @@ class TSRobotChatRoomController {
         ResponseUtils.write(response, new ReturnMessageBean(200, "", JSONObject.parseObject(retJson)))
     }
 
+    @RequestMapping(value = "/pull_member_list")
+    public void pull_member_list(
+            @RequestBody ListParams params,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        if (params.getIs_open() == null) {
+            params.setIs_open(0)
+        }
+        String retJson = tsRobotChatRoomService.getChatRoomInfoList(params.getRobot_id(), params.getRoom_id(), params.getIs_open())
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", JSONObject.parseObject(retJson)))
+    }
+
+
     @RequestMapping(value = "/send_message")
     public void sendMessage(
             @RequestBody SendMessageParams params,
@@ -46,8 +60,9 @@ class TSRobotChatRoomController {
         String retJson = tsRobotMessageService.sendChatRoomMessage(params.getRobot_id(), params.getSerial_no(), params.getWx_id(), params.getTsMessageBean())
         ResponseUtils.write(response, new ReturnMessageBean(200, "", JSONObject.parseObject(retJson)))
     }
-}
 
+
+}
 class ListParams {
     String robot_id
     String room_id
@@ -59,4 +74,9 @@ class SendMessageParams {
     String serial_no
     String wx_id
     TSMessageBean tsMessageBean
+}
+
+class PullMemberParams{
+    String robot_id
+    String room_id
 }

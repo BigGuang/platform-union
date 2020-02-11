@@ -56,7 +56,7 @@ class TSRobotConfigController {
         if (!StringUtils.isNull(params.getHead_img())) {
             retStr = tsRobotConfigService.setProfileHeadImg(params.getRobot_id(), params.getHead_img())
         }
-        if (params.getSex() != null) {
+        if (params.getSex() != null && params.getSex() > 0) {
             retStr = tsRobotConfigService.setProfileGender(params.getRobot_id(), params.getSex())
         }
         ResponseUtils.write(response, new ReturnMessageBean(200, "", retStr))
@@ -74,5 +74,5 @@ class ConfigProfileParams {
     String whats_up
     String nick_name
     String head_img
-    Integer sex
+    Integer sex = -1
 }

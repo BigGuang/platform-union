@@ -3,6 +3,9 @@ package com.waps.robot_api.service
 import com.alibaba.fastjson.JSONObject
 import com.waps.robot_api.bean.request.TSPostChatRoomInfoBean
 import com.waps.robot_api.utils.TSApiConfig
+import com.waps.service.jd.es.domain.TSChatRoomESMap
+import com.waps.service.jd.es.service.TSChatRoomESService
+import com.waps.union_jd_api.utils.DateUtils
 import com.waps.union_jd_api.utils.HttpUtils
 import com.waps.utils.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,6 +16,8 @@ class TSRobotChatRoomService {
 
     @Autowired
     TSAuthService tsAuthService
+    @Autowired
+    TSChatRoomESService tsChatRoomESService
 
     /**
      * 获取群列表
@@ -38,6 +43,29 @@ class TSRobotChatRoomService {
     }
 
     /**
+     *  拉取
+     * 【异步调用】获取群成员信息列表接口
+     * 可通过接口主动获取机器人所在群成员信息列表（用户编号，昵称，头像）。
+     * 调用限制：
+     * 机器人维度，每分钟每个机器人最多获取3次群成员信息；每小时每个机器人最多获取20次群成员，每小时（例如08:00-09:00）；每日00：00-06:00禁止调用该接口；
+     * 超出限制提示语：“每分钟每个机器人最多调用3次该接口” ； “每小时每个机器人最多调用该接口20次” “每日00：00-06:00禁止调用该接口”
+     * 群维度，每分钟每个群最多被查询1次群成员信息；每小时每个群最多被查询5次群成员；
+     * 超出限制提示语： “每分钟每个群最多被调用1次该接口” “每小时每个群最多调用5次该接口”
+     * 次数按照调用即算作一次，不论是否失败；
+     * @param vcRobotSerialNo
+     * @param vcChatRoomSerialNo
+     * @return
+     */
+    public String pullChatRoomMemberList(String vcRobotSerialNo, String vcChatRoomSerialNo) {
+        String url = TSApiConfig.ROBOT_CHATROOM_GetChatRoomUserInfo.replace("{TOKEN}", tsAuthService.getToken())
+        TSPostChatRoomInfoBean postChatRoomInfoBean = new TSPostChatRoomInfoBean()
+        postChatRoomInfoBean.setVcRobotSerialNo(vcRobotSerialNo)
+        postChatRoomInfoBean.setVcChatRoomSerialNo(vcChatRoomSerialNo)
+        String retJson = HttpUtils.postJsonString(url, JSONObject.toJSONString(postChatRoomInfoBean))
+        return retJson
+    }
+
+    /**
      * 群信息回调  4001
      * 群名称、群主转移（机器人被转移为群主）、群头像变化，当多个机器人在群内时，所有机器人群信息变动回调参照以下规则：
      * 1、非机器人群主把群主转移给为管理员的机器人时，每个机器人不论是否开群都会收到群信息变动回调（4001），每个机器人收到群管理员变动回调（4510，被设置为群主的机器人管理员取消）
@@ -47,7 +75,7 @@ class TSRobotChatRoomService {
      * 机器人群主转移群主时，无群信息回调（4001）
      * 5、商家扫码号第一次登录至平台时，登录初始化成功后，会将所有群的基本信息通过4001回调给商家；
      */
-    public callBackChatRoomInfo(String strContext){
+    public callBackChatRoomInfo(String strContext) {
 
     }
 
@@ -84,8 +112,22 @@ class TSRobotChatRoomService {
      * 商家通过调用群成员信息列表接口之后，可以通过"群成员信息列表回调接口"直接返回给商家群成员信息。 群成员排序为随机排序。
      * http://docs.op.opsdns.cc:8081/groupmember/get-chatroom-members-callback/
      */
-    public callBackChatRoomMemberInfo(String strContext){
-
+    public callBackChatRoomMemberInfo(String strContext) {
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(strContext)
+            println jsonObject
+            if (jsonObject && jsonObject.get("Data")) {
+                JSONObject dataObj = jsonObject.get("Data") as JSONObject
+                TSChatRoomESMap tsChatRoomESMap = JSONObject.parseObject(dataObj.toString(), TSChatRoomESMap.class) as TSChatRoomESMap
+                if (tsChatRoomESService != null) {
+                    tsChatRoomESMap.setId(tsChatRoomESMap.getVcChatRoomId())
+                    tsChatRoomESMap.setUpdatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
+                    tsChatRoomESService.save(tsChatRoomESMap.getId(), tsChatRoomESMap)
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace()
+        }
     }
 
     /**
@@ -93,7 +135,7 @@ class TSRobotChatRoomService {
      * 群内有新人加入，通过该接口将新人入群信息回调给商家
      * http://docs.op.opsdns.cc:8081/groupmember/chatroom-members-join/
      */
-    public callBackChatRoomAddMember(String strContext){
+    public callBackChatRoomAddMember(String strContext) {
 
     }
 
@@ -102,7 +144,7 @@ class TSRobotChatRoomService {
      * 群内有成员退群，通过该接口将成员退群信息回调给商家
      * http://docs.op.opsdns.cc:8081/groupmember/chatroom-members-quit/
      */
-    public callBackChatRoomDeleteMember(String strContext){
+    public callBackChatRoomDeleteMember(String strContext) {
 
     }
 

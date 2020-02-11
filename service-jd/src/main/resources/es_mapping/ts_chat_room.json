@@ -1,0 +1,76 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "vcChatRoomId": {
+      "type": "keyword"
+    },
+    "vcChatRoomSerialNo": {
+      "type": "keyword"
+    },
+    "vcChatRoomName": {
+      "type": "keyword"
+    },
+    "vcBase64ChatRoomName": {
+      "type": "keyword"
+    },
+    "vcChatAdminWxUserSerialNo": {
+      "type": "keyword"
+    },
+    "vcChatAdminWxId": {
+      "type": "keyword"
+    },
+    "nMemberCount": {
+      "type": "integer"
+    },
+    "Managers": {
+      "properties": {
+        "vcManagerWxId": {
+          "type": "keyword"
+        },
+        "vcManagerSerialNo": {
+          "type": "keyword"
+        }
+      }
+    },
+    "Members": {
+      "properties": {
+        "vcMemberUserSerialNo": {
+          "type": "keyword"
+        },
+        "vcMemberUserWxId": {
+          "type": "keyword"
+        },
+        "vcNickName": {
+          "type": "keyword"
+        },
+        "vcBase64NickName": {
+          "type": "keyword"
+        },
+        "vcHeadImgUrl": {
+          "type": "keyword"
+        },
+        "vcFatherWxId": {
+          "type": "keyword"
+        },
+        "vcFatherWxUserSerialNo": {
+          "type": "keyword"
+        },
+        "vcGroupNickName": {
+          "type": "keyword"
+        },
+        "vcBase64GroupNickName": {
+          "type": "keyword"
+        }
+      }
+    },
+    "updatetime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}
