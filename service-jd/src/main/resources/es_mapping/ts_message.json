@@ -1,0 +1,95 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "nType": {
+      "type": "integer"
+    },
+    "vcMerchantNo": {
+      "type": "keyword"
+    },
+    "vcRobotWxId": {
+      "type": "keyword"
+    },
+    "vcRobotSerialNo": {
+      "type": "keyword"
+    },
+    "vcSerialNo": {
+      "type": "keyword"
+    },
+    "vcMsgSerialNo": {
+      "type": "keyword"
+    },
+    "vcMsgId": {
+      "type": "keyword"
+    },
+    "vcChatRoomSerialNo": {
+      "type": "keyword"
+    },
+    "vcChatRoomId": {
+      "type": "keyword"
+    },
+    "vcFromWxUserSerialNo": {
+      "type": "keyword"
+    },
+    "vcFromWxUserWxId": {
+      "type": "keyword"
+    },
+    "vcToWxUserSerialNo": {
+      "type": "keyword"
+    },
+    "vcToWxUserWxId": {
+      "type": "keyword"
+    },
+    "nMsgType": {
+      "type": "integer"
+    },
+    "vcContent": {
+      "type": "keyword"
+    },
+    "nVoiceTime": {
+      "type": "integer"
+    },
+    "vcShareTitle": {
+      "type": "keyword"
+    },
+    "vcShareDesc": {
+      "type": "keyword"
+    },
+    "vcShareUrl": {
+      "type": "keyword"
+    },
+    "dtMsgTime": {
+      "type": "keyword"
+    },
+    "nIsHit": {
+      "type": "integer"
+    },
+    "nPlatformMsgType": {
+      "type": "integer"
+    },
+    "vcRelaSerialNo": {
+      "type": "keyword"
+    },
+    "nMsgNum": {
+      "type": "integer"
+    },
+    "vcDownFileSerialNo": {
+      "type": "keyword"
+    },
+    "msg_status":{
+      "type": "keyword"
+    },
+    "msg_from":{
+      "type": "keyword"
+    },
+    "createtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

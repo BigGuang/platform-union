@@ -5,6 +5,9 @@ import com.waps.robot_api.bean.request.TSMessageBean
 import com.waps.robot_api.bean.request.TSPostGroupMessageBean
 import com.waps.robot_api.bean.request.TSPostPrivateMessageBean
 import com.waps.robot_api.utils.TSApiConfig
+import com.waps.service.jd.es.domain.TSMessageESMap
+import com.waps.service.jd.es.service.TSMessageESService
+import com.waps.union_jd_api.utils.DateUtils
 import com.waps.union_jd_api.utils.HttpUtils
 import com.waps.utils.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,6 +18,8 @@ class TSRobotMessageService {
 
     @Autowired
     TSAuthService tsAuthService
+    @Autowired
+    TSMessageESService tsMessageESService
 
     /**
      * 发送私聊消息,一次单条
@@ -137,7 +142,23 @@ class TSRobotMessageService {
      * http://docs.op.opsdns.cc:8081/Personal-number-function/friend-privateinformation-callback/
      */
     public void callBackReceivePrivateMessage(String strContext) {
-
+        if (strContext != null) {
+            JSONObject jsonObject = JSONObject.parseObject(strContext)
+            if (jsonObject != null && jsonObject.get("Data")) {
+                TSMessageESMap tsMessageESMap = JSONObject.parseObject(jsonObject.get("Data").toString(), TSMessageESMap.class) as TSMessageESMap
+                if (tsMessageESMap != null) {
+                    tsMessageESMap.setId(tsMessageESMap.getVcMsgId())
+                    tsMessageESMap.setnType(jsonObject.getInteger("nType"))
+                    tsMessageESMap.setVcMerchantNo(jsonObject.getString("vcMerchantNo"))
+                    tsMessageESMap.setVcRobotSerialNo(jsonObject.getString("vcRobotSerialNo"))
+                    tsMessageESMap.setVcRobotWxId(jsonObject.getString("vcRobotWxId"))
+                    tsMessageESMap.setVcSerialNo(jsonObject.getString("vcSerialNo"))
+                    tsMessageESMap.setMsg_from(jsonObject.getInteger("nType") + "")
+                    tsMessageESMap.setCreatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
+                    tsMessageESService.save(tsMessageESMap.getId(), tsMessageESMap)
+                }
+            }
+        }
     }
 
 
@@ -154,6 +175,22 @@ class TSRobotMessageService {
      * http://docs.op.opsdns.cc:8081/groupmessage/realtime-notify/
      */
     public void callBackChatRoomReceiveMessage(String strContext) {
-
+        if (strContext != null) {
+            JSONObject jsonObject = JSONObject.parseObject(strContext)
+            if (jsonObject != null && jsonObject.get("Data")) {
+                TSMessageESMap tsMessageESMap = JSONObject.parseObject(jsonObject.get("Data").toString(), TSMessageESMap.class) as TSMessageESMap
+                if (tsMessageESMap != null) {
+                    tsMessageESMap.setId(tsMessageESMap.getVcMsgId())
+                    tsMessageESMap.setnType(jsonObject.getInteger("nType"))
+                    tsMessageESMap.setVcMerchantNo(jsonObject.getString("vcMerchantNo"))
+                    tsMessageESMap.setVcRobotSerialNo(jsonObject.getString("vcRobotSerialNo"))
+                    tsMessageESMap.setVcRobotWxId(jsonObject.getString("vcRobotWxId"))
+                    tsMessageESMap.setVcSerialNo(jsonObject.getString("vcSerialNo"))
+                    tsMessageESMap.setMsg_from(jsonObject.getInteger("nType") + "")
+                    tsMessageESMap.setCreatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
+                    tsMessageESService.save(tsMessageESMap.getId(), tsMessageESMap)
+                }
+            }
+        }
     }
 }
