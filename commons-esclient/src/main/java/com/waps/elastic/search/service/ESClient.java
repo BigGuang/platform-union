@@ -239,7 +239,7 @@ public class ESClient {
      * @param size
      * @return
      */
-    public SearchHits findByKVMap(Map<String, String> kvMap, int page, int size) {
+    public SearchHits findByKVMap(Map<String, String> kvMap, int page, int size, String orderField, SortOrder sortOrder) {
         PageUtils pageUtils = new PageUtils(page, size);
         SearchHits hits = null;
         try {
@@ -251,11 +251,21 @@ public class ESClient {
                 String value = (String) entity.getValue();
                 boolQueryBuilder.must(QueryBuilders.matchPhraseQuery(field, value));
             }
+
+
             SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
             sourceBuilder.query(boolQueryBuilder);
             sourceBuilder.explain(true);// 设置是否按查询匹配度排序
             sourceBuilder.from(pageUtils.getFrom());
             sourceBuilder.size(pageUtils.getSize());
+            // 排序
+            if (!StringUtils.isNull(orderField)) {
+                FieldSortBuilder fsb = SortBuilders.fieldSort(orderField);
+                if (sortOrder != null) {
+                    fsb.order(sortOrder);
+                }
+                sourceBuilder.sort(fsb);
+            }
             SearchRequest searchRequest = new SearchRequest();
             searchRequest.source(sourceBuilder);
             hits = find(searchRequest);
@@ -263,6 +273,10 @@ public class ESClient {
             System.out.println("findByKVMap ERROR:" + e.getLocalizedMessage());
         }
         return hits;
+    }
+
+    public SearchHits findByKVMap(Map<String, String> kvMap, int page, int size) {
+        return findByKVMap(kvMap, page, size, null, null);
     }
 
 
@@ -643,7 +657,7 @@ public class ESClient {
         return response.getHits();
     }
 
-    private SearchHits searchByMoreField(String index, String type, LinkedHashMap<String, Object> kvMap, String orderField, SortOrder orderBy, int page, int size) {
+    public SearchHits searchByMoreField(String index, String type, LinkedHashMap<String, Object> kvMap, String orderField, SortOrder orderBy, int page, int size) {
         PageUtils pageUtils = new PageUtils(page, size);
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         Iterator it = kvMap.entrySet().iterator();

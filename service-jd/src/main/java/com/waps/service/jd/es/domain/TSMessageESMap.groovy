@@ -18,9 +18,12 @@ class TSMessageESMap extends ESBaseBean{
     String vcToWxUserWxId
     int nMsgType
     String vcContent
+    String content
     int nVoiceTime
     String vcShareTitle
+    String shareTitle
     String vcShareDesc
+    String shareDesc
     String vcShareUrl
     String dtMsgTime
     int nIsHit

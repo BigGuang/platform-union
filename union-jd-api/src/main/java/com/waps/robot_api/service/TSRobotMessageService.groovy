@@ -5,13 +5,18 @@ import com.waps.robot_api.bean.request.TSMessageBean
 import com.waps.robot_api.bean.request.TSPostGroupMessageBean
 import com.waps.robot_api.bean.request.TSPostPrivateMessageBean
 import com.waps.robot_api.utils.TSApiConfig
+import com.waps.security.Base64
 import com.waps.service.jd.es.domain.TSMessageESMap
 import com.waps.service.jd.es.service.TSMessageESService
 import com.waps.union_jd_api.utils.DateUtils
 import com.waps.union_jd_api.utils.HttpUtils
 import com.waps.utils.StringUtils
+import org.elasticsearch.action.index.IndexResponse
+import org.elasticsearch.search.SearchHits
+import org.elasticsearch.search.sort.SortOrder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import org.springframework.util.Base64Utils
 
 @Component
 class TSRobotMessageService {
@@ -128,6 +133,73 @@ class TSRobotMessageService {
         return retJson
     }
 
+    /**
+     * 将收到的消息context转成对象并保存,私聊和群聊通用
+     * @param strContext
+     */
+    public void saveContext2MessageBean(String strContext) {
+        try {
+            if (strContext != null) {
+                JSONObject jsonObject = JSONObject.parseObject(strContext)
+                if (jsonObject != null && jsonObject.get("Data")) {
+                    TSMessageESMap tsMessageESMap = JSONObject.parseObject(jsonObject.get("Data").toString(), TSMessageESMap.class) as TSMessageESMap
+                    if (tsMessageESMap != null) {
+                        int nType = jsonObject.getInteger("nType")
+                        tsMessageESMap.setId(tsMessageESMap.getVcMsgId())
+                        tsMessageESMap.setnType(jsonObject.getInteger("nType"))
+                        tsMessageESMap.setVcMerchantNo(jsonObject.getString("vcMerchantNo"))
+                        tsMessageESMap.setVcRobotSerialNo(jsonObject.getString("vcRobotSerialNo"))
+                        tsMessageESMap.setVcRobotWxId(jsonObject.getString("vcRobotWxId"))
+                        tsMessageESMap.setVcSerialNo(jsonObject.getString("vcSerialNo"))
+                        tsMessageESMap.setMsg_from(jsonObject.getInteger("nType") + "")
+                        tsMessageESMap.setCreatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
+//                        消息类型:
+//                        2001 文字
+//                        2002 图片
+//                        2003 语音(只支持amr格式)
+//                        2004 视频
+//                        2005 链接
+//                        2006 好友名片
+//                        2010 文件
+//                        2013 小程序
+//                        2016 音乐
+                        if(tsMessageESMap.getnMsgType()==2001) {
+                            if (!StringUtils.isNull(tsMessageESMap.getVcContent())) {
+                                String content = tsMessageESMap.getVcContent()
+                                println "==Test=="
+                                println Base64.decode(content)
+                                println Base64Utils.decode(content.getBytes())
+                                try {
+                                    tsMessageESMap.setContent(new String(Base64.decode(content), "UTF-8"))
+                                } catch (Exception e) {
+                                    println "Base64 ERROR:" + e.getLocalizedMessage()
+                                    tsMessageESMap.setContent(tsMessageESMap.getVcContent())
+                                }
+                            }
+                        }
+                        if (!StringUtils.isNull(tsMessageESMap.getVcShareTitle())) {
+                            String content = tsMessageESMap.getVcShareTitle()
+                            tsMessageESMap.setVcShareTitle(new String(Base64.decode(content), "UTF-8"))
+                        }
+                        if (!StringUtils.isNull(tsMessageESMap.getVcShareDesc())) {
+                            String content = tsMessageESMap.getVcShareDesc()
+                            tsMessageESMap.setShareDesc(new String(Base64.decode(content), "UTF-8"))
+                        }
+                        IndexResponse indexResponse = tsMessageESService.save(tsMessageESMap.getId(), tsMessageESMap)
+                    }
+                }
+            }
+        }catch(Exception e){
+            e.printStackTrace()
+        }
+    }
+
+
+    public SearchHits loadMessage(Map<String, String> kvMap, int page, int size){
+        SearchHits hits=tsMessageESService.findByKVMap(kvMap, page, size,"createtime", SortOrder.DESC)
+        return hits
+    }
+
 
     /**
      * 发送信息结果回调  5004
@@ -142,23 +214,7 @@ class TSRobotMessageService {
      * http://docs.op.opsdns.cc:8081/Personal-number-function/friend-privateinformation-callback/
      */
     public void callBackReceivePrivateMessage(String strContext) {
-        if (strContext != null) {
-            JSONObject jsonObject = JSONObject.parseObject(strContext)
-            if (jsonObject != null && jsonObject.get("Data")) {
-                TSMessageESMap tsMessageESMap = JSONObject.parseObject(jsonObject.get("Data").toString(), TSMessageESMap.class) as TSMessageESMap
-                if (tsMessageESMap != null) {
-                    tsMessageESMap.setId(tsMessageESMap.getVcMsgId())
-                    tsMessageESMap.setnType(jsonObject.getInteger("nType"))
-                    tsMessageESMap.setVcMerchantNo(jsonObject.getString("vcMerchantNo"))
-                    tsMessageESMap.setVcRobotSerialNo(jsonObject.getString("vcRobotSerialNo"))
-                    tsMessageESMap.setVcRobotWxId(jsonObject.getString("vcRobotWxId"))
-                    tsMessageESMap.setVcSerialNo(jsonObject.getString("vcSerialNo"))
-                    tsMessageESMap.setMsg_from(jsonObject.getInteger("nType") + "")
-                    tsMessageESMap.setCreatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
-                    tsMessageESService.save(tsMessageESMap.getId(), tsMessageESMap)
-                }
-            }
-        }
+        saveContext2MessageBean(strContext)
     }
 
 
@@ -175,22 +231,6 @@ class TSRobotMessageService {
      * http://docs.op.opsdns.cc:8081/groupmessage/realtime-notify/
      */
     public void callBackChatRoomReceiveMessage(String strContext) {
-        if (strContext != null) {
-            JSONObject jsonObject = JSONObject.parseObject(strContext)
-            if (jsonObject != null && jsonObject.get("Data")) {
-                TSMessageESMap tsMessageESMap = JSONObject.parseObject(jsonObject.get("Data").toString(), TSMessageESMap.class) as TSMessageESMap
-                if (tsMessageESMap != null) {
-                    tsMessageESMap.setId(tsMessageESMap.getVcMsgId())
-                    tsMessageESMap.setnType(jsonObject.getInteger("nType"))
-                    tsMessageESMap.setVcMerchantNo(jsonObject.getString("vcMerchantNo"))
-                    tsMessageESMap.setVcRobotSerialNo(jsonObject.getString("vcRobotSerialNo"))
-                    tsMessageESMap.setVcRobotWxId(jsonObject.getString("vcRobotWxId"))
-                    tsMessageESMap.setVcSerialNo(jsonObject.getString("vcSerialNo"))
-                    tsMessageESMap.setMsg_from(jsonObject.getInteger("nType") + "")
-                    tsMessageESMap.setCreatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
-                    tsMessageESService.save(tsMessageESMap.getId(), tsMessageESMap)
-                }
-            }
-        }
+        saveContext2MessageBean(strContext)
     }
 }

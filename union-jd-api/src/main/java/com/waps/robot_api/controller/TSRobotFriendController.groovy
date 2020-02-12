@@ -54,7 +54,7 @@ class TSRobotFriendController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        String retJson = tsRobotMessageService.sendPrivateMessage(params.getRobot_id(), params.getSerial_no(), params.getWx_id(), params.getTsMessageBean())
+        String retJson = tsRobotMessageService.sendPrivateMessage(params.getRobot_id(), params.getSerial_no(), params.getWx_id(), params.getMessage())
         ResponseUtils.write(response, new ReturnMessageBean(200, "", JSONObject.parseObject(retJson)))
     }
 

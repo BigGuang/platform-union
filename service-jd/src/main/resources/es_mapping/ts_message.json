@@ -48,14 +48,41 @@
     "vcContent": {
       "type": "keyword"
     },
+    "content": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
     "nVoiceTime": {
       "type": "integer"
     },
     "vcShareTitle": {
       "type": "keyword"
     },
+    "shareTitle": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
+    },
     "vcShareDesc": {
       "type": "keyword"
+    },
+    "shareDesc": {
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
     },
     "vcShareUrl": {
       "type": "keyword"

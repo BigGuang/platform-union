@@ -57,7 +57,7 @@ class TSRobotChatRoomController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        String retJson = tsRobotMessageService.sendChatRoomMessage(params.getRobot_id(), params.getSerial_no(), params.getWx_id(), params.getTsMessageBean())
+        String retJson = tsRobotMessageService.sendChatRoomMessage(params.getRobot_id(), params.getSerial_no(), params.getWx_id(), params.getMessage())
         ResponseUtils.write(response, new ReturnMessageBean(200, "", JSONObject.parseObject(retJson)))
     }
 
@@ -73,7 +73,7 @@ class SendMessageParams {
     String robot_id
     String serial_no
     String wx_id
-    TSMessageBean tsMessageBean
+    TSMessageBean message
 }
 
 class PullMemberParams{
