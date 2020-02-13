@@ -31,7 +31,7 @@ class TSApiConfig {
     //修改机器人个性签名
     final static String ROBOT_SETTING_ModifyProfileWhatsUp=SERVICE_HOST+"/api/Robot/ModifyProfileWhatsUp?vcToken={TOKEN}"
     //修改机器人昵称
-    final static String ROBOT_SETTING_ModifyProfileName=SERVICE_HOST+"/api/Robot/ModifyProfileName?vcToken={TOKEN}"
+    final static String ROBOT_SETTING_ModifyProfileName=SERVICE_HOST+"/api/Robot/ModifyProfileName?  ={TOKEN}"
     //修改机器人头像
     final static String ROBOT_SETTING_ModifyProfileHeadImg=SERVICE_HOST+"/api/Robot/ModifyProfileHeadImg?vcToken={TOKEN}"
     //修改机器人性别
@@ -40,11 +40,16 @@ class TSApiConfig {
 
 
     //获取群列表接口
+
     final static String ROBOT_INFO_GetChatRoomList=SERVICE_HOST+"/api/ChatRoom/GetChatRoomList?vcToken={TOKEN}"
     //机器人通过好友群邀请接口
     final static String ROBOT_CHATROOM_RobotPullGroupAdopt=SERVICE_HOST+"/api/ChatRoom/RobotPullGroupAdopt?vcToken={TOKEN}"
     //【异步调用】获取群成员信息列表接口
     final static String ROBOT_CHATROOM_GetChatRoomUserInfo=SERVICE_HOST+"/api/ChatRoom/GetChatRoomUserInfo?vcToken={TOKEN}"
+    //群消息开通接收，也就是设置isOpenMessage
+    final static String ROBOT_CHATROOM_RobotChatRoomOpen=SERVICE_HOST+"/api/ChatRoom/RobotChatRoomOpen?vcToken={TOKEN}"
+    //群消息注销接收，也就是设置isOpenMessage
+    final static String ROBOT_CHATROOM_RobotChatRoomCancel=SERVICE_HOST+"/api/ChatRoom/RobotChatRoomCancel?vcToken={TOKEN}"
 
 
 

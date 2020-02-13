@@ -23,20 +23,30 @@ class TSRobotMessageController {
 
     @RequestMapping(value = "/list")
     public void friendList(
+            @RequestParam(value = "type", required = true) Integer type,
             @RequestParam(value = "page", required = true) Integer page,
             @RequestParam(value = "size", required = true) Integer size,
-            @RequestBody Map<String, String> params,
+            @RequestBody HashMap<String, Object> params,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        SearchHits hits = tsRobotMessageService.loadMessage(params, page, size)
-        Map retMap = new HashMap()
-        long total = hits.getTotalHits().value
-        retMap.put("total", total)
-        List<Map> _list = new ArrayList<>()
-        for (SearchHit hit : hits.getHits()) {
-            _list.add(hit.getSourceAsMap())
+        SearchHits hits = null;
+        if (type == 1 || type == 5001) {
+            hits = tsRobotMessageService.loadFriendMessage(params, page, size)
+        } else {
+            hits = tsRobotMessageService.loadChatRoomMessage(params, page, size)
         }
+        Map retMap = new HashMap()
+        long total = 0
+        List<Map> _list = new ArrayList<>()
+        if (hits != null) {
+            total = hits.getTotalHits().value
+            for (SearchHit hit : hits.getHits()) {
+                _list.add(hit.getSourceAsMap())
+            }
+            retMap.put("list", _list)
+        }
+        retMap.put("total", total)
         retMap.put("list", _list)
         ResponseUtils.write(response, new ReturnMessageBean(200, "", retMap))
     }

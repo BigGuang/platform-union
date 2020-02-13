@@ -1,7 +1,9 @@
 package com.waps.robot_api.service
 
 import com.alibaba.fastjson.JSONObject
+import com.waps.elastic.search.utils.PageUtils
 import com.waps.robot_api.bean.request.TSMessageBean
+import com.waps.robot_api.bean.request.TSPostChatRoomInfoBean
 import com.waps.robot_api.bean.request.TSPostGroupMessageBean
 import com.waps.robot_api.bean.request.TSPostPrivateMessageBean
 import com.waps.robot_api.utils.TSApiConfig
@@ -80,15 +82,16 @@ class TSRobotMessageService {
      * @param messageBean
      * @return
      */
-    public sendChatRoomMessage(String vcRobotSerialNo, String vcRelaSerialNo, String vcToWxSerialNo, TSMessageBean messageBean) {
+    public sendChatRoomMessage(String vcRobotSerialNo, String vcChatRoomSerialNo, String vcRelaSerialNo, String vcToWxSerialNo, TSMessageBean messageBean) {
         String url = TSApiConfig.ROBOT_MESSAGE_SendGroupChatMessages.replace("{TOKEN}", tsAuthService.getToken())
         TSPostGroupMessageBean postMessageBean = new TSPostGroupMessageBean()
         postMessageBean.setVcRobotSerialNo(vcRobotSerialNo)
         postMessageBean.setVcRelaSerialNo(vcRelaSerialNo)
+        postMessageBean.setVcChatRoomSerialNo(vcChatRoomSerialNo)
         postMessageBean.setnIsHit(1)
         if (!StringUtils.isNull(vcToWxSerialNo)) {
             postMessageBean.setVcToWxSerialNo(vcToWxSerialNo)
-            if (vcToWxSerialNo.equals("@所有人")) {
+            if (vcToWxSerialNo == "@所有人") {
                 postMessageBean.setnIsHit(0)
             }
         }
@@ -108,16 +111,17 @@ class TSRobotMessageService {
      * @param messageBeans
      * @return
      */
-    public String sendChatRoomMessageList(String vcRobotSerialNo, String vcRelaSerialNo, String vcToWxSerialNo, TSMessageBean... messageBeans) {
+    public String sendChatRoomMessageList(String vcRobotSerialNo, String vcChatRoomSerialNo, String vcRelaSerialNo, String vcToWxSerialNo, TSMessageBean... messageBeans) {
         String url = TSApiConfig.ROBOT_MESSAGE_SendGroupChatMessages.replace("{TOKEN}", tsAuthService.getToken())
         TSPostGroupMessageBean postMessageBean = new TSPostGroupMessageBean()
         postMessageBean.setVcRobotSerialNo(vcRobotSerialNo)
         postMessageBean.setVcRelaSerialNo(vcRelaSerialNo)
         postMessageBean.setVcToWxSerialNo(vcToWxSerialNo)
+        postMessageBean.setVcChatRoomSerialNo(vcChatRoomSerialNo)
         postMessageBean.setnIsHit(1)
         if (!StringUtils.isNull(vcToWxSerialNo)) {
             postMessageBean.setVcToWxSerialNo(vcToWxSerialNo)
-            if (vcToWxSerialNo.equals("@所有人")) {
+            if (vcToWxSerialNo == "@所有人") {
                 postMessageBean.setnIsHit(0)
             }
         }
@@ -130,6 +134,28 @@ class TSRobotMessageService {
         }
         postMessageBean.setData(list)
         String retJson = HttpUtils.postJsonString(url, JSONObject.toJSONString(postMessageBean))
+        return retJson
+    }
+
+
+    /**
+     * 设置群聊是否openMessage
+     * @param vcRobotSerialNo
+     * @param vcChatRoomSerialNo
+     * @param open
+     * @return
+     */
+    public String setChatRoomOpenMessage(String vcRobotSerialNo, String vcChatRoomSerialNo, boolean open) {
+        String url = ""
+        if (open) {
+            url = TSApiConfig.ROBOT_CHATROOM_RobotChatRoomOpen.replace("{TOKEN}", tsAuthService.getToken())
+        } else {
+            url = TSApiConfig.ROBOT_CHATROOM_RobotChatRoomCancel.replace("{TOKEN}", tsAuthService.getToken())
+        }
+        TSPostChatRoomInfoBean postChatRoomInfoBean = new TSPostChatRoomInfoBean()
+        postChatRoomInfoBean.setVcRobotSerialNo(vcRobotSerialNo)
+        postChatRoomInfoBean.setVcChatRoomSerialNo(vcChatRoomSerialNo)
+        String retJson = HttpUtils.postJsonString(url, JSONObject.toJSONString(postChatRoomInfoBean))
         return retJson
     }
 
@@ -163,7 +189,7 @@ class TSRobotMessageService {
 //                        2010 文件
 //                        2013 小程序
 //                        2016 音乐
-                        if(tsMessageESMap.getnMsgType()==2001) {
+                        if (tsMessageESMap.getnMsgType() == 2001) {
                             if (!StringUtils.isNull(tsMessageESMap.getVcContent())) {
                                 String content = tsMessageESMap.getVcContent()
                                 println "==Test=="
@@ -189,14 +215,41 @@ class TSRobotMessageService {
                     }
                 }
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace()
         }
     }
 
 
-    public SearchHits loadMessage(Map<String, String> kvMap, int page, int size){
-        SearchHits hits=tsMessageESService.findByKVMap(kvMap, page, size,"createtime", SortOrder.DESC)
+    /**
+     * 读取私聊消息列表
+     * @param kvMap
+     * @param page
+     * @param size
+     * @return
+     */
+    public SearchHits loadFriendMessage(HashMap<String, Object> kvMap, int page, int size) {
+        PageUtils pageUtils = new PageUtils(page, size)
+        kvMap.put("from", pageUtils.getFrom())
+        kvMap.put("size", pageUtils.getSize())
+        String script = "es_script/ts_message_friend.json"
+        SearchHits hits = tsMessageESService.findByFreeMarkerFromResource(script, kvMap)
+        return hits
+    }
+
+    /**
+     * 读取聊天室消息列表
+     * @param kvMap
+     * @param page
+     * @param size
+     * @return
+     */
+    public SearchHits loadChatRoomMessage(HashMap<String, Object> kvMap, int page, int size) {
+        PageUtils pageUtils = new PageUtils(page, size)
+        kvMap.put("from", pageUtils.getFrom())
+        kvMap.put("size", pageUtils.getSize())
+        String script = "es_script/ts_message_room.json"
+        SearchHits hits = tsMessageESService.findByFreeMarkerFromResource(script, kvMap)
         return hits
     }
 

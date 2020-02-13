@@ -1,0 +1,29 @@
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        },
+        {
+          "match": {
+            "vcRobotSerialNo": "${robot_id}"
+          }
+        },
+        {
+          "multi_match": {
+            "query": "${friend_id}",
+            "fields": [
+              "vcFromWxUserSerialNo","vcToWxUserSerialNo"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "sort": {
+    "createtime": {
+      "order": "desc"
+    }
+  }
+}

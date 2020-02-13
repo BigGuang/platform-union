@@ -1,0 +1,29 @@
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        },
+        {
+          "match": {
+            "vcRobotSerialNo": "${robot_id}"
+          }
+        },
+        {
+          "multi_match": {
+            "query": "${room_id}",
+            "fields": [
+              "vcChatRoomSerialNo"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "sort": {
+    "createtime": {
+      "order": "desc"
+    }
+  }
+}

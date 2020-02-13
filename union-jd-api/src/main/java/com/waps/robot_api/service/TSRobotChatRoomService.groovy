@@ -8,6 +8,7 @@ import com.waps.service.jd.es.service.TSChatRoomESService
 import com.waps.union_jd_api.utils.DateUtils
 import com.waps.union_jd_api.utils.HttpUtils
 import com.waps.utils.StringUtils
+import org.elasticsearch.search.SearchHits
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -65,6 +66,11 @@ class TSRobotChatRoomService {
         return retJson
     }
 
+    public TSChatRoomESMap loadChatRoomMemberList(String vcRobotSerialNo, String vcChatRoomSerialNo){
+        TSChatRoomESMap tsChatRoomESMap=tsChatRoomESService.load(vcChatRoomSerialNo,TSChatRoomESMap.class) as TSChatRoomESMap
+        return tsChatRoomESMap
+    }
+
     /**
      * 群信息回调  4001
      * 群名称、群主转移（机器人被转移为群主）、群头像变化，当多个机器人在群内时，所有机器人群信息变动回调参照以下规则：
@@ -120,7 +126,7 @@ class TSRobotChatRoomService {
                 JSONObject dataObj = jsonObject.get("Data") as JSONObject
                 TSChatRoomESMap tsChatRoomESMap = JSONObject.parseObject(dataObj.toString(), TSChatRoomESMap.class) as TSChatRoomESMap
                 if (tsChatRoomESService != null) {
-                    tsChatRoomESMap.setId(tsChatRoomESMap.getVcChatRoomId())
+                    tsChatRoomESMap.setId(tsChatRoomESMap.getVcChatRoomSerialNo())
                     tsChatRoomESMap.setUpdatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
                     tsChatRoomESService.save(tsChatRoomESMap.getId(), tsChatRoomESMap)
                 }
