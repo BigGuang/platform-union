@@ -50,13 +50,9 @@ class TSRobotCallBackController {
             System.out.println(buffer.toString());
             String body = buffer.toString()
 
-            TestRequest.outPrintRequest(request);
-
             Map<String, String> params = UrlUtil.parseBody(body)
             String strContext = params.get("strContext")
             String strSign = params.get("strSign")
-
-            println "==save=="
 
             boolean flg = tsCallBackService.callBack(nType, strContext)
             if (!flg) {

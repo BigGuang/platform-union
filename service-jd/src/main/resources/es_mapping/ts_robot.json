@@ -1,0 +1,80 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "vcRobotSerialNo": {
+      "type": "keyword"
+    },
+    "vcRobotWxId": {
+      "type": "keyword"
+    },
+    "vcWxAlias": {
+      "type": "keyword"
+    },
+    "vcNickName": {
+      "type": "keyword"
+    },
+    "vcBase64NickName": {
+      "type": "keyword"
+    },
+    "vcHeadImgUrl": {
+      "type": "keyword"
+    },
+    "vcPersonQRCode": {
+      "type": "keyword"
+    },
+    "vcWhatsUp": {
+      "type": "keyword"
+    },
+    "vcBase64WhatsUp": {
+      "type": "keyword"
+    },
+    "vcPhone": {
+      "type": "keyword"
+    },
+    "nStatus": {
+      "type": "integer"
+    },
+    "nIsLimit": {
+      "type": "integer"
+    },
+    "nSex": {
+      "type": "integer"
+    },
+    "nTrueName": {
+      "type": "integer"
+    },
+    "nSourceType": {
+      "type": "integer"
+    },
+    "nIsAutoAddFriend": {
+      "type": "integer"
+    },
+    "nIsAutoJoinChatRoom": {
+      "type": "integer"
+    },
+    "nChatRoomCount": {
+      "type": "integer"
+    },
+    "nOpenChatRoomCount": {
+      "type": "integer"
+    },
+    "room_list": {
+      "properties": {
+
+      }
+    },
+    "updatetime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ssa"
+    },
+    "createtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

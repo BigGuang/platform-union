@@ -10,6 +10,8 @@ import com.waps.robot_api.utils.TSApiConfig
 import com.waps.security.Base64
 import com.waps.service.jd.es.domain.TSMessageESMap
 import com.waps.service.jd.es.service.TSMessageESService
+import com.waps.service.jd.es.service.TSRobotRoomInfoESService
+import com.waps.tools.security.MD5
 import com.waps.union_jd_api.utils.DateUtils
 import com.waps.union_jd_api.utils.HttpUtils
 import com.waps.utils.StringUtils
@@ -27,6 +29,8 @@ class TSRobotMessageService {
     TSAuthService tsAuthService
     @Autowired
     TSMessageESService tsMessageESService
+    @Autowired
+    TSRobotRoomInfoESService tsRobotRoomInfoESService
 
     /**
      * 发送私聊消息,一次单条
@@ -56,7 +60,7 @@ class TSRobotMessageService {
      * @param messageBeans
      * @return
      */
-    public String sendPrivateMessageList(String vcRobotSerialNo, String vcRelaSerialNo, String vcToWxSerialNo, TSMessageBean... messageBeans) {
+    public String sendPrivateMessageList(String vcRobotSerialNo, String vcRelaSerialNo, String vcToWxSerialNo, List<TSMessageBean> messageList) {
         String url = TSApiConfig.ROBOT_MESSAGE_SendPrivateChatMessages.replace("{TOKEN}", tsAuthService.getToken())
         TSPostPrivateMessageBean postMessageBean = new TSPostPrivateMessageBean()
         postMessageBean.setVcRobotSerialNo(vcRobotSerialNo)
@@ -64,7 +68,7 @@ class TSRobotMessageService {
         postMessageBean.setVcToWxSerialNo(vcToWxSerialNo)
         List<TSMessageBean> list = new ArrayList<>()
         int i = 1
-        for (TSMessageBean messageBean : messageBeans) {
+        for (TSMessageBean messageBean : messageList) {
             messageBean.setnMsgNum(i)
             list.add(messageBean)
             i = i + 1
@@ -111,7 +115,7 @@ class TSRobotMessageService {
      * @param messageBeans
      * @return
      */
-    public String sendChatRoomMessageList(String vcRobotSerialNo, String vcChatRoomSerialNo, String vcRelaSerialNo, String vcToWxSerialNo, TSMessageBean... messageBeans) {
+    public String sendChatRoomMessageList(String vcRobotSerialNo, String vcChatRoomSerialNo, String vcRelaSerialNo, String vcToWxSerialNo, List<TSMessageBean> messageList) {
         String url = TSApiConfig.ROBOT_MESSAGE_SendGroupChatMessages.replace("{TOKEN}", tsAuthService.getToken())
         TSPostGroupMessageBean postMessageBean = new TSPostGroupMessageBean()
         postMessageBean.setVcRobotSerialNo(vcRobotSerialNo)
@@ -127,7 +131,7 @@ class TSRobotMessageService {
         }
         List<TSMessageBean> list = new ArrayList<>()
         int i = 1
-        for (TSMessageBean messageBean : messageBeans) {
+        for (TSMessageBean messageBean : messageList) {
             messageBean.setnMsgNum(i)
             list.add(messageBean)
             i = i + 1
@@ -147,15 +151,23 @@ class TSRobotMessageService {
      */
     public String setChatRoomOpenMessage(String vcRobotSerialNo, String vcChatRoomSerialNo, boolean open) {
         String url = ""
+        int isOpen=10
         if (open) {
+            isOpen=10
             url = TSApiConfig.ROBOT_CHATROOM_RobotChatRoomOpen.replace("{TOKEN}", tsAuthService.getToken())
         } else {
+            isOpen=11
             url = TSApiConfig.ROBOT_CHATROOM_RobotChatRoomCancel.replace("{TOKEN}", tsAuthService.getToken())
         }
         TSPostChatRoomInfoBean postChatRoomInfoBean = new TSPostChatRoomInfoBean()
         postChatRoomInfoBean.setVcRobotSerialNo(vcRobotSerialNo)
         postChatRoomInfoBean.setVcChatRoomSerialNo(vcChatRoomSerialNo)
         String retJson = HttpUtils.postJsonString(url, JSONObject.toJSONString(postChatRoomInfoBean))
+        JSONObject jsonObject=JSONObject.parseObject(retJson)
+        if(jsonObject.getInteger("nResult")==1){
+            String id=new MD5().getMD5(vcRobotSerialNo+vcChatRoomSerialNo)
+            tsRobotRoomInfoESService.update(id,"isOpenMessage",isOpen)
+        }
         return retJson
     }
 

@@ -31,7 +31,7 @@ class TSApiConfig {
     //修改机器人个性签名
     final static String ROBOT_SETTING_ModifyProfileWhatsUp=SERVICE_HOST+"/api/Robot/ModifyProfileWhatsUp?vcToken={TOKEN}"
     //修改机器人昵称
-    final static String ROBOT_SETTING_ModifyProfileName=SERVICE_HOST+"/api/Robot/ModifyProfileName?  ={TOKEN}"
+    final static String ROBOT_SETTING_ModifyProfileName=SERVICE_HOST+"/api/Robot/ModifyProfileName?vcToken={TOKEN}"
     //修改机器人头像
     final static String ROBOT_SETTING_ModifyProfileHeadImg=SERVICE_HOST+"/api/Robot/ModifyProfileHeadImg?vcToken={TOKEN}"
     //修改机器人性别

@@ -60,40 +60,48 @@
     <!--<property name="fileEncoding" value="utf-8"/>-->
     <!--</bean>-->
 
+
     <bean id="schedulerFactoryBean" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"/>
     <task:executor id="executor" pool-size="5"/>
     <task:scheduler id="scheduler" pool-size="10"/>
     <task:annotation-driven executor="executor" scheduler="scheduler"/>
 
-    <!-- 更新已发送信息每天上午00:20触发-->
-    <task:scheduler id="jtbApiService_findSendDone"/>
-    <task:scheduled-tasks scheduler="jtbApiService_findSendDone">
-        <task:scheduled ref="syncJTBSendLogJob" method="doSomething" cron="0 20 0 * * ?"/>
+    <!--每5分钟-->
+    <task:scheduler id="tsRobotConfigService_syncAllRobotAndRoom_5min"/>
+    <task:scheduled-tasks scheduler="tsRobotConfigService_syncAllRobotAndRoom_5min">
+        <task:scheduled ref="syncRobotRoomJob" method="doSomething" cron="0 */5 * * * ?"/>
     </task:scheduled-tasks>
 
-    <!--    每分钟-->
-<!--        <task:scheduler id="jdOrderLogService_getOrderLogByDay_1min"/>-->
-<!--        <task:scheduled-tasks scheduler="jdOrderLogService_getOrderLogByDay_1min">-->
-<!--            <task:scheduled ref="syncJdOrderJob" method="doSomething" cron="0 */1 * * * ?"/>-->
-<!--        </task:scheduled-tasks>-->
 
-<!--    <task:scheduler id="jdSkuInfoService_syncSkuInfo"/>-->
-<!--    <task:scheduled-tasks scheduler="jdSkuInfoService_syncSkuInfo">-->
-<!--        <task:scheduled ref="syncJdSkuLibJob" method="doSomething" cron="0 */15 * * * ?"/>-->
+    <!-- 更新已发送信息每天上午00:20触发-->
+<!--    <task:scheduler id="jtbApiService_findSendDone"/>-->
+<!--    <task:scheduled-tasks scheduler="jtbApiService_findSendDone">-->
+<!--        <task:scheduled ref="syncJTBSendLogJob" method="doSomething" cron="0 20 0 * * ?"/>-->
 <!--    </task:scheduled-tasks>-->
+
+    <!--    每分钟-->
+    <!--        <task:scheduler id="jdOrderLogService_getOrderLogByDay_1min"/>-->
+    <!--        <task:scheduled-tasks scheduler="jdOrderLogService_getOrderLogByDay_1min">-->
+    <!--            <task:scheduled ref="syncJdOrderJob" method="doSomething" cron="0 */1 * * * ?"/>-->
+    <!--        </task:scheduled-tasks>-->
+
+    <!--    <task:scheduler id="jdSkuInfoService_syncSkuInfo"/>-->
+    <!--    <task:scheduled-tasks scheduler="jdSkuInfoService_syncSkuInfo">-->
+    <!--        <task:scheduled ref="syncJdSkuLibJob" method="doSomething" cron="0 */15 * * * ?"/>-->
+    <!--    </task:scheduled-tasks>-->
 
     <!--    每天上午01:15触发-->
-<!--    <task:scheduler id="jdCategoryService_startSyncAllCategory_1min"/>-->
-<!--    <task:scheduled-tasks scheduler="jdCategoryService_startSyncAllCategory_1min">-->
-<!--        <task:scheduled ref="syncJdCategoryJob" method="doSomething" cron="0 15 1 * * ?"/>-->
-<!--    </task:scheduled-tasks>-->
+    <!--    <task:scheduler id="jdCategoryService_startSyncAllCategory_1min"/>-->
+    <!--    <task:scheduled-tasks scheduler="jdCategoryService_startSyncAllCategory_1min">-->
+    <!--        <task:scheduled ref="syncJdCategoryJob" method="doSomething" cron="0 15 1 * * ?"/>-->
+    <!--    </task:scheduled-tasks>-->
 
 
     <!--    每小时触发-->
-<!--    <task:scheduler id="hemaService.startSyncHemaUserTree_1hour"/>-->
-<!--    <task:scheduled-tasks scheduler="hemaService.startSyncHemaUserTree_1hour">-->
-<!--        <task:scheduled ref="syncHMUserTreeJob" method="doSomething" cron="0 0 */1 * * ?"/>-->
-<!--    </task:scheduled-tasks>-->
+    <!--    <task:scheduler id="hemaService.startSyncHemaUserTree_1hour"/>-->
+    <!--    <task:scheduled-tasks scheduler="hemaService.startSyncHemaUserTree_1hour">-->
+    <!--        <task:scheduled ref="syncHMUserTreeJob" method="doSomething" cron="0 0 */1 * * ?"/>-->
+    <!--    </task:scheduled-tasks>-->
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix">

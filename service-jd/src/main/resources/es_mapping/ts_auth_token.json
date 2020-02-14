@@ -1,0 +1,25 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "code": {
+      "type": "integer"
+    },
+    "merchant": {
+      "type": "keyword"
+    },
+    "token": {
+      "type": "keyword"
+    },
+    "refresh_token": {
+      "type": "keyword"
+    },
+    "createTime": {
+      "type": "long"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

@@ -8,6 +8,8 @@ import com.waps.service.jd.es.domain.TSChatRoomESMap
 import com.waps.union_jd_api.bean.ReturnMessageBean
 import com.waps.utils.ResponseUtils
 import com.waps.utils.StringUtils
+import org.elasticsearch.search.SearchHit
+import org.elasticsearch.search.SearchHits
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestBody
@@ -30,8 +32,8 @@ class TSRobotChatRoomController {
      * @param request
      * @param response
      */
-    @RequestMapping(value = "/list")
-    public void chat_room_ist(
+    @RequestMapping(value = "/list_live")
+    public void chat_room_list_live(
             @RequestBody ListParams params,
             HttpServletRequest request,
             HttpServletResponse response
@@ -41,6 +43,34 @@ class TSRobotChatRoomController {
         }
         String retJson = tsRobotChatRoomService.getChatRoomInfoList(params.getRobot_id(), params.getRoom_id(), params.getIs_open())
         ResponseUtils.write(response, new ReturnMessageBean(200, "", JSONObject.parseObject(retJson)))
+    }
+
+    /**
+     * 群列表,从ES同步的信息中获取
+     * @param params
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "/list")
+    public void chat_room_list_es(
+            @RequestBody RoomListParams params,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+
+        SearchHits hits = tsRobotChatRoomService.getChatRoomInfoListFromES(params.getRobot_id(), params.getPage(), params.getSize())
+        Map retMap = new HashMap()
+        long total = 0
+        List<Map> _list = new ArrayList<>()
+        if (hits != null) {
+            total = hits.getTotalHits().value
+            for (SearchHit hit : hits) {
+                _list.add(hit.getSourceAsMap())
+            }
+        }
+        retMap.put("total", total)
+        retMap.put("list", _list)
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", retMap))
     }
 
     /**
@@ -96,6 +126,16 @@ class TSRobotChatRoomController {
         ResponseUtils.write(response, new ReturnMessageBean(200, "", JSONObject.parseObject(retJson)))
     }
 
+    @RequestMapping(value = "/send_message_list")
+    public void sendMessageList(
+            @RequestBody SendChatRoomMessageListParams params,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        String retJson = tsRobotMessageService.sendChatRoomMessageList(params.getRobot_id(), params.getRoom_id(), params.getSerial_no(), params.getWx_id(), params.getMessage_list())
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", JSONObject.parseObject(retJson)))
+    }
+
     /**
      * [同步] 设置机器人在此群是否接收消息
      * @param params
@@ -125,6 +165,12 @@ class ListParams {
     Integer is_open
 }
 
+class RoomListParams{
+    String robot_id
+    int page
+    int size
+}
+
 class SendChatRoomMessageParams {
     String robot_id
     String room_id
@@ -132,6 +178,15 @@ class SendChatRoomMessageParams {
     String wx_id
     int nIsHit
     TSMessageBean message
+}
+
+class SendChatRoomMessageListParams {
+    String robot_id
+    String room_id
+    String serial_no
+    String wx_id
+    int nIsHit
+    List<TSMessageBean> message_list=new ArrayList<>()
 }
 
 class PullMemberParams {

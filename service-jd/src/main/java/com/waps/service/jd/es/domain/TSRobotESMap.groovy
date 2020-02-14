@@ -1,18 +1,8 @@
-package com.waps.robot_api.bean.response
+package com.waps.service.jd.es.domain
 
-import com.waps.service.jd.es.domain.TSRobotESMap
+import com.waps.elastic.search.ESBaseBean
 
-class TSResponseRobotInfoBean extends TSResponseBaseBean {
-    TSInfoData Data
-}
-
-class TSInfoData {
-    String vcMerchantNo
-    int nPageIndex
-    List<TSRobotESMap> RobotList = new ArrayList<>()
-}
-
-class TSRobotInfoBean {
+class TSRobotESMap extends ESBaseBean{
     String vcRobotSerialNo  //机器人编号
     String vcRobotWxId    //机器人wxid
     String vcWxAlias      //用户微信号
@@ -32,4 +22,6 @@ class TSRobotInfoBean {
     int nChatRoomCount = 25          //机器人的群数量
     int nOpenChatRoomCount           //机器人开群数量
     String vcPhone                   //扫码号绑定的手机号
+    String updatetime
+    String createtime
 }

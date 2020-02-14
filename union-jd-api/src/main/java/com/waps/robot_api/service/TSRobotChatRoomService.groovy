@@ -1,10 +1,18 @@
 package com.waps.robot_api.service
 
+import com.alibaba.fastjson.JSONArray
 import com.alibaba.fastjson.JSONObject
+import com.waps.elastic.search.utils.PageUtils
 import com.waps.robot_api.bean.request.TSPostChatRoomInfoBean
 import com.waps.robot_api.utils.TSApiConfig
+import com.waps.service.jd.es.domain.JDMediaInfoESMap
 import com.waps.service.jd.es.domain.TSChatRoomESMap
+import com.waps.service.jd.es.domain.TSRoomInfoESMap
 import com.waps.service.jd.es.service.TSChatRoomESService
+import com.waps.service.jd.es.service.TSRobotRoomInfoESService
+import com.waps.tools.security.MD5
+import com.waps.tools.test.TestUtils
+import com.waps.union_jd_api.service.WeChatRobotService
 import com.waps.union_jd_api.utils.DateUtils
 import com.waps.union_jd_api.utils.HttpUtils
 import com.waps.utils.StringUtils
@@ -19,6 +27,36 @@ class TSRobotChatRoomService {
     TSAuthService tsAuthService
     @Autowired
     TSChatRoomESService tsChatRoomESService
+    @Autowired
+    TSRobotRoomInfoESService tsRobotRoomInfoESService
+    @Autowired
+    WeChatRobotService weChatRobotService
+
+    /**
+     * 转能保存对象，并添加必要信息
+     * @param robot_id
+     * @param obj
+     * @return
+     */
+    public TSRoomInfoESMap convertRoomJson2Obj(String robot_id, JSONObject obj) {
+        TSRoomInfoESMap room = obj.toJavaObject(TSRoomInfoESMap.class)
+        room.setVcRobotSerialNo(robot_id)
+        String id = new MD5().getMD5(robot_id + room.getVcChatRoomSerialNo())
+        room.setRoom_status("0")
+        if (room.getVcName() != null) {
+            String channel_name = weChatRobotService.getChannelName(room.getVcName())
+            JDMediaInfoESMap jdMediaInfoESMap = weChatRobotService.getPidFromChannelName(channel_name)
+            room.setChannel_name(channel_name)
+            if (jdMediaInfoESMap != null) {
+                room.setChannel_id(jdMediaInfoESMap.getChannel_id())
+            }
+        }
+        room.setId(id)
+        room.setCreatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
+        println "======"
+        TestUtils.outPrint(room)
+        return room
+    }
 
     /**
      * 获取群列表
@@ -44,6 +82,23 @@ class TSRobotChatRoomService {
     }
 
     /**
+     * 从ES中读取定时同步的群信息
+     * @param vcRobotSerialNo
+     * @param page
+     * @param size
+     * @return
+     */
+    public SearchHits getChatRoomInfoListFromES(String vcRobotSerialNo, int page, int size) {
+        PageUtils pageUtils = new PageUtils(page, size)
+        HashMap params = new HashMap()
+        params.put("from", pageUtils.getFrom())
+        params.put("size", pageUtils.getSize())
+        params.put("robot_id", vcRobotSerialNo)
+        SearchHits hits = tsRobotRoomInfoESService.findByFreeMarkerFromResource("es_script/ts_robot_room_list.json", params)
+        return hits
+    }
+
+    /**
      *  拉取
      * 【异步调用】获取群成员信息列表接口
      * 可通过接口主动获取机器人所在群成员信息列表（用户编号，昵称，头像）。
@@ -66,8 +121,8 @@ class TSRobotChatRoomService {
         return retJson
     }
 
-    public TSChatRoomESMap loadChatRoomMemberList(String vcRobotSerialNo, String vcChatRoomSerialNo){
-        TSChatRoomESMap tsChatRoomESMap=tsChatRoomESService.load(vcChatRoomSerialNo,TSChatRoomESMap.class) as TSChatRoomESMap
+    public TSChatRoomESMap loadChatRoomMemberList(String vcRobotSerialNo, String vcChatRoomSerialNo) {
+        TSChatRoomESMap tsChatRoomESMap = tsChatRoomESService.load(vcChatRoomSerialNo, TSChatRoomESMap.class) as TSChatRoomESMap
         return tsChatRoomESMap
     }
 
@@ -83,6 +138,63 @@ class TSRobotChatRoomService {
      */
     public callBackChatRoomInfo(String strContext) {
 
+        println strContext
+        JSONObject jsonObject = JSONObject.parseObject(strContext)
+        String vcRobotSerialNo = jsonObject.getString("vcRobotSerialNo")
+        println "vcRobotSerialNo:"+vcRobotSerialNo
+        println "jsonObject.get(\"Data\")="+jsonObject.get("Data")
+        if (jsonObject.getJSONArray("Data")) {
+            JSONArray array = jsonObject.getJSONArray("Data")
+            List<TSRoomInfoESMap> _list=new ArrayList<>()
+            for (int i = 0; i < array.size(); i++) {
+                JSONObject obj = array.get(i) as JSONObject
+                TSRoomInfoESMap room = convertRoomJson2Obj(vcRobotSerialNo, obj)
+                if (room != null) {
+                    _list.add(room)
+                }else{
+                    println "==ERROR room is null=="
+                }
+            }
+            tsRobotRoomInfoESService.saveBulk(_list)
+        }
+    }
+
+    /**
+     * 修改群名
+     * @param strContext
+     * @return
+     */
+    public callBackChatRoomNameChange(String strContext) {
+        JSONObject jsonObject = JSONObject.parseObject(strContext)
+        String vcRobotSerialNo = jsonObject.getString("vcRobotSerialNo")
+        Integer nType = jsonObject.getInteger("nType")
+        if (jsonObject.getJSONObject("Data")) {
+            JSONObject obj = jsonObject.getJSONObject("Data")
+            TSRoomInfoESMap room = convertRoomJson2Obj(vcRobotSerialNo, obj)
+            if (room != null)
+                tsRobotRoomInfoESService.save(room.getId(), room)
+        }
+    }
+
+    /**
+     * 4007和4507 主动退群回调 4007 被踢出群回调 4507
+     * @param strContext
+     */
+    public callBackQuitChatRoom(String strContext) {
+        JSONObject jsonObject = JSONObject.parseObject(strContext)
+        String vcRobotSerialNo = jsonObject.getString("vcRobotSerialNo")
+        Integer nType = jsonObject.getInteger("nType")
+        if (jsonObject.getJSONObject("Data")) {
+            String room_Id = jsonObject.getJSONObject("Data").getString("vcChatRoomSerialNo")
+            String id = new MD5().getMD5(vcRobotSerialNo + room_Id)
+            String status = "1"
+            if (nType == 4007) {
+                status = "1"
+            } else if (nType == 4507) {
+                status = "2"
+            }
+            tsRobotRoomInfoESService.update(id, "room_status", status)
+        }
     }
 
     /**

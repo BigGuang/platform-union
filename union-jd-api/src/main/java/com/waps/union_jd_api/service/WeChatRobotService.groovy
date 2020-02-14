@@ -323,7 +323,7 @@ class WeChatRobotService {
      * @param roomName
      * @return
      */
-    public static String getChannelName(String roomName) {
+    public String getChannelName(String roomName) {
 
         //todo 支持更多数字位数
         String channelName = null

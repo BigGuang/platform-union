@@ -1,0 +1,71 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "vcRobotSerialNo": {
+      "type": "keyword"
+    },
+    "vcChatRoomId": {
+      "type": "keyword"
+    },
+    "vcHeadImg": {
+      "type": "keyword"
+    },
+    "vcName": {
+      "type": "keyword"
+    },
+    "channel_name": {
+      "type": "keyword"
+    },
+    "channel_id": {
+      "type": "keyword"
+    },
+    "vcChatRoomQRCode": {
+      "type": "keyword"
+    },
+    "vcGroupNotice": {
+      "type": "keyword"
+    },
+    "vcBase64Notice": {
+      "type": "keyword"
+    },
+    "vcAdminWxId": {
+      "type": "keyword"
+    },
+    "vcAdminWxUserSerialNo": {
+      "type": "keyword"
+    },
+    "dtCreateDate": {
+      "type": "keyword"
+    },
+    "vcBase64Name": {
+      "type": "keyword"
+    },
+    "vcChatRoomSerialNo": {
+      "type": "keyword"
+    },
+    "room_status": {
+      "type": "keyword"
+    },
+    "nIsInContacts": {
+      "type": "integer"
+    },
+    "nUserCount": {
+      "type": "integer"
+    },
+    "isOpenMessage": {
+      "type": "integer"
+    },
+    "nRobotInStatus": {
+      "type": "integer"
+    },
+    "createtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

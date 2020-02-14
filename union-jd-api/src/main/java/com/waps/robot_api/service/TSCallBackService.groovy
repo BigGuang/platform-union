@@ -28,13 +28,10 @@ class TSCallBackService {
     public Boolean callBack(int nType, String strContext) {
 
         println "==strContext=="
-        println strContext
 
         if (!StringUtils.isNull(strContext)) {
             strContext = URLDecoder.decode(strContext, "UTF-8")
         }
-
-        println "==保存callback=="
         saveCallBackLog2ES(strContext)
         saveCallBackLog(nType, strContext)
 
@@ -67,6 +64,7 @@ class TSCallBackService {
         //5003  群内实时消息回调
         //5004  私聊消息发送结果回调接口
 
+        println "=处理nType:"+nType
         switch (nType) {
             case 1006:
                 //1006  修改机器人信息回调  http://docs.op.opsdns.cc:8081/Personal-number-msg/Personal-msg-callback/
@@ -114,10 +112,18 @@ class TSCallBackService {
                 break;
             case 4001:
                 //4001  群信息变动回调, 商家扫码号第一次登录至平台时，登录初始化成功后，会将所有群的基本信息通过4001回调给商家；
+                println "==开始处理=="
                 tsChatRoomService.callBackChatRoomInfo(strContext)
                 break;
+
+            case 4002:
+                //4002 修改群名称回调
+                tsChatRoomService.callBackChatRoomNameChange(strContext)
+                break;
+
             case 4007:
                 //4007   机器人主动退群回调接口
+                tsChatRoomService.callBackQuitChatRoom(strContext)
 
                 break;
             case 4009:
@@ -154,6 +160,7 @@ class TSCallBackService {
                 break;
             case 4507:
                 //4507  机器人被踢出群回调接口
+                tsChatRoomService.callBackQuitChatRoom(strContext)
                 break;
             case 4510:
                 //4510  被设置为群主的机器人管理员取消
@@ -194,7 +201,6 @@ class TSCallBackService {
                 new File(path).write(strContext)
             }
             println "nType:" + nType
-            println "strContext:" + strContext
         } catch (Exception e) {
             println "saveCallBackLog ERROR:" + e.getLocalizedMessage()
         }
@@ -205,8 +211,6 @@ class TSCallBackService {
             TSCallBackLogESMap tsCallBackLogESMap = JSONObject.parseObject(strContext, TSCallBackLogESMap.class) as TSCallBackLogESMap
             if (tsCallBackLogESMap != null) {
                 tsCallBackLogESMap.setCreatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
-                println "===tsCallBackLogESMap====="
-                TestUtils.outPrint(tsCallBackLogESMap)
                 String id = UUID.randomUUID().toString()
                 tsCallBackLogESService.save(id, tsCallBackLogESMap)
             }

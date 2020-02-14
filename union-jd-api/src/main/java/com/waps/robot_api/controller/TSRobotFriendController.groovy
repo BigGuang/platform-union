@@ -54,6 +54,16 @@ class TSRobotFriendController {
         ResponseUtils.write(response, new ReturnMessageBean(200, "", JSONObject.parseObject(retJson)))
     }
 
+    @RequestMapping(value = "/send_message_list")
+    public void sendMessageList(
+            @RequestBody SendFriendMessageListParams params,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        String retJson = tsRobotMessageService.sendPrivateMessageList(params.getRobot_id(), params.getSerial_no(), params.getWx_id(), params.getMessage_list())
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", JSONObject.parseObject(retJson)))
+    }
+
     @RequestMapping(value = "/delete")
     public void deleteFriend(
             @RequestBody DeleteContactParams params,
@@ -84,5 +94,12 @@ class SendFriendMessageParams {
     String serial_no
     String wx_id
     TSMessageBean message
+}
+
+class SendFriendMessageListParams {
+    String robot_id
+    String serial_no
+    String wx_id
+    List<TSMessageBean> message_list=new ArrayList<>()
 }
 

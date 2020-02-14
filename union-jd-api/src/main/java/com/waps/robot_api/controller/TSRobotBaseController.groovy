@@ -4,10 +4,13 @@ import com.waps.robot_api.bean.response.TSResponseRobotInfoBean
 import com.waps.robot_api.service.TSAuthService
 import com.waps.robot_api.service.TSCallBackService
 import com.waps.robot_api.service.TSRobotConfigService
+import com.waps.robot_api.utils.TSApiConfig
 import com.waps.robot_api.utils.TestRequest
 import com.waps.robot_api.utils.UrlUtil
 import com.waps.union_jd_api.bean.ReturnMessageBean
 import com.waps.utils.ResponseUtils
+import org.elasticsearch.search.SearchHit
+import org.elasticsearch.search.SearchHits
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Controller
@@ -36,7 +39,22 @@ class TSRobotBaseController {
         ResponseUtils.write(response, new ReturnMessageBean(200, "", token))
     }
 
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    /**
+     * 主动调用同步
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "/sync")
+    public void sync2ES(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        tsRobotConfigService.syncAllRobotAndRoom()
+        ResponseUtils.write(response, new ReturnMessageBean(200, ""))
+    }
+
+
+    @RequestMapping(value = "/list_live", method = RequestMethod.POST)
     public void getRobotList(
             @RequestBody RobotListParams params,
             HttpServletRequest request,
@@ -51,6 +69,33 @@ class TSRobotBaseController {
         ResponseUtils.write(response, new ReturnMessageBean(200, "", responseRobotInfoBean))
     }
 
+    /**
+     * 从ES中读取定时同步下来的机器人列表
+     * @param params
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    public void getESRobotList(
+            @RequestBody RobotListParams params,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        SearchHits hits = tsRobotConfigService.getRobotInfoListFromES(params.getPage(), params.getSize())
+        Map retMap = new HashMap()
+        long total = 0
+        List<Map> _list = new ArrayList<>()
+        if (hits != null) {
+            total = hits.getTotalHits().value
+            for (SearchHit hit : hits) {
+                _list.add(hit.getSourceAsMap())
+            }
+        }
+        retMap.put("total", total)
+        retMap.put("list", _list)
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", retMap))
+    }
+
 }
 
 class PostParams {
@@ -61,4 +106,5 @@ class PostParams {
 class RobotListParams {
     String[] robot_ids
     int page = 1
+    int size = 50
 }
