@@ -7,6 +7,7 @@ import com.waps.robot_api.bean.request.TSPostChatRoomInfoBean
 import com.waps.robot_api.utils.TSApiConfig
 import com.waps.service.jd.es.domain.JDMediaInfoESMap
 import com.waps.service.jd.es.domain.TSChatRoomESMap
+import com.waps.service.jd.es.domain.TSChatRoomMemberESMap
 import com.waps.service.jd.es.domain.TSRoomInfoESMap
 import com.waps.service.jd.es.service.TSChatRoomESService
 import com.waps.service.jd.es.service.TSRobotRoomInfoESService
@@ -16,6 +17,9 @@ import com.waps.union_jd_api.service.WeChatRobotService
 import com.waps.union_jd_api.utils.DateUtils
 import com.waps.union_jd_api.utils.HttpUtils
 import com.waps.utils.StringUtils
+import com.waps.utils.XmlUtils
+import groovy.json.JsonSlurper
+import org.elasticsearch.action.get.GetResponse
 import org.elasticsearch.search.SearchHits
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -141,17 +145,17 @@ class TSRobotChatRoomService {
         println strContext
         JSONObject jsonObject = JSONObject.parseObject(strContext)
         String vcRobotSerialNo = jsonObject.getString("vcRobotSerialNo")
-        println "vcRobotSerialNo:"+vcRobotSerialNo
-        println "jsonObject.get(\"Data\")="+jsonObject.get("Data")
+        println "vcRobotSerialNo:" + vcRobotSerialNo
+        println "jsonObject.get(\"Data\")=" + jsonObject.get("Data")
         if (jsonObject.getJSONArray("Data")) {
             JSONArray array = jsonObject.getJSONArray("Data")
-            List<TSRoomInfoESMap> _list=new ArrayList<>()
+            List<TSRoomInfoESMap> _list = new ArrayList<>()
             for (int i = 0; i < array.size(); i++) {
                 JSONObject obj = array.get(i) as JSONObject
                 TSRoomInfoESMap room = convertRoomJson2Obj(vcRobotSerialNo, obj)
                 if (room != null) {
                     _list.add(room)
-                }else{
+                } else {
                     println "==ERROR room is null=="
                 }
             }
@@ -254,7 +258,27 @@ class TSRobotChatRoomService {
      * http://docs.op.opsdns.cc:8081/groupmember/chatroom-members-join/
      */
     public callBackChatRoomAddMember(String strContext) {
-
+        println strContext
+        def jsonSlurper = new JsonSlurper()
+        def json = jsonSlurper.parseText(strContext)
+        String robot_id = json['vcRobotSerialNo']
+        if (json['Data'] != null) {
+            String room_id = json['Data']['vcChatRoomSerialNo']
+            JSONArray array = json['Data']['Members'] as JSONArray
+            TSChatRoomESMap tsChatRoomESMap = tsChatRoomESService.load(room_id, TSChatRoomESMap.class) as TSChatRoomESMap
+            List<TSChatRoomMemberESMap> memberESMapList = tsChatRoomESMap.getMembers()
+            for (int i = 0; i < array.size(); i++) {
+                JSONObject memberObj = array.get(i) as JSONObject
+                TSChatRoomMemberESMap tsChatRoomMemberESMap = memberObj.toJavaObject(TSChatRoomMemberESMap.class) as TSChatRoomMemberESMap
+                if (tsChatRoomMemberESMap) {
+                    memberESMapList.add(tsChatRoomMemberESMap)
+                }
+            }
+            tsChatRoomESMap.setMembers(memberESMapList)
+            tsChatRoomESMap.setnMemberCount(memberESMapList.size())
+            tsChatRoomESService.save(room_id, tsChatRoomESMap)
+            println "===save callBackChatRoomAddMember==="
+        }
     }
 
     /**
@@ -263,7 +287,29 @@ class TSRobotChatRoomService {
      * http://docs.op.opsdns.cc:8081/groupmember/chatroom-members-quit/
      */
     public callBackChatRoomDeleteMember(String strContext) {
+        println strContext
+        def jsonSlurper = new JsonSlurper()
+        def json = jsonSlurper.parseText(strContext)
+        String robot_id = json['vcRobotSerialNo']
 
+        if (json['Data'] != null) {
+            json['Data'].each {it->
+                String room_id=it['vcChatRoomSerialNo']
+                String vcMemberUserSerialNo=it['vcMemberUserSerialNo']
+                TSChatRoomESMap tsChatRoomESMap = tsChatRoomESService.load(room_id, TSChatRoomESMap.class) as TSChatRoomESMap
+                List<TSChatRoomMemberESMap> memberESMapList = tsChatRoomESMap.getMembers()
+                for(TSChatRoomMemberESMap tsChatRoomMemberESMap:memberESMapList){
+                    if(tsChatRoomMemberESMap.vcMemberUserSerialNo==vcMemberUserSerialNo){
+                        memberESMapList.remove(tsChatRoomMemberESMap)
+                    }
+                }
+                tsChatRoomESMap.setMembers(memberESMapList)
+                tsChatRoomESMap.setnMemberCount(memberESMapList.size())
+
+                tsChatRoomESService.save(room_id, tsChatRoomESMap)
+                println "===save callBackChatRoomDeleteMember==="
+            }
+        }
     }
 
 }
