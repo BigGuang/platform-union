@@ -1,0 +1,49 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "content": {
+      "type": "keyword"
+    },
+    "img_url": {
+      "type": "keyword"
+    },
+    "title":{
+      "type": "keyword"
+    },
+    "desc": {
+      "type": "keyword"
+    },
+    "send_type": {
+      "type": "integer"
+    },
+    "task_status": {
+      "type": "integer"
+    },
+    "send_day_order": {
+      "type": "integer"
+    },
+    "send_day": {
+      "type": "date",
+      "format": "yyyy-MM-dd"
+    },
+    "send_time": {
+      "type": "date",
+      "format": "HH:mm"
+    },
+    "target_channel_name": {
+      "type": "keyword"
+    },
+    "black_channel_name": {
+      "type": "keyword"
+    },
+    "createtime": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "from": "${from}",
+  "size": "${size}",
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        },
+        {
+          "match": {
+            "send_day": "${send_day}"
+          }
+        },
+        {
+          "match": {
+            "send_time": "${send_time}"
+          }
+        }
+      ]
+    }
+  },
+  "sort": {
+    "createtime": {
+      "order": "asc"
+    }
+  }
+}
