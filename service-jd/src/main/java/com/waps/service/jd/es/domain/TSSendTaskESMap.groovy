@@ -6,6 +6,7 @@ import com.waps.elastic.search.ESBaseBean
 class TSSendTaskESMap extends ESBaseBean{
     String content
     String img_url             //图片地址，多个用','分割
+    String href                //分享的链接
     String title               //标题，用在一些消息类型
     String desc                //说明内容，用在链接等消息类型
     int send_type             //以什么类型发送，区分文本，链接，图片以及小程序

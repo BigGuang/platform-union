@@ -36,8 +36,6 @@ class TSRobotChatRoomService {
     @Autowired
     WeChatRobotService weChatRobotService
 
-    @Autowired
-
 
     /**
      * 转能保存对象，并添加必要信息

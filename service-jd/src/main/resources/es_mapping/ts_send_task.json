@@ -9,6 +9,9 @@
     "img_url": {
       "type": "keyword"
     },
+    "href":{
+      "type": "keyword"
+    },
     "title":{
       "type": "keyword"
     },

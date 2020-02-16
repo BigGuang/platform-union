@@ -1,16 +1,21 @@
 package com.waps.robot_api.service
 
 import com.waps.elastic.search.utils.PageUtils
+import com.waps.robot_api.bean.request.TSMessageBean
 import com.waps.service.jd.es.domain.TSMessageESMap
 import com.waps.service.jd.es.domain.TSRoomInfoESMap
 import com.waps.service.jd.es.domain.TSSendTaskESMap
 import com.waps.service.jd.es.service.TSRobotESService
 import com.waps.service.jd.es.service.TSRobotRoomInfoESService
 import com.waps.service.jd.es.service.TSSendTaskESService
+import com.waps.utils.StringUtils
 import org.elasticsearch.search.SearchHit
 import org.elasticsearch.search.SearchHits
+import org.jsoup.helper.StringUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+
+import java.text.SimpleDateFormat
 
 @Component
 class TSSendTaskService {
@@ -30,22 +35,22 @@ class TSSendTaskService {
      * @param size
      * @return
      */
-    public SearchHits getSendTaskWaitingList(String send_day,String send_time, int page, int size) {
+    public SearchHits getSendTaskWaitingList(String send_day, String send_time, int page, int size) {
         HashMap params = new HashMap()
         PageUtils pageUtils = new PageUtils(page, size)
-        params.put("from",pageUtils.getFrom())
-        params.put("size",pageUtils.getSize())
-        params.put("task_status",0)
-        params.put("send_day",send_day)
-        params.put("send_day",send_time)
-        return tsSendTaskESService.findByFreeMarkerFromResource("es_script/ts_send_task_time.json",params)
+        params.put("from", pageUtils.getFrom())
+        params.put("size", pageUtils.getSize())
+        params.put("send_day", send_day)
+        params.put("send_time", send_time)
+        println params
+        return tsSendTaskESService.findByFreeMarkerFromResource("es_script/ts_send_task_time.json", params)
     }
 
-    public List<TSSendTaskESMap> loadSendTaskWaitingList(String send_day,String send_time){
-        SearchHits hits=getSendTaskWaitingList(send_day,send_time,1,40)
-        List<TSSendTaskESMap> _list=new ArrayList<>()
-        for(SearchHit hit:hits){
-            TSSendTaskESMap tsSendTaskESMap=tsSendTaskESService.getObjectFromJson(hit.getSourceAsString(),TSSendTaskESMap.class) as TSSendTaskESMap
+    public List<TSSendTaskESMap> loadSendTaskWaitingList(String send_day, String send_time) {
+        SearchHits hits = getSendTaskWaitingList(send_day, send_time, 1, 40)
+        List<TSSendTaskESMap> _list = new ArrayList<>()
+        for (SearchHit hit : hits) {
+            TSSendTaskESMap tsSendTaskESMap = tsSendTaskESService.getObjectFromJson(hit.getSourceAsString(), TSSendTaskESMap.class) as TSSendTaskESMap
             _list.add(tsSendTaskESMap)
         }
         return _list
@@ -54,10 +59,10 @@ class TSSendTaskService {
     public SearchHits getSendTaskListByStatus(int task_status, int page, int size) {
         HashMap params = new HashMap()
         PageUtils pageUtils = new PageUtils(page, size)
-        params.put("from",pageUtils.getFrom())
-        params.put("size",pageUtils.getSize())
-        params.put("task_status",task_status)
-        return tsSendTaskESService.findByFreeMarkerFromResource("es_script/ts_send_task_time.json",params)
+        params.put("from", pageUtils.getFrom())
+        params.put("size", pageUtils.getSize())
+        params.put("task_status", task_status)
+        return tsSendTaskESService.findByFreeMarkerFromResource("es_script/ts_send_task_time.json", params)
     }
 
     /**
@@ -65,9 +70,56 @@ class TSSendTaskService {
      * @param taskESMap
      * @return
      */
-    public TSMessageESMap convertTask2Message(TSSendTaskESMap taskESMap) {
-        TSMessageESMap tsMessageESMap = new TSMessageESMap()
-        return tsMessageESMap
+    public List<TSMessageBean> convertTask2Message(String channel_id, TSSendTaskESMap taskESMap) {
+//        消息类型
+//        2001 文字
+//        2002 图片
+//        2003 语音(只支持amr格式)
+//        2004 视频
+//        2005 链接
+//        2006 好友名片
+//        2010 文件
+//        2013 小程序
+//        2016 音乐
+        List<TSMessageBean> messageBeanList = new ArrayList<>()
+        if (taskESMap != null) {
+            if (!StringUtils.isNull(taskESMap.getImg_url())) {
+                String imgUrl = taskESMap.getImg_url()
+                if (imgUrl.indexOf(",") < 0) {
+                    imgUrl = imgUrl + ","
+                }
+                String[] imgList = imgUrl.split(",")
+                for (int i = 0; i < imgList.length; i++) {
+                    String img = imgList[i]
+                    if (!StringUtils.isNull(img)) {
+                        TSMessageBean tsMessageESMap = new TSMessageBean()
+                        tsMessageESMap.setnMsgType(2002)
+                        tsMessageESMap.setMsgContent(img)
+                        messageBeanList.add(tsMessageESMap)
+                    }
+                }
+            }
+            if (!StringUtils.isNull(taskESMap.getContent()) && StringUtils.isNull(taskESMap.getTitle()) && StringUtils.isNull(taskESMap.getDesc())) {
+                TSMessageBean tsMessageESMap = new TSMessageBean()
+                tsMessageESMap.setnMsgType(2001)
+
+                if(!StringUtils.isNull(channel_id)){
+                    //todo：对taskESMap.getContent()内容做强制转链
+                }
+                tsMessageESMap.setMsgContent(taskESMap.getContent())
+                messageBeanList.add(tsMessageESMap)
+            }
+            if (!StringUtils.isNull(taskESMap.getHref()) && !StringUtils.isNull(taskESMap.getTitle())) {
+                TSMessageBean tsMessageESMap = new TSMessageBean()
+                tsMessageESMap.setnMsgType(2005)
+                tsMessageESMap.setMsgContent(taskESMap.getHref())
+                tsMessageESMap.setVcHref(taskESMap.getHref())
+                tsMessageESMap.setVcTitle(taskESMap.getTitle())
+                tsMessageESMap.setVcDesc(taskESMap.getDesc())
+                messageBeanList.add(tsMessageESMap)
+            }
+        }
+        return messageBeanList
     }
 
 
@@ -80,17 +132,63 @@ class TSSendTaskService {
      * 4. 发送前任务内容需要转链
      * 5. 发送要用多任务并发
      */
-    public sendTask2Room(){
-        String send_day=""
-        String send_time=""
+    public sendTask2Room() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd")
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm")
+        String send_day = dateFormat.format(new Date())
+        String send_time = timeFormat.format(new Date())
 
-        List<TSSendTaskESMap> taskList=loadSendTaskWaitingList(send_day,send_time)
-        if(taskList.size()>0) {
-            int page=1
-            int size=40
-            RobotRoomListBean robotRoom= tsRobotRoomService.listRobotRoom(page,size)
-            long total=robotRoom.getTotal()
-            List<TSRoomInfoESMap> roomList=robotRoom.getList()
+        List<TSSendTaskESMap> taskList = loadSendTaskWaitingList(send_day, send_time)
+        if (taskList.size() > 0) {
+            println "===" + taskList.size() + " 条发送任务"
+            for (TSSendTaskESMap tsSendTaskESMap : taskList) {
+                int page = 1
+                int size = 40
+                RobotRoomListBean robotRoom = tsRobotRoomService.listRobotRoom(page, size)
+                long total = robotRoom.getTotal()
+                List<TSRoomInfoESMap> roomList = robotRoom.getList()
+                println "===" + roomList.size() + " 个群聊发送"
+                for (TSRoomInfoESMap roomInfoESMap : roomList) {
+
+                    println "===判断给 " + roomInfoESMap.getVcName() + " 发送的内容"
+                    boolean flg = checkSendStatus(tsSendTaskESMap, roomInfoESMap)
+                    println "===判断结果:"+flg
+                    if (flg) {
+                        println "===给" + roomInfoESMap.getVcName() + " 发送内容"
+                        println " room info:" + roomInfoESMap.getChannel_name() + " " + roomInfoESMap.getChannel_id() + " " + roomInfoESMap.getnUserCount() + "人"
+                        //发送消息
+                        String robot_id = roomInfoESMap.getVcRobotSerialNo()
+                        String room_id = roomInfoESMap.getVcChatRoomSerialNo()
+                        String channel_id = roomInfoESMap.getChannel_id()
+                        String action_id = UUID.randomUUID().toString()
+                        List<TSMessageBean> messageList = convertTask2Message(channel_id, tsSendTaskESMap)
+                        if (messageList != null && messageList.size() > 0) {
+                            tsRobotMessageService.sendChatRoomMessageList(robot_id, room_id, action_id, "", messageList)
+                        }
+                    }
+                }
+            }
+        } else {
+            println "===无发送任务"
         }
+    }
+
+
+    public boolean checkSendStatus(TSSendTaskESMap tsSendTaskESMap, TSRoomInfoESMap roomInfoESMap) {
+        boolean flg = true
+        if (!StringUtils.isNull(tsSendTaskESMap.getBlack_channel_name())
+                && !StringUtils.isNull(roomInfoESMap.getChannel_name())
+                && tsSendTaskESMap.getBlack_channel_name().toLowerCase().indexOf(roomInfoESMap.getChannel_name().toLowerCase()) > -1) {
+            flg = false
+        }
+        if (!StringUtils.isNull(tsSendTaskESMap.getTarget_channel_name())) {
+            flg = false
+        }
+        if (!StringUtils.isNull(tsSendTaskESMap.getTarget_channel_name())
+                && !StringUtils.isNull(roomInfoESMap.getChannel_name())
+                && tsSendTaskESMap.getTarget_channel_name().toLowerCase().indexOf(roomInfoESMap.getChannel_name().toLowerCase()) > -1) {
+            flg = true
+        }
+        return flg
     }
 }

@@ -22,7 +22,8 @@ class TSRobotRoomService {
      */
     public RobotRoomListBean listRobotRoom(int page, int size) {
         HashMap params = new PageUtils(page, size).getParamsMap()
-        params.put("status", "0")
+        params.put("room_status", "0")
+        println params
         SearchHits hits = tsRobotRoomInfoESService.findByFreeMarkerFromResource("es_script/ts_robot_room_list_status.json", params)
         RobotRoomListBean listReturn = new RobotRoomListBean()
         listReturn.setTotal(hits.getTotalHits().value)
