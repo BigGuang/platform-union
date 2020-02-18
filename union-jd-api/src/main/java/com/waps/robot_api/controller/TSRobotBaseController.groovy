@@ -4,6 +4,7 @@ import com.waps.robot_api.bean.response.TSResponseRobotInfoBean
 import com.waps.robot_api.service.TSAuthService
 import com.waps.robot_api.service.TSCallBackService
 import com.waps.robot_api.service.TSRobotConfigService
+import com.waps.robot_api.service.TestTaskService
 import com.waps.robot_api.utils.TSApiConfig
 import com.waps.robot_api.utils.TestRequest
 import com.waps.robot_api.utils.UrlUtil
@@ -29,22 +30,25 @@ class TSRobotBaseController {
     private TSAuthService tuSeAuthService
     @Autowired
     private TSRobotConfigService tsRobotConfigService
+    @Autowired
+    private TestTaskService testTaskService
 
-    @RequestMapping(value = "/test")
+    @RequestMapping(value = "/test_task")
     public void test(
+            @RequestParam(value = "num", required = false) Integer num,
+            @RequestParam(value = "wait", required = false) Integer wait,
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        StringBuffer buff = new StringBuffer()
-        Properties ps = System.getProperties();
-        Enumeration names = ps.propertyNames();
-        while (names.hasMoreElements()) {
-            String ps_name = (String) names.nextElement();
-            buff.append(ps_name + "=" + ps.getProperty(ps_name) + "\r\n");
+        List<String> test_list = new ArrayList<>()
+        for (int i = 0; i < 1000; i++) {
+            String content = "test_" + i
+            test_list.add(content)
         }
-        println "==System=="
-        println buff.toString()
-        ResponseUtils.write(response, new ReturnMessageBean(200, "", buff))
+        String params = "{\"pool_num\":" + num + ",\"wait_time\":" + wait + "}"
+        testTaskService.setParams(params)
+        testTaskService.testTask(test_list)
+        ResponseUtils.write(response, new ReturnMessageBean(200, ""))
     }
 
     @RequestMapping(value = "/token")

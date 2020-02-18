@@ -149,7 +149,7 @@ class WeChatRobotService {
                     } else if (CMD_CREATE_CHANNEL.indexOf(search) > -1) {
                         sendMessageFlg = 4
                     }
-                    println "===sendMessageFlg " + sendMessageFlg + "=="
+
 
                 } else {
                     sendMessageFlg = 2  //搜索内容不正确，回复帮助内容
@@ -205,6 +205,8 @@ class WeChatRobotService {
             if (sendMessageFlg == 5) {
                 sendMessageOnHelpForPerson(chatId, token, contactName, msgFrom)
             }
+
+            println "===sendMessageFlg " + sendMessageFlg + "=="
 
             if (sendMessageFlg == 1) {
 
@@ -306,7 +308,13 @@ class WeChatRobotService {
         return search
     }
 
-    public static String getAssignChannelName(String content) {
+
+    /**
+     * 获取内容中指定的渠道号
+     * @param content
+     * @return
+     */
+    public String getAssignChannelName(String content) {
         String _assignChannelName = null
         if (!StringUtils.isNull(content) && content.length() > 4) {
             try {

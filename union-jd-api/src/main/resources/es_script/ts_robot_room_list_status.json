@@ -10,7 +10,7 @@
         },
         {
           "match": {
-            "room_status": "${room_status}"
+            "room_status": "${room_status} "
           }
         }
       ]

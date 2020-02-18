@@ -2,6 +2,7 @@ package com.waps.robot_api.jobs
 
 import com.waps.robot_api.service.TSRobotConfigService
 import com.waps.robot_api.service.TSSendTaskService
+import com.waps.robot_api.service.TestTaskService
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.XxlJob;
@@ -27,15 +28,33 @@ class JobHandle {
     private TSSendTaskService tsSendTaskService
     @Autowired
     private TSRobotConfigService tsRobotConfigService
+
+    @Autowired
+    private TestTaskService testTaskService
     /**
      * 1、简单任务示例（Bean模式）
      */
     @XxlJob("sendTaskJob")
     public ReturnT<String> sendTaskJob(String param) throws Exception {
-
-        println "==收到sendTaskJob任务调度:" + param
+        String catalinaHome = System.getProperty("catalina.home")
+        println "==" + catalinaHome + "  收到sendTaskJob任务调度:" + param
         println "==调度:sendTask2Room()"
         tsSendTaskService.sendTask2Room()
+        return ReturnT.SUCCESS;
+    }
+
+    @XxlJob("testTaskJob")
+    public ReturnT<String> testTaskJob(String param) throws Exception {
+        String catalinaHome = System.getProperty("catalina.home")
+        println "==" + catalinaHome + "  收到testTaskJob任务调度:" + param
+        println "==调度:testTask()"
+        List<String> test_list = new ArrayList<>()
+        for (int i = 0; i < 1000; i++) {
+            String content = "test_" + i
+            test_list.add(content)
+        }
+        testTaskService.setParams(param)
+        testTaskService.testTask(test_list)
         return ReturnT.SUCCESS;
     }
 
@@ -51,7 +70,7 @@ class JobHandle {
      * 2、分片广播任务
      */
     @XxlJob("shardingJobHandler")
-    public ReturnT<String> shardingJobHandler(String param) throws Exception {
+    public ReturnT<String> shardingTaskJob(String param) throws Exception {
 
         println "==分片广播任务 被调度:" + param
         return ReturnT.SUCCESS;

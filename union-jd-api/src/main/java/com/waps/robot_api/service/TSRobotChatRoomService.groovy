@@ -184,11 +184,14 @@ class TSRobotChatRoomService {
      * @param strContext
      */
     public callBackQuitChatRoom(String strContext) {
+        println "==callBackQuitChatRoom=="
+        println strContext
         JSONObject jsonObject = JSONObject.parseObject(strContext)
-        String vcRobotSerialNo = jsonObject.getString("vcRobotSerialNo")
-        Integer nType = jsonObject.getInteger("nType")
-        if (jsonObject.getJSONObject("Data")) {
-            String room_Id = jsonObject.getJSONObject("Data").getString("vcChatRoomSerialNo")
+        String vcRobotSerialNo = jsonObject.get("vcRobotSerialNo") as String
+        Integer nType = jsonObject.get("nType") as Integer
+        if (jsonObject.get("Data")) {
+            JSONObject dataObj = jsonObject.get("Data") as JSONObject
+            String room_Id = dataObj.get("vcChatRoomSerialNo") as String
             String id = new MD5().getMD5(vcRobotSerialNo + room_Id)
             String status = "1"
             if (nType == 4007) {
@@ -292,13 +295,13 @@ class TSRobotChatRoomService {
         String robot_id = json['vcRobotSerialNo']
 
         if (json['Data'] != null) {
-            json['Data'].each {it->
-                String room_id=it['vcChatRoomSerialNo']
-                String vcMemberUserSerialNo=it['vcMemberUserSerialNo']
+            json['Data'].each { it ->
+                String room_id = it['vcChatRoomSerialNo']
+                String vcMemberUserSerialNo = it['vcMemberUserSerialNo']
                 TSChatRoomESMap tsChatRoomESMap = tsChatRoomESService.load(room_id, TSChatRoomESMap.class) as TSChatRoomESMap
                 List<TSChatRoomMemberESMap> memberESMapList = tsChatRoomESMap.getMembers()
-                for(TSChatRoomMemberESMap tsChatRoomMemberESMap:memberESMapList){
-                    if(tsChatRoomMemberESMap.vcMemberUserSerialNo==vcMemberUserSerialNo){
+                for (TSChatRoomMemberESMap tsChatRoomMemberESMap : memberESMapList) {
+                    if (tsChatRoomMemberESMap.vcMemberUserSerialNo == vcMemberUserSerialNo) {
                         memberESMapList.remove(tsChatRoomMemberESMap)
                     }
                 }
