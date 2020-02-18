@@ -7,6 +7,7 @@ import com.waps.service.jd.api.bean.SearchParams
 import com.waps.service.jd.api.service.JdUnionService
 import com.waps.service.jd.es.domain.JDMediaInfoESMap
 import com.waps.union_jd_api.utils.JDConfig
+import com.waps.union_jd_api.utils.SkuUtils
 import com.waps.utils.StringUtils
 import jd.union.open.goods.query.response.Coupon
 import jd.union.open.goods.query.response.GoodsResp
@@ -376,19 +377,14 @@ class JDConvertLinkService {
             while (mt.find()) {
                 sukId = mt.group()
                 sukId = sukId.replaceAll("/", "").replaceAll(".html", "")
-
             }
             if (StringUtils.isNull(sukId)) {
-                if (!StringUtils.isNull(url)) {
-                    if (url.indexOf("sku=") > 0) {
-                        String _temp = url.substring(url.indexOf("sku=") + 4, url.length());
-                        if (_temp.indexOf("&") > 0) {
-                            sukId = _temp.substring(0, _temp.indexOf("&"));
-                        } else {
-                            sukId = _temp;
-                        }
-                    }
-                }
+                println "==通过sku参数判断=="
+                sukId= SkuUtils.getSkuIDFromUrl(url,"sku")
+            }
+            if (StringUtils.isNull(sukId)) {
+                println "==通过wareId参数判断=="
+                sukId= SkuUtils.getSkuIDFromUrl(url,"wareId")
             }
             return sukId
         }
@@ -508,7 +504,7 @@ class JDConvertLinkService {
         String message = jsonObjec.get("message")
         println code + ' ' + message
         ReturnBean returnBean = new ReturnBean()
-        if (code.equals('200')) {
+        if (code == '200') {
             JSONObject jsonObject = jsonObjec.get('data')
             PromotionCodeResp promotionCodeResp = jsonObject.toJavaObject(PromotionCodeResp.class)
             returnBean.setShortURL(promotionCodeResp.getShortURL())

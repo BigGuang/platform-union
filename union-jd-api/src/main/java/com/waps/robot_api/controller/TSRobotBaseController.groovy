@@ -30,11 +30,29 @@ class TSRobotBaseController {
     @Autowired
     private TSRobotConfigService tsRobotConfigService
 
+    @RequestMapping(value = "/test")
+    public void test(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        StringBuffer buff = new StringBuffer()
+        Properties ps = System.getProperties();
+        Enumeration names = ps.propertyNames();
+        while (names.hasMoreElements()) {
+            String ps_name = (String) names.nextElement();
+            buff.append(ps_name + "=" + ps.getProperty(ps_name) + "\r\n");
+        }
+        println "==System=="
+        println buff.toString()
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", buff))
+    }
+
     @RequestMapping(value = "/token")
     public void getToken(
             HttpServletRequest request,
             HttpServletResponse response
     ) {
+
         String token = tuSeAuthService.getToken()
         ResponseUtils.write(response, new ReturnMessageBean(200, "", token))
     }

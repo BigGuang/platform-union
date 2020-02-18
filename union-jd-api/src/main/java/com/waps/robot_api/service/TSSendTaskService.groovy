@@ -8,6 +8,9 @@ import com.waps.service.jd.es.domain.TSSendTaskESMap
 import com.waps.service.jd.es.service.TSRobotESService
 import com.waps.service.jd.es.service.TSRobotRoomInfoESService
 import com.waps.service.jd.es.service.TSSendTaskESService
+import com.waps.tools.test.TestUtils
+import com.waps.union_jd_api.service.JDConvertLinkService
+import com.waps.union_jd_api.service.ResultBean
 import com.waps.utils.StringUtils
 import org.elasticsearch.search.SearchHit
 import org.elasticsearch.search.SearchHits
@@ -20,13 +23,15 @@ import java.text.SimpleDateFormat
 @Component
 class TSSendTaskService {
     @Autowired
-    TSSendTaskESService tsSendTaskESService
+    private TSSendTaskESService tsSendTaskESService
     @Autowired
-    TSRobotMessageService tsRobotMessageService
+    private TSRobotMessageService tsRobotMessageService
     @Autowired
-    TSRobotESService tsRobotESService
+    private TSRobotESService tsRobotESService
     @Autowired
-    TSRobotRoomService tsRobotRoomService
+    private TSRobotRoomService tsRobotRoomService
+    @Autowired
+    private JDConvertLinkService jdConvertLinkService;
 
     /**
      * 发送任务列表
@@ -70,7 +75,7 @@ class TSSendTaskService {
      * @param taskESMap
      * @return
      */
-    public List<TSMessageBean> convertTask2Message(String channel_id, TSSendTaskESMap taskESMap) {
+    public List<TSMessageBean> convertTask2Message(String channel_name, TSSendTaskESMap taskESMap) {
 //        消息类型
 //        2001 文字
 //        2002 图片
@@ -103,8 +108,13 @@ class TSSendTaskService {
                 TSMessageBean tsMessageESMap = new TSMessageBean()
                 tsMessageESMap.setnMsgType(2001)
 
-                if(!StringUtils.isNull(channel_id)){
-                    //todo：对taskESMap.getContent()内容做强制转链
+                println "==channel_name:"+channel_name
+                if(!StringUtils.isNull(channel_name)){
+                    //对taskESMap.getContent()内容做强制转链
+                    ResultBean resultBean = jdConvertLinkService.convertLink(taskESMap.getContent(), channel_name, "true")
+                    println "==转链结果=="
+                    TestUtils.outPrint(resultBean)
+                    taskESMap.setContent(resultBean.getContent())
                 }
                 tsMessageESMap.setMsgContent(taskESMap.getContent())
                 messageBeanList.add(tsMessageESMap)
@@ -160,8 +170,9 @@ class TSSendTaskService {
                         String robot_id = roomInfoESMap.getVcRobotSerialNo()
                         String room_id = roomInfoESMap.getVcChatRoomSerialNo()
                         String channel_id = roomInfoESMap.getChannel_id()
+                        String channel_name = roomInfoESMap.getChannel_name()
                         String action_id = UUID.randomUUID().toString()
-                        List<TSMessageBean> messageList = convertTask2Message(channel_id, tsSendTaskESMap)
+                        List<TSMessageBean> messageList = convertTask2Message(channel_name, tsSendTaskESMap)
                         if (messageList != null && messageList.size() > 0) {
                             tsRobotMessageService.sendChatRoomMessageList(robot_id, room_id, action_id, "", messageList)
                         }

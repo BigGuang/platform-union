@@ -41,7 +41,7 @@ class UnionPageConfigController {
             _order = order_by
         }
         SortOrder _sort = SortOrder.DESC
-        if (!StringUtils.isNull(sort) && "asc".equals(sort)) {
+        if (!StringUtils.isNull(sort) && "asc" == sort) {
             _sort = SortOrder.ASC
         }
         SearchHits hits = unionPageConfigESService.findAll(_order, _sort, page, size)

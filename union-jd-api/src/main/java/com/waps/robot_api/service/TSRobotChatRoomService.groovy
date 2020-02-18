@@ -58,8 +58,6 @@ class TSRobotChatRoomService {
         }
         room.setId(id)
         room.setCreatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
-        println "======"
-        TestUtils.outPrint(room)
         return room
     }
 

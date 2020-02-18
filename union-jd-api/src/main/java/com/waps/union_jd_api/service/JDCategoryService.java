@@ -123,6 +123,8 @@ public class JDCategoryService {
     }
 
     public void loadAllCategory2Map(int page) {
+
+
         int now_count = OnLineService.getJdCategoryMap().size();
         if (page < 2 && now_count > 1) {
         } else {

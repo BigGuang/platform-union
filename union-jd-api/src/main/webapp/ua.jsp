@@ -65,7 +65,18 @@
     buff.append("getCharacterEncoding=" + response.getCharacterEncoding() + "\r\n");
     buff.append("getContentType=" + response.getContentType() + "\r\n");
     buff.append("getBufferSize=" + response.getBufferSize() + "\r\n");
+
+    buff.append("============system============\r\n");
+
+    Properties ps=System.getProperties();
+    Enumeration names=ps.propertyNames();
+    while(names.hasMoreElements()){
+         String ps_name=(String)names.nextElement();
+         buff.append(ps_name+"="+ps.getProperty(ps_name)+"\r\n");
+    }
+
     System.out.println(buff.toString());
+
     out.println(buff.toString().replaceAll("\r\n","</br>"));
 
 %>
