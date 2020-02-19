@@ -5,8 +5,11 @@ import com.waps.elastic.search.utils.SearchHitsUtils
 import com.waps.robot_api.service.TSSendTaskService
 import com.waps.service.jd.es.domain.TSSendTaskESMap
 import com.waps.service.jd.es.service.TSSendTaskESService
+import com.waps.tools.security.MD5
 import com.waps.union_jd_api.bean.ReturnMessageBean
+import com.waps.union_jd_api.utils.DateUtils
 import com.waps.utils.ResponseUtils
+import com.waps.utils.StringUtils
 import org.elasticsearch.action.delete.DeleteResponse
 import org.elasticsearch.search.SearchHits
 import org.springframework.beans.factory.annotation.Autowired
@@ -78,6 +81,10 @@ class TSSendTaskController {
             HttpServletResponse response
     ) {
         if (tsSendTaskESMap) {
+            if(StringUtils.isNull(tsSendTaskESMap.getId())){
+                tsSendTaskESMap.setId(new MD5().getMD5(UUID.randomUUID().toString()))
+            }
+            tsSendTaskESMap.setCreatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
             tsSendTaskESService.save(tsSendTaskESMap.getId(), tsSendTaskESMap)
         }
         ResponseUtils.write(response, new ReturnMessageBean(200, ""))
