@@ -44,6 +44,8 @@ class TSSendTaskController {
             HttpServletResponse response
     ) {
         SearchHits hits=tsSendTaskService.getSendTaskListByStatus(task_status,page,size)
+        println hits.getTotalHits().value
+        println hits.getHits().length
         ESReturnList esReturnList= SearchHitsUtils.getHits2ReturnMap(hits)
         ResponseUtils.write(response, new ReturnMessageBean(200, "", esReturnList))
     }

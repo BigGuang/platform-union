@@ -3,24 +3,6 @@
     "id": {
       "type": "keyword"
     },
-    "content": {
-      "type": "keyword"
-    },
-    "img_url": {
-      "type": "keyword"
-    },
-    "href":{
-      "type": "keyword"
-    },
-    "title":{
-      "type": "keyword"
-    },
-    "desc": {
-      "type": "keyword"
-    },
-    "send_type": {
-      "type": "integer"
-    },
     "task_status": {
       "type": "integer"
     },
@@ -40,6 +22,37 @@
     },
     "black_channel_name": {
       "type": "keyword"
+    },
+    "message_list": {
+      "properties": {
+        "nMsgNum": {
+          "type": "integer"
+        },
+        "nMsgType": {
+          "type": "integer"
+        },
+        "msgContent": {
+          "type": "text",
+          "fields": {
+            "raw": {
+              "type": "keyword"
+            }
+          },
+          "store": true
+        },
+        "nVoiceTime": {
+          "type": "integer"
+        },
+        "vcTitle": {
+          "type": "keyword"
+        },
+        "vcDesc": {
+          "type": "keyword"
+        },
+        "vcHref": {
+          "type": "keyword"
+        }
+      }
     },
     "createtime": {
       "type": "date",

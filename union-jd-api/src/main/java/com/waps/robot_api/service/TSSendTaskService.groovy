@@ -68,7 +68,8 @@ class TSSendTaskService {
         params.put("from", pageUtils.getFrom())
         params.put("size", pageUtils.getSize())
         params.put("task_status", task_status)
-        return tsSendTaskESService.findByFreeMarkerFromResource("es_script/ts_send_task_time.json", params)
+        println params
+        return tsSendTaskESService.findByFreeMarkerFromResource("es_script/ts_send_task_status.json", params)
     }
 
 
@@ -100,7 +101,6 @@ class TSSendTaskService {
                 List<TSRoomInfoESMap> roomList = robotRoom.getList()
                 println "===" + roomList.size() + " 个群聊发送"
                 for (TSRoomInfoESMap roomInfoESMap : roomList) {
-
                     println "===判断给 " + roomInfoESMap.getVcName() + " 发送的内容"
                     boolean flg = checkSendStatus(sendTaskESMap, roomInfoESMap)
                     println "===判断结果:" + flg

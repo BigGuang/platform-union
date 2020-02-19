@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.JSONObject
 import com.waps.robot_api.bean.request.TSMessageBean
 import com.waps.service.jd.es.domain.TSRoomInfoESMap
+import com.waps.service.jd.es.domain.TSSendMessageESMap
 import com.waps.service.jd.es.domain.TSSendTaskESMap
 import com.waps.tools.test.TestUtils
 import com.waps.union_jd_api.service.JDConvertLinkService
@@ -125,55 +126,28 @@ class SendService {
 //        2016 音乐
         List<TSMessageBean> messageBeanList = new ArrayList<>()
         if (taskESMap != null) {
-            if (!StringUtils.isNull(taskESMap.getImg_url())) {
-                String imgUrl = taskESMap.getImg_url()
-                if (imgUrl.indexOf(",") < 0) {
-                    imgUrl = imgUrl + ","
-                }
-                String[] imgList = imgUrl.split(",")
-                for (int i = 0; i < imgList.length; i++) {
-                    String img = imgList[i]
-                    if (!StringUtils.isNull(img)) {
-                        if(img.toLowerCase().endsWith(".mp4")){
-                            TSMessageBean tsMessageESMap = new TSMessageBean()
-                            tsMessageESMap.setnMsgType(2004)
-                            tsMessageESMap.setMsgContent("http://jd.wapg.cn/images/icon_3.png")
-                            tsMessageESMap.setnVoiceTime(14)
-                            tsMessageESMap.setVcHref(img)
-                            messageBeanList.add(tsMessageESMap)
-                        }else{
-                            TSMessageBean tsMessageESMap = new TSMessageBean()
-                            tsMessageESMap.setnMsgType(2002)
-                            tsMessageESMap.setMsgContent(img)
-                            messageBeanList.add(tsMessageESMap)
+            List<TSSendMessageESMap> message_list = taskESMap.getMessage_list()
+            int i=0
+            for (TSSendMessageESMap messageESMap : message_list) {
+                if (messageESMap) {
+                    i=i+1
+                    TSMessageBean tsMessageBean = new TSMessageBean()
+                    tsMessageBean.setnMsgNum(i)
+                    tsMessageBean.setnMsgType(messageESMap.getnMsgType())
+                    if (tsMessageBean.getnMsgType() == 2001) {
+                        ResultBean resultBean = jdConvertLinkService.convertLink(messageESMap.getMsgContent(), channel_name, "true")
+                        if (resultBean) {
+                            tsMessageBean.setMsgContent(resultBean.getContent())
                         }
-
+                    } else {
+                        tsMessageBean.setMsgContent(messageESMap.getMsgContent())
                     }
+                    tsMessageBean.setnVoiceTime(messageESMap.getnVoiceTime())
+                    tsMessageBean.setVcTitle(messageESMap.getVcTitle())
+                    tsMessageBean.setVcDesc(messageESMap.getVcDesc())
+                    tsMessageBean.setVcHref(messageESMap.getVcHref())
+                    messageBeanList.add(tsMessageBean)
                 }
-            }
-            if (!StringUtils.isNull(taskESMap.getContent()) && StringUtils.isNull(taskESMap.getTitle()) && StringUtils.isNull(taskESMap.getDesc())) {
-                TSMessageBean tsMessageESMap = new TSMessageBean()
-                tsMessageESMap.setnMsgType(2001)
-
-                println "==channel_name:" + channel_name
-                if (!StringUtils.isNull(channel_name)) {
-                    //对taskESMap.getContent()内容做强制转链
-                    ResultBean resultBean = jdConvertLinkService.convertLink(taskESMap.getContent(), channel_name, "true")
-                    println "==转链结果=="
-                    TestUtils.outPrint(resultBean)
-                    taskESMap.setContent(resultBean.getContent())
-                }
-                tsMessageESMap.setMsgContent(taskESMap.getContent())
-                messageBeanList.add(tsMessageESMap)
-            }
-            if (!StringUtils.isNull(taskESMap.getHref()) && !StringUtils.isNull(taskESMap.getTitle())) {
-                TSMessageBean tsMessageESMap = new TSMessageBean()
-                tsMessageESMap.setnMsgType(2005)
-                tsMessageESMap.setMsgContent(taskESMap.getHref())
-                tsMessageESMap.setVcHref(taskESMap.getHref())
-                tsMessageESMap.setVcTitle(taskESMap.getTitle())
-                tsMessageESMap.setVcDesc(taskESMap.getDesc())
-                messageBeanList.add(tsMessageESMap)
             }
         }
         return messageBeanList
