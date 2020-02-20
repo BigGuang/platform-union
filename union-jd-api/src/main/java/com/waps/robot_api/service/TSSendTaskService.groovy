@@ -11,6 +11,7 @@ import com.waps.service.jd.es.service.TSSendTaskESService
 import com.waps.tools.test.TestUtils
 import com.waps.union_jd_api.service.JDConvertLinkService
 import com.waps.union_jd_api.service.ResultBean
+import com.waps.utils.DateUtils
 import com.waps.utils.StringUtils
 import org.elasticsearch.search.SearchHit
 import org.elasticsearch.search.SearchHits
@@ -62,6 +63,13 @@ class TSSendTaskService {
         return _list
     }
 
+    /**
+     * 通过状态获取发送列表
+     * @param task_status
+     * @param page
+     * @param size
+     * @return
+     */
     public SearchHits getSendTaskListByStatus(int task_status, int page, int size) {
         HashMap params = new HashMap()
         PageUtils pageUtils = new PageUtils(page, size)
@@ -72,6 +80,65 @@ class TSSendTaskService {
         return tsSendTaskESService.findByFreeMarkerFromResource("es_script/ts_send_task_status.json", params)
     }
 
+    /**
+     * 获取某一天的
+     * @param send_day
+     * @param page
+     * @param size
+     * @return
+     */
+    public SearchHits getSendTaskListBySendDay(String send_day, int page, int size, String order_by, String order) {
+        HashMap params = new HashMap()
+        PageUtils pageUtils = new PageUtils(page, size)
+        params.put("from", pageUtils.getFrom())
+        params.put("size", pageUtils.getSize())
+        params.put("send_day", send_day)
+        params.put("order_by", order_by)
+        params.put("order", order)
+        println params
+        return tsSendTaskESService.findByFreeMarkerFromResource("es_script/ts_send_task_day.json", params)
+    }
+
+    /**
+     * 通过定时任务记录，计算出队列中下一步的时间
+     * @return
+     */
+    public Date getSendTaskNextTime() {
+        long loopTime_5min = 5 * 1000 * 60 //循环时间，5分钟
+        Date currentTime = new Date();
+        SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd")
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm")
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm")
+        String send_day = dayFormat.format(currentTime)
+        println "===搜索 " + send_day + " 下一轮时间==="
+        SearchHits searchHits = getSendTaskListBySendDay(send_day, 1, 100, "send_time", "desc")
+        String send_time = "08:00"
+        String new_send_date = dateFormat.format(currentTime)
+        if (searchHits == null) {
+            send_time = "07:45"  //最后会加15分钟，默认就减15分钟
+            new_send_date = send_day + " " + send_time
+            println "=无记录,默认:" + new_send_date
+        } else {
+            SearchHit[] hit_list = searchHits.getHits()
+            if (hit_list.length > 0) {
+                TSSendTaskESMap tsSendTaskESMap = tsSendTaskESService.getObjectFromJson(hit_list[0].getSourceAsString(), TSSendTaskESMap.class) as TSSendTaskESMap
+                String _last_send_time = tsSendTaskESMap.getSend_time()
+                if (!StringUtils.isNull(_last_send_time)) {
+                    new_send_date = send_day + " " + _last_send_time
+                    println "=最近一轮时间:" + new_send_date
+                }
+            }
+        }
+        Date fullDate = dateFormat.parse(new_send_date)
+        Date nextDate = new Date(fullDate.getTime() + loopTime_5min * 3)
+        if (nextDate.before(currentTime)) {
+            //小于当前时间，nextDate无效，重新计算,当前时间加5分钟
+            Date _new_nextDate = new Date(currentTime.getTime() + loopTime_5min)
+            return _new_nextDate
+        } else {
+            return nextDate
+        }
+    }
 
     /**
      * 执行发送任务
