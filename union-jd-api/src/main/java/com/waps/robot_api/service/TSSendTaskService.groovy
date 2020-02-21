@@ -4,10 +4,12 @@ import com.waps.elastic.search.utils.PageUtils
 import com.waps.robot_api.bean.request.TSMessageBean
 import com.waps.service.jd.es.domain.TSMessageESMap
 import com.waps.service.jd.es.domain.TSRoomInfoESMap
+import com.waps.service.jd.es.domain.TSSendMessageESMap
 import com.waps.service.jd.es.domain.TSSendTaskESMap
 import com.waps.service.jd.es.service.TSRobotESService
 import com.waps.service.jd.es.service.TSRobotRoomInfoESService
 import com.waps.service.jd.es.service.TSSendTaskESService
+import com.waps.service.jd.es.service.TSSendTaskUserESService
 import com.waps.tools.test.TestUtils
 import com.waps.union_jd_api.service.JDConvertLinkService
 import com.waps.union_jd_api.service.ResultBean
@@ -24,6 +26,10 @@ import java.text.SimpleDateFormat
 class TSSendTaskService {
     @Autowired
     private TSSendTaskESService tsSendTaskESService
+    @Autowired
+    private TSSendTaskUserService tsSendTaskUserService
+    @Autowired
+    private TSSendTaskUserESService tsSendTaskUserESService
     @Autowired
     private TSRobotMessageService tsRobotMessageService
     @Autowired
@@ -99,19 +105,26 @@ class TSSendTaskService {
         return tsSendTaskESService.findByFreeMarkerFromResource("es_script/ts_send_task_day.json", params)
     }
 
+    public Date getSendTaskNextTime() {
+        Date currentTime = new Date();
+        SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd")
+        String send_day = dayFormat.format(currentTime)
+        SearchHits searchHits = getSendTaskListBySendDay(send_day, 1, 100, "send_time", "desc")
+        println "===搜索 " + send_day + " 下一轮时间==="
+        return getSendTaskNextTime(send_day, searchHits)
+    }
+
     /**
      * 通过定时任务记录，计算出队列中下一步的时间
      * @return
      */
-    public Date getSendTaskNextTime() {
+    public Date getSendTaskNextTime(String send_day, SearchHits searchHits) {
         long loopTime_5min = 5 * 1000 * 60 //循环时间，5分钟
         Date currentTime = new Date();
         SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd")
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm")
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm")
-        String send_day = dayFormat.format(currentTime)
-        println "===搜索 " + send_day + " 下一轮时间==="
-        SearchHits searchHits = getSendTaskListBySendDay(send_day, 1, 100, "send_time", "desc")
+
         String send_time = "08:00"
         String new_send_date = dateFormat.format(currentTime)
         if (searchHits == null) {
@@ -158,23 +171,45 @@ class TSSendTaskService {
         List<MessageTaskBean> sendList = new ArrayList<>()
 
         List<TSSendTaskESMap> taskList = loadSendTaskWaitingList(send_day, send_time)
+        List<TSSendTaskESMap> userTaskList = tsSendTaskUserService.loadSendTaskWaitingList(send_day, send_time)
+        TSSendTaskESMap userSendTaskESMap = new TSSendTaskESMap()
+        if (userTaskList.size() > 0) {
+            userSendTaskESMap = userTaskList.get(0)
+        }
         if (taskList.size() > 0) {
             println "===" + taskList.size() + " 条发送任务"
             for (TSSendTaskESMap sendTaskESMap : taskList) {
                 int page = 1
                 int size = 40
                 RobotRoomListBean robotRoom = tsRobotRoomService.listRobotRoom(page, size)
-                long total = robotRoom.getTotal()
                 List<TSRoomInfoESMap> roomList = robotRoom.getList()
                 println "===" + roomList.size() + " 个群聊发送"
                 for (TSRoomInfoESMap roomInfoESMap : roomList) {
-                    println "===判断给 " + roomInfoESMap.getVcName() + " 发送的内容"
+                    println "===判断给 " + roomInfoESMap.getVcName() + " 发送的内容 "+userSendTaskESMap.getTarget_channel_name()+"=="+roomInfoESMap.getChannel_name()
                     boolean flg = checkSendStatus(sendTaskESMap, roomInfoESMap)
-                    println "===判断结果:" + flg
-                    if (flg) {
-                        MessageTaskBean messageTaskBean = new MessageTaskBean()
+                    //如果有群主提交的文案，优先发群主提交的文案
+                    MessageTaskBean messageTaskBean = new MessageTaskBean()
+                    if (userSendTaskESMap != null
+                            && !StringUtils.isNull(userSendTaskESMap.getId())
+                            && userSendTaskESMap.getMessage_list() != null
+                            && userSendTaskESMap.getMessage_list().size() > 0
+                            && (userSendTaskESMap.getTarget_channel_name().toLowerCase() + ",").indexOf(roomInfoESMap.getChannel_name().toLowerCase() + ",") > -1
+                    ) {
+                        println "==有群主提交文案=="
+                        flg = true
+                        messageTaskBean.setSendTaskESMap(userSendTaskESMap)
+                        Map upMap = new HashMap()
+                        upMap.put("task_status", 1)
+                        tsSendTaskUserESService.update(userSendTaskESMap.getId(), upMap)
+                    } else {
                         messageTaskBean.setSendTaskESMap(sendTaskESMap)
+                    }
+                    if (flg) {
                         messageTaskBean.setRoomInfoESMap(roomInfoESMap)
+                        println "@@@@@@@@@@  发送 " + roomInfoESMap.vcName + "@@@@@@@@@@"
+                        for (TSSendMessageESMap messageESMap : messageTaskBean.getSendTaskESMap().getMessage_list()) {
+                            println messageESMap.getMsgContent()
+                        }
                         sendList.add(messageTaskBean)
                     }
                 }
@@ -182,7 +217,6 @@ class TSSendTaskService {
             if (sendList.size() > 0) {
                 sendService.setParams(params)
                 sendService.sendTask(sendList)
-
             }
         } else {
             println "===无发送任务"

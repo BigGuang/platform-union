@@ -56,6 +56,70 @@ public class UnionAppUserController {
      * @param response
      * @throws Exception
      */
+    @RequestMapping(value = "/mini_save", method = RequestMethod.POST)
+    public void newSaveAppUser(
+            @RequestBody UnionAppUserESMap unionAppUserESMap,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        unionAppUserESMap.setFrom_type("app");
+        unionAppUserESMap.setUser_type("app");
+        try {
+            if (StringUtils.isNull(unionAppUserESMap.getId())) {
+                String md5_id = new MD5().getMD5(unionAppUserESMap.getPhone());
+                unionAppUserESMap.setId(md5_id);
+            }
+            DocWriteResponse ret = unionAppUserService.saveAppUser(unionAppUserESMap);
+            if (ret != null) {
+                ResponseUtils.write(response, new ReturnMessageBean(200, "", ret).toString());
+            } else {
+                ResponseUtils.write(response, new ReturnMessageBean(500, "保存失败").toString());
+            }
+
+        } catch (Exception e) {
+            System.out.println("saveAppUser ERROR:" + e.getLocalizedMessage());
+            ResponseUtils.write(response, new ReturnMessageBean(500, "ERROR:" + e.getLocalizedMessage()).toString());
+        }
+    }
+
+    /**
+     * 读取小程序用户信息
+     *
+     * @param open_id
+     * @param request
+     * @param response
+     * @throws Exception
+     */
+    @RequestMapping(value = "/mini_info")
+    public void newGetAppUserInfo(
+            @RequestParam(value = "id", required = false) String id,
+            @RequestParam(value = "open_id", required = false) String open_id,
+            @RequestParam(value = "phone", required = false) String phone,
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        try {
+            UnionAppUserESMap unionAppUserESMap = unionAppUserService.loadUser(id, phone, open_id);
+
+            if (unionAppUserESMap != null && !StringUtils.isNull(unionAppUserESMap.getId())) {
+                ResponseUtils.write(response, new ReturnMessageBean(200, "", unionAppUserESMap).toString());
+            } else {
+                ResponseUtils.write(response, new ReturnMessageBean(404, "用户不存在").toString());
+            }
+        } catch (Exception e) {
+            System.out.println("getAppUserInfo ERROR:" + e.getLocalizedMessage());
+            ResponseUtils.write(response, new ReturnMessageBean(500, "ERROR:" + e.getLocalizedMessage()).toString());
+        }
+    }
+
+
+
+    /**
+     * 保存小程序过来的用户信息
+     *
+     * @param unionAppUserESMap
+     * @param request
+     * @param response
+     * @throws Exception
+     */
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     public void saveAppUser(
             @RequestBody UnionAppUserESMap unionAppUserESMap,

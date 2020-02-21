@@ -18,10 +18,22 @@
       "format": "HH:mm"
     },
     "target_channel_name": {
-      "type": "keyword"
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
     },
     "black_channel_name": {
-      "type": "keyword"
+      "type": "text",
+      "fields": {
+        "raw": {
+          "type": "keyword"
+        }
+      },
+      "store": true
     },
     "message_list": {
       "properties": {
