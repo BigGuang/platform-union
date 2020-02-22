@@ -152,6 +152,7 @@ class TSCallBackService {
                 break;
             case 4505:
                 //4505   机器人入群回调接口, 机器人入群方式为好友邀请时，接收本接口回调
+                //todo: 入群后自动同步一下群信息，并改机器人群内昵称。
                 tsChatRoomService.callBackJoinChatRoom(strContext)
                 break;
             case 4506:

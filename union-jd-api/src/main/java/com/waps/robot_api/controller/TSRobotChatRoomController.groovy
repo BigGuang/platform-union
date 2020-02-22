@@ -151,6 +151,16 @@ class TSRobotChatRoomController {
         String retJson = tsRobotMessageService.setChatRoomOpenMessage(params.getRobot_id(), params.getRoom_id(), params.getOpen())
         ResponseUtils.write(response, new ReturnMessageBean(200, "", JSONObject.parseObject(retJson)))
     }
+
+    @RequestMapping(value = "/set_nick_room")
+    public void setNickNameInRoom(
+            @RequestBody NickNameInRoom params,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        String retJson = tsRobotChatRoomService.setRobotNickNameInRoom(params.getRobot_id(), params.getRoom_id(), params.getNick_name())
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", JSONObject.parseObject(retJson)))
+    }
 }
 
 class OpenMessageParams {
@@ -192,4 +202,10 @@ class SendChatRoomMessageListParams {
 class PullMemberParams {
     String robot_id
     String room_id
+}
+
+class NickNameInRoom{
+    String robot_id
+    String room_id
+    String nick_name
 }

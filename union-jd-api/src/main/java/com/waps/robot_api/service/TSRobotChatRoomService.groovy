@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray
 import com.alibaba.fastjson.JSONObject
 import com.waps.elastic.search.utils.PageUtils
 import com.waps.robot_api.bean.request.TSPostChatRoomInfoBean
+import com.waps.robot_api.bean.request.TSPostRobotNickNameInRoom
 import com.waps.robot_api.utils.TSApiConfig
 import com.waps.service.jd.es.domain.JDMediaInfoESMap
 import com.waps.service.jd.es.domain.TSChatRoomESMap
@@ -124,10 +125,34 @@ class TSRobotChatRoomService {
         return retJson
     }
 
+    /**
+     * 从ES中加载已经同步的群聊成员信息列表
+     * @param vcRobotSerialNo
+     * @param vcChatRoomSerialNo
+     * @return
+     */
     public TSChatRoomESMap loadChatRoomMemberList(String vcRobotSerialNo, String vcChatRoomSerialNo) {
         TSChatRoomESMap tsChatRoomESMap = tsChatRoomESService.load(vcChatRoomSerialNo, TSChatRoomESMap.class) as TSChatRoomESMap
         return tsChatRoomESMap
     }
+
+    /**
+     * 【异步调用】设置群内昵称
+     * @param vcRobotSerialNo
+     * @param vcChatRoomSerialNo
+     * @param nickName
+     * @return
+     */
+    public String setRobotNickNameInRoom(String vcRobotSerialNo, String vcChatRoomSerialNo, String nickName) {
+        String url = TSApiConfig.ROBOT_CHATROOM_RobotChatRoomSetNickName.replace("{TOKEN}", tsAuthService.getToken())
+        TSPostRobotNickNameInRoom postRobotNickNameInRoom = new TSPostRobotNickNameInRoom()
+        postRobotNickNameInRoom.setVcRobotSerialNo(vcRobotSerialNo)
+        postRobotNickNameInRoom.setVcChatRoomSerialNo(vcChatRoomSerialNo)
+        postRobotNickNameInRoom.setVcAlias(nickName)
+        String retJson = HttpUtils.postJsonString(url, JSONObject.toJSONString(postRobotNickNameInRoom))
+        return retJson
+    }
+
 
     /**
      * 群信息回调  4001
@@ -226,9 +251,37 @@ class TSRobotChatRoomService {
      * 机器人入群方式为好友邀请时，接收本接口回调。
      * 当日被踢出群超过3次时，且设置了自动进入群聊，当机器人在以上条件下被邀请入群，商家会收到4505机器人入群回调失败，提示：“当日被踢出群超过3次，禁止进入群聊”
      * http://docs.op.opsdns.cc:8081/Personal-number-function/RobotIntoChatRoom-callback/
-     */
+     *{*     "nType": 4505,
+     *     "vcMerchantNo": "",
+     *     "vcRobotWxId": "",
+     *     "vcRobotSerialNo": "",
+     *     "vcSerialNo": "",
+     *     "nResult": 1,
+     *     "vcResult": "SUCCESS",
+     *     "Data": {*           "vcChatRoomSerialNo": "",
+     *           "vcChatRoomId": "",
+     *           "vcChatRoomName": "",
+     *           "vcChatRoomBase64Name": "",
+     *           "vcFriendWxId": "",
+     *           "vcFriendSerialNo": "",
+     *           "vcNickName": null,
+     *           "vcHeadImgUrl": "",
+     *           "nUserCount":"",
+     *           "vcAdminWxId":"",
+     *           "vcAdminWxUserSerialNo":""
+     *}*}*/
     public callBackJoinChatRoom(String strContext) {
 
+        def jsonSlurper = new JsonSlurper()
+        def json = jsonSlurper.parseText(strContext)
+        String robot_id = json['vcRobotSerialNo']
+        String room_id = ""
+        if (json['Data'] != null) {
+            room_id = json['Data']['vcChatRoomSerialNo']
+        }
+        if (!StringUtils.isNull(room_id) && !StringUtils.isNull(robot_id)) {
+            String retString = pullChatRoomMemberList(robot_id, room_id)
+        }
     }
 
     /**
@@ -238,16 +291,40 @@ class TSRobotChatRoomService {
      */
     public callBackChatRoomMemberInfo(String strContext) {
         try {
+            String robot_id = null
+            String room_id = null
+            String robotNickName = null
+
             JSONObject jsonObject = JSONObject.parseObject(strContext)
             println jsonObject
             if (jsonObject && jsonObject.get("Data")) {
+                robot_id = jsonObject.get("vcRobotSerialNo") as String
                 JSONObject dataObj = jsonObject.get("Data") as JSONObject
                 TSChatRoomESMap tsChatRoomESMap = JSONObject.parseObject(dataObj.toString(), TSChatRoomESMap.class) as TSChatRoomESMap
                 if (tsChatRoomESService != null) {
+                    room_id = tsChatRoomESMap.getVcChatRoomSerialNo()
                     tsChatRoomESMap.setId(tsChatRoomESMap.getVcChatRoomSerialNo())
                     tsChatRoomESMap.setUpdatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
                     tsChatRoomESService.save(tsChatRoomESMap.getId(), tsChatRoomESMap)
+
+                    //查找群主昵称
+                    String vcChatAdminWxId = tsChatRoomESMap.getVcChatAdminWxId()
+                    if (vcChatAdminWxId && tsChatRoomESMap.getMembers() && tsChatRoomESMap.getMembers().size() > 0) {
+                        for (TSChatRoomMemberESMap memberESMap : tsChatRoomESMap.getMembers()) {
+                            if (memberESMap && memberESMap.getVcMemberUserWxId() == vcChatAdminWxId) {
+                                String manager_nick = memberESMap.getVcNickName()
+                                robotNickName = manager_nick + "的助手"
+                                break
+                            }
+                        }
+                    }
                 }
+            }
+            //修改机器人在群内昵称
+            if (!StringUtils.isNull(robotNickName)
+                    && !StringUtils.isNull(robot_id)
+                    && !StringUtils.isNull(room_id)) {
+                setRobotNickNameInRoom(robot_id, room_id, robotNickName)
             }
         } catch (Exception e) {
             e.printStackTrace()

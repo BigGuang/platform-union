@@ -50,6 +50,8 @@ class TSApiConfig {
     final static String ROBOT_CHATROOM_RobotChatRoomOpen=SERVICE_HOST+"/api/ChatRoom/RobotChatRoomOpen?vcToken={TOKEN}"
     //群消息注销接收，也就是设置isOpenMessage
     final static String ROBOT_CHATROOM_RobotChatRoomCancel=SERVICE_HOST+"/api/ChatRoom/RobotChatRoomCancel?vcToken={TOKEN}"
+    //【异步调用】设置群内昵称
+    final static String ROBOT_CHATROOM_RobotChatRoomSetNickName=SERVICE_HOST+"/api/ChatRoom/SetAliasForGroup?vcToken={TOKEN}"
 
 
 
