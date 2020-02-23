@@ -1,6 +1,8 @@
 package com.waps.robot_api.controller
 
 import com.alibaba.fastjson.JSONObject
+import com.waps.elastic.search.ESReturnList
+import com.waps.elastic.search.utils.SearchHitsUtils
 import com.waps.robot_api.bean.request.TSMessageBean
 import com.waps.robot_api.service.TSRobotChatRoomService
 import com.waps.robot_api.service.TSRobotMessageService
@@ -102,9 +104,9 @@ class TSRobotChatRoomController {
             HttpServletResponse response
     ) {
         TSChatRoomESMap tsChatRoomESMap = tsRobotChatRoomService.loadChatRoomMemberList(params.getRobot_id(), params.getRoom_id())
-        if(tsChatRoomESMap!=null && !StringUtils.isNull(tsChatRoomESMap.getId())) {
+        if (tsChatRoomESMap != null && !StringUtils.isNull(tsChatRoomESMap.getId())) {
             ResponseUtils.write(response, new ReturnMessageBean(200, "", tsChatRoomESMap))
-        }else{
+        } else {
             ResponseUtils.write(response, new ReturnMessageBean(404, "未找到群成员信息"))
         }
     }
@@ -152,6 +154,23 @@ class TSRobotChatRoomController {
         ResponseUtils.write(response, new ReturnMessageBean(200, "", JSONObject.parseObject(retJson)))
     }
 
+    /**
+     * 通过channel_name列出群列表
+     * @param params
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "/channel_room")
+    public void check_room(
+            @RequestBody CheckRoom params,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        SearchHits hits = tsRobotChatRoomService.getRoomInfoFromChannelName(params.getChannel_name(), params.getPage(), params.getSize())
+        ESReturnList returnList = SearchHitsUtils.getHits2ReturnMap(hits)
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", returnList))
+    }
+
     @RequestMapping(value = "/set_nick_room")
     public void setNickNameInRoom(
             @RequestBody NickNameInRoom params,
@@ -175,7 +194,7 @@ class ListParams {
     Integer is_open
 }
 
-class RoomListParams{
+class RoomListParams {
     String robot_id
     int page
     int size
@@ -196,7 +215,7 @@ class SendChatRoomMessageListParams {
     String serial_no
     String wx_id
     int nIsHit
-    List<TSMessageBean> message_list=new ArrayList<>()
+    List<TSMessageBean> message_list = new ArrayList<>()
 }
 
 class PullMemberParams {
@@ -204,8 +223,14 @@ class PullMemberParams {
     String room_id
 }
 
-class NickNameInRoom{
+class NickNameInRoom {
     String robot_id
     String room_id
     String nick_name
+}
+
+class CheckRoom {
+    String channel_name
+    int page = 1
+    int size = 20
 }

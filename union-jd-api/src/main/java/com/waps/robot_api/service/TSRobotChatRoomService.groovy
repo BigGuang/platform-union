@@ -153,6 +153,21 @@ class TSRobotChatRoomService {
         return retJson
     }
 
+    /**
+     * 通过channel_name查找群
+     * @param channel_name
+     * @param page
+     * @param size
+     * @return
+     */
+    public SearchHits getRoomInfoFromChannelName(String channel_name,int page,int size){
+        if(!StringUtils.isNull(channel_name)) {
+            Map<String,String> params = new HashMap()
+            params.put("channel_name",channel_name)
+            SearchHits hits=tsRobotRoomInfoESService.findByKVMap(params,page,size)
+        }
+    }
+
 
     /**
      * 群信息回调  4001

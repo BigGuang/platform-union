@@ -131,7 +131,8 @@ class MiniAppController {
     public String getMiniQR(
             @RequestBody QRParam qrParam,
             HttpServletResponse response) throws Exception {
-
+        println "/we_app/qr"
+        println qrParam
         String path = miniAppService.getMiniQR(qrParam)
         Map map = new HashMap()
         map.put("data", path)

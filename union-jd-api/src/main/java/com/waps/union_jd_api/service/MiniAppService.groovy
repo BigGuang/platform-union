@@ -33,7 +33,10 @@ class MiniAppService {
         if (qrParam.getWidth() < 10) {
             qrParam.setWidth(300)
         }
-        String qr_name = new MD5().getMD5(qrParam.getApp_id() + qrParam.getPage() + qrParam.getScene() + qrParam.getWidth())
+        String qr_param=qrParam.getApp_id() + qrParam.getPage() + qrParam.getScene() + qrParam.getWidth()
+        println "qr_param:"+qr_param
+        String qr_name = new MD5().getMD5(qr_param)
+        println "qr_name:"+qr_name
         String uri = "/images/qr/" + qr_name + ".jpg"
 //        String path = "/Users/xguang/temp04/" + uri
         String path = StringUtils.getRealPath(uri)
@@ -41,14 +44,15 @@ class MiniAppService {
         if (new File(path).exists()) {
             String imgUrl = Config.HOST + uri
             imgUrl = imgUrl.replace("//images", "/images")
+            println "QR 存在:"+imgUrl
             return imgUrl
         } else {
-
             String token = miniAppApiService.getToken(qrParam.getApp_id())
             if (!StringUtils.isNull(token)) {
                 miniAppApiService.getMiniQRFromToken(qrParam, token, path)
                 String imgUrl = Config.HOST + uri
                 imgUrl = imgUrl.replace("//images", "/images")
+                println "QR 生成:"+imgUrl
                 return imgUrl
             }
         }
