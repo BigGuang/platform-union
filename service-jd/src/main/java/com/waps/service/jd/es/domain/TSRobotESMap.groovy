@@ -2,7 +2,7 @@ package com.waps.service.jd.es.domain
 
 import com.waps.elastic.search.ESBaseBean
 
-class TSRobotESMap extends ESBaseBean{
+class TSRobotESMap extends ESBaseBean {
     String vcRobotSerialNo  //机器人编号
     String vcRobotWxId    //机器人wxid
     String vcWxAlias      //用户微信号
@@ -22,6 +22,26 @@ class TSRobotESMap extends ESBaseBean{
     int nChatRoomCount = 25          //机器人的群数量
     int nOpenChatRoomCount           //机器人开群数量
     String vcPhone                   //扫码号绑定的手机号
+    List<TSRobotFriendESMap> friend_list = new ArrayList<>()
     String updatetime
     String createtime
+}
+
+
+class TSRobotFriendESMap {
+    String vcFriendWxId
+    String vcFriendSerialNo
+    int nSex = 0
+    String vcWxAlias
+    String vcNickName
+    String vcBase64NickName
+    String vcHeadImgUrl
+    String vcRemarkName
+    String vcBase64RemarkName
+    String vcCountry
+    String vcProvince
+    String vcCity
+    int nBlockStatus = 10  //是否被加入黑名单（11 是 10 否）
+    String vcTagIds   //标签编号
+
 }

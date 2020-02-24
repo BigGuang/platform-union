@@ -62,6 +62,27 @@ class TSRobotConfigController {
         ResponseUtils.write(response, new ReturnMessageBean(200, "", retStr))
     }
 
+    @RequestMapping(value = "/room_send_status")
+    public void room_send_status(
+            @RequestBody ConfigRoomSendStatusParams params,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        String retStr = tsRobotConfigService.setAutoJoinChatRoomSetup(params.getRobot_id(), params.getIsAuto())
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", retStr))
+    }
+
+    @RequestMapping(value = "/room_nick_name")
+    public void room_nick_name(
+            @RequestBody ConfigAutoParams params,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        String retStr = tsRobotConfigService.setAutoJoinChatRoomSetup(params.getRobot_id(), params.getIsAuto())
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", retStr))
+    }
+
+
 }
 
 class ConfigAutoParams {

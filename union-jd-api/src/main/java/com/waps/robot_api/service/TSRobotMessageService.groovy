@@ -10,14 +10,13 @@ import com.waps.robot_api.utils.TSApiConfig
 import com.waps.security.Base64
 import com.waps.service.jd.es.domain.TSMessageESMap
 import com.waps.service.jd.es.service.TSMessageESService
-import com.waps.service.jd.es.service.TSRobotRoomInfoESService
+import com.waps.service.jd.es.service.TSRoomConfigESService
 import com.waps.tools.security.MD5
 import com.waps.union_jd_api.utils.DateUtils
 import com.waps.union_jd_api.utils.HttpUtils
 import com.waps.utils.StringUtils
 import org.elasticsearch.action.index.IndexResponse
 import org.elasticsearch.search.SearchHits
-import org.elasticsearch.search.sort.SortOrder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.util.Base64Utils
@@ -30,7 +29,7 @@ class TSRobotMessageService {
     @Autowired
     TSMessageESService tsMessageESService
     @Autowired
-    TSRobotRoomInfoESService tsRobotRoomInfoESService
+    TSRoomConfigESService tsRobotRoomInfoESService
 
     /**
      * 发送私聊消息,一次单条

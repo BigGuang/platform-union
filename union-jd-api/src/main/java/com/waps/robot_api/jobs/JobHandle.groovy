@@ -1,6 +1,7 @@
 package com.waps.robot_api.jobs
 
 import com.waps.robot_api.service.TSRobotConfigService
+import com.waps.robot_api.service.TSRobotFriendService
 import com.waps.robot_api.service.TSSendTaskService
 import com.waps.robot_api.service.TestTaskService
 import com.xxl.job.core.biz.model.ReturnT;
@@ -28,6 +29,8 @@ class JobHandle {
     private TSSendTaskService tsSendTaskService
     @Autowired
     private TSRobotConfigService tsRobotConfigService
+    @Autowired
+    private TSRobotFriendService tsRobotFriendService
 
     @Autowired
     private TestTaskService testTaskService
@@ -62,6 +65,13 @@ class JobHandle {
     public ReturnT<String> syncRobotRoomJob(String param) throws Exception {
         println "==收到syncRobotRoomJob任务调度:" + param
         tsRobotConfigService.syncAllRobotAndRoom()
+        return ReturnT.SUCCESS;
+    }
+
+    @XxlJob("syncRobotFriendJob")
+    public ReturnT<String> syncRobotFriendJob(String param) throws Exception {
+        println "==收到syncRobotRoomJob任务调度:" + param
+        tsRobotFriendService.syncAllRobotFriend()
         return ReturnT.SUCCESS;
     }
 

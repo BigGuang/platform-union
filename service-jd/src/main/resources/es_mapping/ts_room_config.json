@@ -48,6 +48,12 @@
     "room_status": {
       "type": "keyword"
     },
+    "send_status": {
+      "type": "keyword"
+    },
+    "room_nick_name": {
+      "type": "keyword"
+    },
     "nIsInContacts": {
       "type": "integer"
     },

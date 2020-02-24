@@ -2,25 +2,25 @@ package com.waps.robot_api.service
 
 import com.alibaba.fastjson.JSONArray
 import com.alibaba.fastjson.JSONObject
+import com.waps.elastic.search.ESReturnList
 import com.waps.elastic.search.utils.PageUtils
+import com.waps.elastic.search.utils.SearchHitsUtils
 import com.waps.robot_api.bean.request.TSPostChatRoomInfoBean
 import com.waps.robot_api.bean.request.TSPostRobotNickNameInRoom
 import com.waps.robot_api.utils.TSApiConfig
 import com.waps.service.jd.es.domain.JDMediaInfoESMap
 import com.waps.service.jd.es.domain.TSChatRoomESMap
 import com.waps.service.jd.es.domain.TSChatRoomMemberESMap
-import com.waps.service.jd.es.domain.TSRoomInfoESMap
+import com.waps.service.jd.es.domain.TSRobotFriendESMap
+import com.waps.service.jd.es.domain.TSRoomConfigESMap
 import com.waps.service.jd.es.service.TSChatRoomESService
-import com.waps.service.jd.es.service.TSRobotRoomInfoESService
+import com.waps.service.jd.es.service.TSRoomConfigESService
 import com.waps.tools.security.MD5
-import com.waps.tools.test.TestUtils
 import com.waps.union_jd_api.service.WeChatRobotService
 import com.waps.union_jd_api.utils.DateUtils
 import com.waps.union_jd_api.utils.HttpUtils
 import com.waps.utils.StringUtils
-import com.waps.utils.XmlUtils
 import groovy.json.JsonSlurper
-import org.elasticsearch.action.get.GetResponse
 import org.elasticsearch.search.SearchHits
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -33,7 +33,13 @@ class TSRobotChatRoomService {
     @Autowired
     TSChatRoomESService tsChatRoomESService
     @Autowired
-    TSRobotRoomInfoESService tsRobotRoomInfoESService
+    TSRoomConfigESService tsRobotRoomInfoESService
+    @Autowired
+    TSRobotFriendService tsRobotFriendService
+    @Autowired
+    TSRobotConfigService tsRobotConfigService
+    @Autowired
+    TSRoomConfigService tsRoomConfigService
     @Autowired
     WeChatRobotService weChatRobotService
 
@@ -44,8 +50,8 @@ class TSRobotChatRoomService {
      * @param obj
      * @return
      */
-    public TSRoomInfoESMap convertRoomJson2Obj(String robot_id, JSONObject obj) {
-        TSRoomInfoESMap room = obj.toJavaObject(TSRoomInfoESMap.class)
+    public TSRoomConfigESMap convertRoomJson2Obj(String robot_id, JSONObject obj) {
+        TSRoomConfigESMap room = obj.toJavaObject(TSRoomConfigESMap.class)
         room.setVcRobotSerialNo(robot_id)
         String id = new MD5().getMD5(robot_id + room.getVcChatRoomSerialNo())
         room.setRoom_status("0")
@@ -58,7 +64,24 @@ class TSRobotChatRoomService {
             }
         }
         room.setId(id)
-        room.setCreatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
+        TSRoomConfigESMap tsRoomInfoESMap = tsRobotRoomInfoESService.load(room.getId(), TSRoomConfigESMap.class) as TSRoomConfigESMap
+        if (tsRoomInfoESMap != null) {
+            if (!StringUtils.isNull(tsRoomInfoESMap.getSend_status())) {
+                room.setSend_status(tsRoomInfoESMap.getSend_status())
+            }
+            if (!StringUtils.isNull(tsRoomInfoESMap.getRoom_nick_name())) {
+                room.setRoom_nick_name(tsRoomInfoESMap.getRoom_nick_name())
+            }
+            if (!StringUtils.isNull(tsRoomInfoESMap.getRoom_status())) {
+                room.setRoom_status(tsRoomInfoESMap.getRoom_status())
+            }
+            if (!StringUtils.isNull(tsRoomInfoESMap.getCreatetime())) {
+                room.setCreatetime(tsRoomInfoESMap.getCreatetime())
+            }
+        }
+        if (StringUtils.isNull(room.getCreatetime())) {
+            room.setCreatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
+        }
         return room
     }
 
@@ -92,14 +115,30 @@ class TSRobotChatRoomService {
      * @param size
      * @return
      */
-    public SearchHits getChatRoomInfoListFromES(String vcRobotSerialNo, int page, int size) {
+    public ESReturnList getChatRoomInfoListFromES(String vcRobotSerialNo, int page, int size) {
         PageUtils pageUtils = new PageUtils(page, size)
         HashMap params = new HashMap()
         params.put("from", pageUtils.getFrom())
         params.put("size", pageUtils.getSize())
         params.put("robot_id", vcRobotSerialNo)
         SearchHits hits = tsRobotRoomInfoESService.findByFreeMarkerFromResource("es_script/ts_robot_room_list.json", params)
-        return hits
+        ESReturnList returnList = SearchHitsUtils.getHits2ReturnMap(hits)
+        return returnList
+    }
+
+
+    /**
+     * 根据已加入群数来决定是否自动同意入群
+     * @param vcRobotSerialNo
+     */
+    public void autoSetAllowAddRoom(String vcRobotSerialNo) {
+        ESReturnList returnList = getChatRoomInfoListFromES(vcRobotSerialNo, 1, 20)
+        if (returnList.getTotal() >= TSApiConfig.ROBOT_ROOM_LIMIT) {
+            //关闭自动同意入群
+            tsRobotConfigService.setAutoJoinChatRoomSetup(vcRobotSerialNo, false)
+        } else {
+            tsRobotConfigService.setAutoJoinChatRoomSetup(vcRobotSerialNo, true)
+        }
     }
 
     /**
@@ -160,11 +199,11 @@ class TSRobotChatRoomService {
      * @param size
      * @return
      */
-    public SearchHits getRoomInfoFromChannelName(String channel_name,int page,int size){
-        if(!StringUtils.isNull(channel_name)) {
-            Map<String,String> params = new HashMap()
-            params.put("channel_name",channel_name)
-            SearchHits hits=tsRobotRoomInfoESService.findByKVMap(params,page,size)
+    public SearchHits getRoomInfoFromChannelName(String channel_name, int page, int size) {
+        if (!StringUtils.isNull(channel_name)) {
+            Map<String, String> params = new HashMap()
+            params.put("channel_name", channel_name)
+            SearchHits hits = tsRobotRoomInfoESService.findByKVMap(params, page, size)
         }
     }
 
@@ -188,10 +227,10 @@ class TSRobotChatRoomService {
         println "jsonObject.get(\"Data\")=" + jsonObject.get("Data")
         if (jsonObject.getJSONArray("Data")) {
             JSONArray array = jsonObject.getJSONArray("Data")
-            List<TSRoomInfoESMap> _list = new ArrayList<>()
+            List<TSRoomConfigESMap> _list = new ArrayList<>()
             for (int i = 0; i < array.size(); i++) {
                 JSONObject obj = array.get(i) as JSONObject
-                TSRoomInfoESMap room = convertRoomJson2Obj(vcRobotSerialNo, obj)
+                TSRoomConfigESMap room = convertRoomJson2Obj(vcRobotSerialNo, obj)
                 if (room != null) {
                     _list.add(room)
                 } else {
@@ -213,7 +252,7 @@ class TSRobotChatRoomService {
         Integer nType = jsonObject.getInteger("nType")
         if (jsonObject.getJSONObject("Data")) {
             JSONObject obj = jsonObject.getJSONObject("Data")
-            TSRoomInfoESMap room = convertRoomJson2Obj(vcRobotSerialNo, obj)
+            TSRoomConfigESMap room = convertRoomJson2Obj(vcRobotSerialNo, obj)
             if (room != null)
                 tsRobotRoomInfoESService.save(room.getId(), room)
         }
@@ -241,6 +280,9 @@ class TSRobotChatRoomService {
             }
             tsRobotRoomInfoESService.update(id, "room_status", status)
         }
+        if (vcRobotSerialNo) {
+            autoSetAllowAddRoom(vcRobotSerialNo)
+        }
     }
 
     /**
@@ -248,7 +290,7 @@ class TSRobotChatRoomService {
      * 机器人收到入群邀请回调码：4506。收到此回调的条件：被邀请的群群成员人数超过40人，且收到邀请的机器人关闭了自动进入群聊设置。
      * http://docs.op.opsdns.cc:8081/Personal-number-function/RobotNewChatRoomAccept-callback/
      */
-    public callBackJoinCharRoomRequest(String strContext) {
+    public callBackJoinChatRoomRequest(String strContext) {
 
     }
 
@@ -286,17 +328,32 @@ class TSRobotChatRoomService {
      *           "vcAdminWxUserSerialNo":""
      *}*}*/
     public callBackJoinChatRoom(String strContext) {
-
+        println "==callBackJoinChatRoom=="
         def jsonSlurper = new JsonSlurper()
         def json = jsonSlurper.parseText(strContext)
         String robot_id = json['vcRobotSerialNo']
         String room_id = ""
+        String friend_id = ""
         if (json['Data'] != null) {
             room_id = json['Data']['vcChatRoomSerialNo']
+            friend_id = json['Data']['vcFriendSerialNo']
+        }
+
+        if (robot_id) {
+            autoSetAllowAddRoom(robot_id)
+        }
+        if (!StringUtils.isNull(friend_id)) {
+            println "===查找邀请好友信息==="
+            TSRobotFriendESMap friendESMap = tsRobotFriendService.getRobotFriend(robot_id, friend_id)
+            String inRoomNickName = friendESMap.getVcNickName() + "助手"
+            println "===根据邀请好友改昵称:" + inRoomNickName
+            String retString = tsRoomConfigService.setRobotNickNameInRoom(robot_id, room_id, inRoomNickName)
+            println retString
         }
         if (!StringUtils.isNull(room_id) && !StringUtils.isNull(robot_id)) {
             String retString = pullChatRoomMemberList(robot_id, room_id)
         }
+
     }
 
     /**
@@ -309,7 +366,6 @@ class TSRobotChatRoomService {
             String robot_id = null
             String room_id = null
             String robotNickName = null
-
             JSONObject jsonObject = JSONObject.parseObject(strContext)
             println jsonObject
             if (jsonObject && jsonObject.get("Data")) {
@@ -328,7 +384,7 @@ class TSRobotChatRoomService {
                         for (TSChatRoomMemberESMap memberESMap : tsChatRoomESMap.getMembers()) {
                             if (memberESMap && memberESMap.getVcMemberUserWxId() == vcChatAdminWxId) {
                                 String manager_nick = memberESMap.getVcNickName()
-                                robotNickName = manager_nick + "的助手"
+                                robotNickName = manager_nick + "助手"
                                 break
                             }
                         }
@@ -339,7 +395,7 @@ class TSRobotChatRoomService {
             if (!StringUtils.isNull(robotNickName)
                     && !StringUtils.isNull(robot_id)
                     && !StringUtils.isNull(room_id)) {
-                setRobotNickNameInRoom(robot_id, room_id, robotNickName)
+                tsRoomConfigService.setRobotNickNameInRoom(robot_id, room_id, robotNickName)
             }
         } catch (Exception e) {
             e.printStackTrace()
@@ -385,7 +441,6 @@ class TSRobotChatRoomService {
         def jsonSlurper = new JsonSlurper()
         def json = jsonSlurper.parseText(strContext)
         String robot_id = json['vcRobotSerialNo']
-
         if (json['Data'] != null) {
             json['Data'].each { it ->
                 String room_id = it['vcChatRoomSerialNo']
@@ -399,11 +454,9 @@ class TSRobotChatRoomService {
                 }
                 tsChatRoomESMap.setMembers(memberESMapList)
                 tsChatRoomESMap.setnMemberCount(memberESMapList.size())
-
                 tsChatRoomESService.save(room_id, tsChatRoomESMap)
                 println "===save callBackChatRoomDeleteMember==="
             }
         }
     }
-
 }

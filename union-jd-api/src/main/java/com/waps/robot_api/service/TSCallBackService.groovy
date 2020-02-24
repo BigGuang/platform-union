@@ -3,7 +3,6 @@ package com.waps.robot_api.service
 import com.alibaba.fastjson.JSONObject
 import com.waps.service.jd.es.domain.TSCallBackLogESMap
 import com.waps.service.jd.es.service.TSCallBackLogESService
-import com.waps.tools.test.TestUtils
 import com.waps.union_jd_api.utils.DateUtils
 import com.waps.utils.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -68,19 +67,19 @@ class TSCallBackService {
         switch (nType) {
             case 1006:
                 //1006  修改机器人信息回调  http://docs.op.opsdns.cc:8081/Personal-number-msg/Personal-msg-callback/
-                tsRobotConfigService.callBackModifyInfo(strContext)
+//                tsRobotConfigService.callBackModifyInfo(strContext)
                 break;
             case 3001:
                 //3001  机器人登录后，回调给商家一次全量好友列表, 每24小时推送一次
-                tsRobotFriendService.callBackAllFriendList(strContext)
+//                tsRobotFriendService.callBackAllFriendList(strContext)
                 break;
             case 3002:
                 //3002  【直接回调】 主动添加好友结果回调接口（还未成为好友）
-                tsRobotFriendService.callBackPushAddFriendRequest(strContext)
+//                tsRobotFriendService.callBackPushAddFriendRequest(strContext)
                 break;
             case 3003:
                 //3003  【直接回调】 新好友请求回调接口  http://docs.op.opsdns.cc:8081/Personal-number-function/NewFriendRq-callback/
-                tsRobotFriendService.callBackAddFriendRequest(strContext)
+//                tsRobotFriendService.callBackAddFriendRequest(strContext)
                 break;
             case 3004:
                 //3004   删除联系人好友结果回调
@@ -104,7 +103,7 @@ class TSCallBackService {
                 break;
             case 3011:
                 //3011  【直接回调】 通过好友请求回调接口
-                tsRobotFriendService.callBackAddFriendThrough(strContext)
+//                tsRobotFriendService.callBackAddFriendThrough(strContext)
                 break;
             case 3015:
                 //3015   好友信息变动回调
@@ -152,12 +151,11 @@ class TSCallBackService {
                 break;
             case 4505:
                 //4505   机器人入群回调接口, 机器人入群方式为好友邀请时，接收本接口回调
-                //todo: 入群后自动同步一下群信息，并改机器人群内昵称。
                 tsChatRoomService.callBackJoinChatRoom(strContext)
                 break;
             case 4506:
                 //4506  【直接回调】 机器人收到入群邀请回调,收到此回调的条件：被邀请的群群成员人数超过40人，且收到邀请的机器人关闭了自动进入群聊设置。
-                tsChatRoomService.callBackJoinCharRoomRequest(strContext)
+//                tsChatRoomService.callBackJoinChatRoomRequest(strContext)
                 break;
             case 4507:
                 //4507  机器人被踢出群回调接口
@@ -177,7 +175,7 @@ class TSCallBackService {
                 break;
             case 5002:
                 //5002  群聊消息发送结果回调接口
-                tsRobotMessageService.callBackChatRoomSendMessageResult(strContext)
+//                tsRobotMessageService.callBackChatRoomSendMessageResult(strContext)
                 break;
             case 5003:
                 //5003  群内实时消息回调
@@ -185,7 +183,7 @@ class TSCallBackService {
                 break;
             case 5004:
                 //5004  私聊消息发送结果回调接口
-                tsRobotMessageService.callBackSendPrivateMessageResult(strContext)
+//                tsRobotMessageService.callBackSendPrivateMessageResult(strContext)
                 break;
         }
         return true

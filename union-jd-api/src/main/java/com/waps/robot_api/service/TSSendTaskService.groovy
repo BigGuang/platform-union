@@ -1,19 +1,13 @@
 package com.waps.robot_api.service
 
 import com.waps.elastic.search.utils.PageUtils
-import com.waps.robot_api.bean.request.TSMessageBean
-import com.waps.service.jd.es.domain.TSMessageESMap
-import com.waps.service.jd.es.domain.TSRoomInfoESMap
+import com.waps.service.jd.es.domain.TSRoomConfigESMap
 import com.waps.service.jd.es.domain.TSSendMessageESMap
 import com.waps.service.jd.es.domain.TSSendTaskESMap
 import com.waps.service.jd.es.service.TSRobotESService
-import com.waps.service.jd.es.service.TSRobotRoomInfoESService
 import com.waps.service.jd.es.service.TSSendTaskESService
 import com.waps.service.jd.es.service.TSSendTaskUserESService
-import com.waps.tools.test.TestUtils
 import com.waps.union_jd_api.service.JDConvertLinkService
-import com.waps.union_jd_api.service.ResultBean
-import com.waps.utils.DateUtils
 import com.waps.utils.StringUtils
 import org.elasticsearch.search.SearchHit
 import org.elasticsearch.search.SearchHits
@@ -35,7 +29,7 @@ class TSSendTaskService {
     @Autowired
     private TSRobotESService tsRobotESService
     @Autowired
-    private TSRobotRoomService tsRobotRoomService
+    private TSRoomConfigService tsRobotRoomService
     @Autowired
     private JDConvertLinkService jdConvertLinkService
     @Autowired
@@ -181,36 +175,41 @@ class TSSendTaskService {
             for (TSSendTaskESMap sendTaskESMap : taskList) {
                 int page = 1
                 int size = 40
-                RobotRoomListBean robotRoom = tsRobotRoomService.listRobotRoom(page, size)
-                List<TSRoomInfoESMap> roomList = robotRoom.getList()
+                RoomConfigListBean robotRoom = tsRobotRoomService.listRobotRoom(page, size)
+                List<TSRoomConfigESMap> roomList = robotRoom.getList()
                 println "===" + roomList.size() + " 个群聊发送"
-                for (TSRoomInfoESMap roomInfoESMap : roomList) {
-                    println "===判断给 " + roomInfoESMap.getVcName() + " 发送的内容 "+userSendTaskESMap.getTarget_channel_name()+"=="+roomInfoESMap.getChannel_name()
-                    boolean flg = checkSendStatus(sendTaskESMap, roomInfoESMap)
-                    //如果有群主提交的文案，优先发群主提交的文案
-                    MessageTaskBean messageTaskBean = new MessageTaskBean()
-                    if (userSendTaskESMap != null
-                            && !StringUtils.isNull(userSendTaskESMap.getId())
-                            && userSendTaskESMap.getMessage_list() != null
-                            && userSendTaskESMap.getMessage_list().size() > 0
-                            && (userSendTaskESMap.getTarget_channel_name().toLowerCase() + ",").indexOf(roomInfoESMap.getChannel_name().toLowerCase() + ",") > -1
-                    ) {
-                        println "==有群主提交文案=="
-                        flg = true
-                        messageTaskBean.setSendTaskESMap(userSendTaskESMap)
-                        Map upMap = new HashMap()
-                        upMap.put("task_status", 1)
-                        tsSendTaskUserESService.update(userSendTaskESMap.getId(), upMap)
-                    } else {
-                        messageTaskBean.setSendTaskESMap(sendTaskESMap)
-                    }
-                    if (flg) {
-                        messageTaskBean.setRoomInfoESMap(roomInfoESMap)
-                        println "@@@@@@@@@@  发送 " + roomInfoESMap.vcName + "@@@@@@@@@@"
-                        for (TSSendMessageESMap messageESMap : messageTaskBean.getSendTaskESMap().getMessage_list()) {
-                            println messageESMap.getMsgContent()
+                for (TSRoomConfigESMap roomInfoESMap : roomList) {
+                    if (!StringUtils.isNull(roomInfoESMap.getSend_status()) && "open" == roomInfoESMap.getSend_status()) {
+                        println "===判断给 " + roomInfoESMap.getVcName() + " 发送的内容 " + userSendTaskESMap.getTarget_channel_name() + "==" + roomInfoESMap.getChannel_name()
+
+                        boolean flg = checkSendStatus(sendTaskESMap, roomInfoESMap)
+                        //如果有群主提交的文案，优先发群主提交的文案
+                        MessageTaskBean messageTaskBean = new MessageTaskBean()
+                        if (userSendTaskESMap != null
+                                && !StringUtils.isNull(userSendTaskESMap.getId())
+                                && userSendTaskESMap.getMessage_list() != null
+                                && userSendTaskESMap.getMessage_list().size() > 0
+                                && (userSendTaskESMap.getTarget_channel_name().toLowerCase() + ",").indexOf(roomInfoESMap.getChannel_name().toLowerCase() + ",") > -1
+                        ) {
+                            println "==有群主提交文案=="
+                            flg = true
+                            messageTaskBean.setSendTaskESMap(userSendTaskESMap)
+                            Map upMap = new HashMap()
+                            upMap.put("task_status", 1)
+                            tsSendTaskUserESService.update(userSendTaskESMap.getId(), upMap)
+                        } else {
+                            messageTaskBean.setSendTaskESMap(sendTaskESMap)
                         }
-                        sendList.add(messageTaskBean)
+                        if (flg) {
+                            messageTaskBean.setRoomInfoESMap(roomInfoESMap)
+                            println "@@@@@@@@@@  发送 " + roomInfoESMap.vcName + "@@@@@@@@@@"
+                            for (TSSendMessageESMap messageESMap : messageTaskBean.getSendTaskESMap().getMessage_list()) {
+                                println messageESMap.getMsgContent()
+                            }
+                            sendList.add(messageTaskBean)
+                        }
+                    } else {
+                        println roomInfoESMap.getVcName() + " send_status:" + roomInfoESMap.getSend_status() + " 已关闭发送"
                     }
                 }
             }
@@ -224,7 +223,7 @@ class TSSendTaskService {
     }
 
 
-    public boolean checkSendStatus(TSSendTaskESMap tsSendTaskESMap, TSRoomInfoESMap roomInfoESMap) {
+    public boolean checkSendStatus(TSSendTaskESMap tsSendTaskESMap, TSRoomConfigESMap roomInfoESMap) {
         boolean flg = true
         //机器人在群里
         if (roomInfoESMap.nRobotInStatus != 0) {

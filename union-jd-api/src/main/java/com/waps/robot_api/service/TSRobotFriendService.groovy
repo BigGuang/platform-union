@@ -1,11 +1,20 @@
 package com.waps.robot_api.service
 
+import com.alibaba.fastjson.JSON
+import com.alibaba.fastjson.JSONArray
 import com.alibaba.fastjson.JSONObject
 import com.waps.robot_api.bean.request.TSPostDeleteFriend
 import com.waps.robot_api.bean.request.TSPostRobotFriendBean
 import com.waps.robot_api.bean.request.TSPostRobotSerialNoBean
+import com.waps.robot_api.bean.response.TSResponseRobotInfoBean
 import com.waps.robot_api.utils.TSApiConfig
+import com.waps.service.jd.es.domain.TSRobotESMap
+import com.waps.service.jd.es.domain.TSRobotFriendESMap
+import com.waps.service.jd.es.service.TSRobotESService
 import com.waps.union_jd_api.utils.HttpUtils
+import com.waps.utils.StringUtils
+import groovy.json.JsonSlurper
+import org.elasticsearch.search.SearchHits
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -13,6 +22,10 @@ import org.springframework.stereotype.Component
 class TSRobotFriendService {
     @Autowired
     TSAuthService tsAuthService
+    @Autowired
+    TSRobotConfigService tsRobotConfigService
+    @Autowired
+    TSRobotESService tsRobotESService
 
     /**
      * 手动通过加好友请求
@@ -43,16 +56,96 @@ class TSRobotFriendService {
 
 
     /**
-     * 获取微信机器人的好友列表
+     * 删除好友
      * @return
      */
-    public String deleteFriend(String vcRobotSerialNo,String vcContactSerialNo) {
+    public String deleteFriend(String vcRobotSerialNo, String vcContactSerialNo) {
         String url = TSApiConfig.ROBOT_FRIEND_DeleteContact.replace("{TOKEN}", tsAuthService.getToken())
         TSPostDeleteFriend postDeleteFriend = new TSPostDeleteFriend()
         postDeleteFriend.setVcRobotSerialNo(vcRobotSerialNo)
         postDeleteFriend.setVcContactSerialNo(vcContactSerialNo)
         String retJson = HttpUtils.postJsonString(url, JSONObject.toJSONString(postDeleteFriend))
         return retJson
+    }
+
+    /**
+     * 获取某一个机器人下的好友信息
+     * @param robot_id
+     * @param friend_id
+     * @return
+     */
+    public TSRobotFriendESMap getRobotFriend(String robot_id, String friend_id) {
+        if (!StringUtils.isNull(robot_id)) {
+            TSRobotESMap tsRobotESMap = tsRobotESService.load(robot_id, TSRobotESMap.class) as TSRobotESMap
+            for (TSRobotFriendESMap friendESMap : tsRobotESMap.getFriend_list()) {
+                if (friendESMap.getVcFriendSerialNo() == friend_id) {
+                    return friendESMap
+                }
+            }
+        }
+    }
+
+    /**
+     * 获取个机器人下的好友列表
+     * @param robot_id
+     * @return
+     */
+    public List<TSRobotFriendESMap> getRobotFriendList(String robot_id) {
+        if (!StringUtils.isNull(robot_id)) {
+            TSRobotESMap tsRobotESMap = tsRobotESService.load(robot_id, TSRobotESMap.class) as TSRobotESMap
+            if (tsRobotESMap != null) {
+                return tsRobotESMap.getFriend_list()
+            }
+        }
+    }
+
+
+    /**
+     * 同步好友信息到es缓存
+     */
+    public void syncAllRobotFriend() {
+        println "===syncAllRobotFriend==="
+        try {
+            int page = 1
+            while (page == 1) {
+                TSResponseRobotInfoBean tsResponseRobotInfoBean = tsRobotConfigService.getRobotInfoListBean(null, page)
+                page = tsResponseRobotInfoBean.getData().getnPageIndex()
+                List<TSRobotESMap> list = tsResponseRobotInfoBean.getData().getRobotList()
+                for (TSRobotESMap tsRobotESMap : list) {
+                    String robot_id = tsRobotESMap.getVcRobotSerialNo()
+                    String friendJson = getRobotFriendListStr(robot_id)
+                    def jsonSlurper = new JsonSlurper()
+                    def json = jsonSlurper.parseText(friendJson)
+                    def data = json['Data']
+                    if (data) {
+                        JSONArray _data = data as JSONArray
+                        for (int i = 0; i < _data.size(); i++) {
+                            def obj = _data.get(i)
+                            JSONArray friend_list = obj['FriendList'] as JSONArray
+                            List<TSRobotFriendESMap> _friendList = new ArrayList<>()
+                            for (int j = 0; j < friend_list.size(); j++) {
+                                JSONObject _friendObj = friend_list.get(j)
+                                if (_friendObj) {
+                                    TSRobotFriendESMap friendESMap = _friendObj.toJavaObject(TSRobotFriendESMap.class) as TSRobotFriendESMap
+                                    _friendList.add(friendESMap)
+                                }
+                            }
+                            Map<String, Object> params = new HashMap<>()
+                            params.put("friend_list", _friendList)
+                            TSRobotESMap _robotESMap = tsRobotESService.load(robot_id, TSRobotESMap.class) as TSRobotESMap
+                            if (_robotESMap != null) {
+                                _robotESMap.setFriend_list(_friendList)
+                            }
+                            tsRobotESService.save(robot_id, _robotESMap)
+
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace()
+        }
+
     }
 
 
@@ -74,7 +167,7 @@ class TSRobotFriendService {
      * http://docs.op.opsdns.cc:8081/Personal-number-function/NewFriendRq-callback/
      * @param strContext
      */
-    public callBackAddFriendRequest(String strContext){
+    public callBackAddFriendRequest(String strContext) {
 
     }
 
@@ -98,7 +191,29 @@ class TSRobotFriendService {
      * http://docs.op.opsdns.cc:8081/Personal-number-function/add-to-friends-callback/
      */
     public callBackAddFriendSuccess(String strContext) {
-
+        println "===callBackAddFriendSuccess==="
+        def jsonSlurper = new JsonSlurper()
+        def json = jsonSlurper.parseText(strContext)
+        String robot_id = json['vcRobotSerialNo']
+        if (json['Data'] != null) {
+            TSRobotESMap robotESMap = tsRobotESService.load(robot_id, TSRobotESMap.class) as TSRobotESMap
+            if (robotESMap != null) {
+                List<TSRobotFriendESMap> friend_list = robotESMap.getFriend_list()
+                if (friend_list == null && friend_list.size() == 0) {
+                    friend_list = new ArrayList<>()
+                }
+                JSONArray array = json['Data'] as JSONArray
+                for (int i = 0; i < array.size(); i++) {
+                    JSONObject obj = array.get(i)
+                    if (obj != null) {
+                        TSRobotFriendESMap robotFriendESMap = obj.toJavaObject(TSRobotFriendESMap.class) as TSRobotFriendESMap
+                        friend_list.add(robotFriendESMap)
+                    }
+                }
+                robotESMap.setFriend_list(friend_list)
+                tsRobotESService.save(robotESMap.getId(), robotESMap)
+            }
+        }
     }
 
     /**
@@ -119,7 +234,26 @@ class TSRobotFriendService {
      * http://docs.op.opsdns.cc:8081/Personal-number-function/DeleteContact-callback/
      * @param strContext
      */
-    public callBackDeleteFriend(String strContext){
-
+    public callBackDeleteFriend(String strContext) {
+        println "===callBackDeleteFriend==="
+        def jsonSlurper = new JsonSlurper()
+        def json = jsonSlurper.parseText(strContext)
+        String robot_id = json['vcRobotSerialNo']
+        if (json['Data'] != null) {
+            String vcContactSerialNo = json['Data']['vcContactSerialNo']
+            if (!StringUtils.isNull(vcContactSerialNo)) {
+                TSRobotESMap robotESMap = tsRobotESService.load(robot_id, TSRobotESMap.class) as TSRobotESMap
+                if (robotESMap != null) {
+                    List<TSRobotFriendESMap> _friend_list = robotESMap.getFriend_list()
+                    for (TSRobotFriendESMap robotFriendESMap : _friend_list) {
+                        if (robotFriendESMap.getVcFriendSerialNo() == vcContactSerialNo) {
+                            _friend_list.remove(robotFriendESMap)
+                        }
+                    }
+                    robotESMap.setFriend_list(_friend_list)
+                    tsRobotESService.save(robotESMap.getId(), robotESMap)
+                }
+            }
+        }
     }
 }

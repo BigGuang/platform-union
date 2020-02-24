@@ -60,9 +60,50 @@
     "nOpenChatRoomCount": {
       "type": "integer"
     },
-    "room_list": {
+    "friend_list": {
       "properties": {
-
+        "vcFriendWxId": {
+          "type": "keyword"
+        },
+        "vcFriendSerialNo": {
+          "type": "keyword"
+        },
+        "nSex": {
+          "type": "integer"
+        },
+        "vcWxAlias": {
+          "type": "keyword"
+        },
+        "vcNickName": {
+          "type": "keyword"
+        },
+        "vcBase64NickName": {
+          "type": "keyword"
+        },
+        "vcHeadImgUrl": {
+          "type": "keyword"
+        },
+        "vcRemarkName": {
+          "type": "keyword"
+        },
+        "vcBase64RemarkName": {
+          "type": "keyword"
+        },
+        "vcCountry": {
+          "type": "keyword"
+        },
+        "vcProvince": {
+          "type": "keyword"
+        },
+        "vcCity": {
+          "type": "keyword"
+        },
+        "nBlockStatus": {
+          "type": "integer"
+        },
+        "vcTagIds": {
+          "type": "keyword"
+        }
       }
     },
     "updatetime": {

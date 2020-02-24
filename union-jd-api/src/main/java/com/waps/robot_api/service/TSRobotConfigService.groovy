@@ -3,22 +3,16 @@ package com.waps.robot_api.service
 import com.alibaba.fastjson.JSONArray
 import com.alibaba.fastjson.JSONObject
 import com.waps.elastic.search.utils.PageUtils
-import com.waps.robot_api.bean.request.TSPostDeleteFriend
 import com.waps.robot_api.bean.request.TSPostModifyInfoBean
-import com.waps.robot_api.bean.request.TSPostRobotFriendBean
 import com.waps.robot_api.bean.request.TSPostRobotInfoBean
-import com.waps.robot_api.bean.request.TSPostRobotSerialNoBean
 import com.waps.robot_api.bean.request.TSPostRobotSwitchBean
 import com.waps.robot_api.bean.response.TSResponseRobotInfoBean
 import com.waps.robot_api.utils.TSApiConfig
-import com.waps.service.jd.es.domain.JDMediaInfoESMap
 import com.waps.service.jd.es.domain.TSRobotESMap
-import com.waps.service.jd.es.domain.TSRoomInfoESMap
+import com.waps.service.jd.es.domain.TSRoomConfigESMap
 import com.waps.service.jd.es.service.TSRobotESService
-import com.waps.service.jd.es.service.TSRobotRoomInfoESService
-import com.waps.tools.security.MD5
+import com.waps.service.jd.es.service.TSRoomConfigESService
 import com.waps.union_jd_api.service.WeChatRobotService
-import com.waps.union_jd_api.utils.DateUtils
 import com.waps.union_jd_api.utils.HttpUtils
 import com.waps.utils.StringUtils
 import org.elasticsearch.search.SearchHits
@@ -34,7 +28,7 @@ class TSRobotConfigService {
     @Autowired
     TSRobotChatRoomService tsRobotChatRoomService
     @Autowired
-    TSRobotRoomInfoESService tsRobotRoomInfoESService
+    TSRoomConfigESService tsRoomConfigESService
     @Autowired
     WeChatRobotService weChatRobotService
 
@@ -135,22 +129,25 @@ class TSRobotConfigService {
                 List<TSRobotESMap> list = tsResponseRobotInfoBean.getData().getRobotList()
                 for (TSRobotESMap tsRobotESMap : list) {
                     println "==sync:" + tsRobotESMap.getVcNickName() + " " + tsRobotESMap.getVcRobotSerialNo()
+                    String robot_id = tsRobotESMap.getVcRobotSerialNo()
                     tsRobotESMap.setId(tsRobotESMap.getVcRobotSerialNo())
                     tsRobotESService.save(tsRobotESMap.getId(), tsRobotESMap)
                     String retJson = tsRobotChatRoomService.getChatRoomInfoList(tsRobotESMap.getVcRobotSerialNo(), null, 0)
                     JSONObject jsonObject = JSONObject.parseObject(retJson)
-                    List<TSRoomInfoESMap> _roomList = new ArrayList<>()
+                    List<TSRoomConfigESMap> _roomList = new ArrayList<>()
                     if (jsonObject && jsonObject.getJSONArray("Data")) {
                         JSONArray array = jsonObject.getJSONArray("Data")
                         for (int i = 0; i < array.size(); i++) {
                             JSONObject obj = array.get(i) as JSONObject
-                            TSRoomInfoESMap room = tsRobotChatRoomService.convertRoomJson2Obj(tsRobotESMap.getVcRobotSerialNo(), obj)
+                            TSRoomConfigESMap room = tsRobotChatRoomService.convertRoomJson2Obj(tsRobotESMap.getVcRobotSerialNo(), obj)
                             _roomList.add(room)
                         }
-                        tsRobotRoomInfoESService.saveBulk(_roomList)
+                        tsRoomConfigESService.saveBulk(_roomList)
                     }
+                    tsRobotChatRoomService.autoSetAllowAddRoom(robot_id)
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace()
         }

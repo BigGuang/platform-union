@@ -1,12 +1,11 @@
 package com.waps.robot_api.service
 
-import com.alibaba.fastjson.JSON
+
 import com.alibaba.fastjson.JSONObject
 import com.waps.robot_api.bean.request.TSMessageBean
-import com.waps.service.jd.es.domain.TSRoomInfoESMap
+import com.waps.service.jd.es.domain.TSRoomConfigESMap
 import com.waps.service.jd.es.domain.TSSendMessageESMap
 import com.waps.service.jd.es.domain.TSSendTaskESMap
-import com.waps.tools.test.TestUtils
 import com.waps.union_jd_api.service.JDConvertLinkService
 import com.waps.union_jd_api.service.ResultBean
 import com.waps.utils.StringUtils
@@ -156,7 +155,7 @@ class SendService {
 
 class MessageTaskBean {
     TSSendTaskESMap sendTaskESMap
-    TSRoomInfoESMap roomInfoESMap
+    TSRoomConfigESMap roomInfoESMap
 }
 
 class MessageSendBean {

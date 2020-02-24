@@ -33,7 +33,7 @@ class TSChatRoomMemberESMap {
 
 }
 
-class TSRoomInfoESMap extends ESBaseBean {
+class TSRoomConfigESMap extends ESBaseBean {
 //    "vcChatRoomId": "18094678040@chatroom",
 //    "nIsInContacts": 0,
 //    "nUserCount": 13,
@@ -66,6 +66,8 @@ class TSRoomInfoESMap extends ESBaseBean {
     int nRobotInStatus
     String vcChatRoomSerialNo
     String room_status
+    String room_nick_name      //机器人在群内的昵称
+    String send_status      //自定义发送消息的开关, 打开为open, 其他都视为close
     String createtime
 }
 

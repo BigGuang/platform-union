@@ -6,6 +6,7 @@ import com.waps.elastic.search.utils.SearchHitsUtils
 import com.waps.robot_api.bean.request.TSMessageBean
 import com.waps.robot_api.service.TSRobotChatRoomService
 import com.waps.robot_api.service.TSRobotMessageService
+import com.waps.robot_api.service.TSRoomConfigService
 import com.waps.service.jd.es.domain.TSChatRoomESMap
 import com.waps.union_jd_api.bean.ReturnMessageBean
 import com.waps.utils.ResponseUtils
@@ -27,6 +28,8 @@ class TSRobotChatRoomController {
     TSRobotChatRoomService tsRobotChatRoomService
     @Autowired
     TSRobotMessageService tsRobotMessageService
+    @Autowired
+    TSRoomConfigService tsRoomConfigService
 
     /**
      * [同步] 群列表
@@ -60,19 +63,8 @@ class TSRobotChatRoomController {
             HttpServletResponse response
     ) {
 
-        SearchHits hits = tsRobotChatRoomService.getChatRoomInfoListFromES(params.getRobot_id(), params.getPage(), params.getSize())
-        Map retMap = new HashMap()
-        long total = 0
-        List<Map> _list = new ArrayList<>()
-        if (hits != null) {
-            total = hits.getTotalHits().value
-            for (SearchHit hit : hits) {
-                _list.add(hit.getSourceAsMap())
-            }
-        }
-        retMap.put("total", total)
-        retMap.put("list", _list)
-        ResponseUtils.write(response, new ReturnMessageBean(200, "", retMap))
+        ESReturnList returnList = tsRobotChatRoomService.getChatRoomInfoListFromES(params.getRobot_id(), params.getPage(), params.getSize())
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", returnList))
     }
 
     /**
@@ -180,6 +172,27 @@ class TSRobotChatRoomController {
         String retJson = tsRobotChatRoomService.setRobotNickNameInRoom(params.getRobot_id(), params.getRoom_id(), params.getNick_name())
         ResponseUtils.write(response, new ReturnMessageBean(200, "", JSONObject.parseObject(retJson)))
     }
+
+
+    @RequestMapping(value = "/room_send_status")
+    public void room_send_status(
+            @RequestBody ConfigRoomSendStatusParams params,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        String retStr = tsRoomConfigService.setRoomSendStatus(params.getRobot_id(), params.getRoom_id(),params.getSend_status())
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", retStr))
+    }
+
+    @RequestMapping(value = "/room_nick_name")
+    public void room_nick_name(
+            @RequestBody ConfigRoomNickNameParams params,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        String retStr = tsRoomConfigService.setRobotNickNameInRoom(params.getRobot_id(), params.getRoom_id(),params.getRoom_nick_name())
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", retStr))
+    }
 }
 
 class OpenMessageParams {
@@ -233,4 +246,17 @@ class CheckRoom {
     String channel_name
     int page = 1
     int size = 20
+}
+
+
+class ConfigRoomSendStatusParams{
+    String robot_id
+    String room_id
+    String send_status
+}
+
+class ConfigRoomNickNameParams{
+    String robot_id
+    String room_id
+    String room_nick_name
 }
