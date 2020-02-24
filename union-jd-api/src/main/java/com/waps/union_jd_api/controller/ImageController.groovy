@@ -3,8 +3,10 @@ package com.waps.union_jd_api.controller
 import com.waps.tools.security.MD5
 import com.waps.tools.test.TestUtils
 import com.waps.union_jd_api.bean.ReturnMessageBean
+import com.waps.union_jd_api.utils.FFMpegUtils
 import com.waps.union_jd_api.utils.FileMD5
 import com.waps.union_jd_api.utils.ImageUtils
+import com.waps.union_jd_api.utils.VideoInfo
 import com.waps.utils.ConfigUtils
 import com.waps.utils.ResponseUtils
 import com.waps.utils.StringUtils
@@ -24,13 +26,13 @@ import java.text.SimpleDateFormat
 class ImageController {
 
     @RequestMapping(value = "/upload")
-    public void getGoodsPromotionInfo(HttpServletRequest request,
+    public void upLoad(HttpServletRequest request,
                                       HttpServletResponse response) throws Exception {
         println "==upload=="
         try {
             MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
             MultipartFile multipartFile = req.getFile("file");
-            TestUtils.outPrint(multipartFile)
+            println "===multipartFile.getContentType():"+multipartFile.getContentType()
             String type = ".jpg"
             if (multipartFile.getContentType() == "image/jpeg") {
                 type = ".jpg"
@@ -40,6 +42,9 @@ class ImageController {
             }
             if (multipartFile.getContentType() == "image/gif") {
                 type = ".gif"
+            }
+            if (multipartFile.getContentType() == "video/mp4") {
+                type = ".mp4"
             }
             SimpleDateFormat format0 = new SimpleDateFormat("yyyyMMdd")
             String dateDir = format0.format(new Date())
@@ -56,6 +61,13 @@ class ImageController {
             println saveRealPath
             println url
             multipartFile.transferTo(new File(saveRealPath))
+            if(saveRealPath.endsWith(".mp4")){
+                String ret=FFMpegUtils.getAutoScreenShot(saveRealPath,saveRealDir)
+                println ret
+                VideoInfo videoInfo=FFMpegUtils.getVideoINFO(saveRealPath)
+                TestUtils.outPrint(videoInfo)
+            }
+
             ResponseUtils.write(response, new ReturnMessageBean(200, "", url))
         } catch (Exception e) {
             ResponseUtils.write(response, new ReturnMessageBean(500, "文件上传出现错误"))
