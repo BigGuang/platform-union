@@ -103,11 +103,15 @@ class TSSendTaskController {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm")
         Date nextDate = tsSendTaskService.getSendTaskNextTime()
-        String send_day = dayFormat.format(nextDate)
-        String send_time = timeFormat.format(nextDate)
-        Map params = new HashMap()
-        params.put("send_day", send_day)
-        params.put("send_time", send_time)
-        ResponseUtils.write(response, new ReturnMessageBean(200, "", params))
+        if(nextDate!=null) {
+            String send_day = dayFormat.format(nextDate)
+            String send_time = timeFormat.format(nextDate)
+            Map params = new HashMap()
+            params.put("send_day", send_day)
+            params.put("send_time", send_time)
+            ResponseUtils.write(response, new ReturnMessageBean(200, "", params))
+        }else{
+            ResponseUtils.write(response, new ReturnMessageBean(404, ""))
+        }
     }
 }

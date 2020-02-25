@@ -4,6 +4,7 @@ import com.waps.robot_api.bean.response.TSResponseRobotInfoBean
 import com.waps.robot_api.service.TSAuthService
 import com.waps.robot_api.service.TSCallBackService
 import com.waps.robot_api.service.TSRobotConfigService
+import com.waps.robot_api.service.TSSendTaskService
 import com.waps.robot_api.service.TestTaskService
 import com.waps.robot_api.utils.TSApiConfig
 import com.waps.robot_api.utils.TestRequest
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import java.text.SimpleDateFormat
 
 @Controller
 @RequestMapping("/ts/robot/base")
@@ -32,6 +34,35 @@ class TSRobotBaseController {
     private TSRobotConfigService tsRobotConfigService
     @Autowired
     private TestTaskService testTaskService
+    @Autowired
+    private TSSendTaskService tsSendTaskService
+
+
+    @RequestMapping(value = "/test_time")
+    public void test_time(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd")
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm")
+        List<Date> list = tsSendTaskService.getTimeLine()
+        println list
+        for (Date d : list) {
+            println timeFormat.format(d)
+        }
+        Date nextDate = tsSendTaskService.getSendTaskNextDateTime()
+        if (nextDate != null) {
+            String send_day = dayFormat.format(nextDate)
+            String send_time = timeFormat.format(nextDate)
+            Map params = new HashMap()
+            params.put("send_day", send_day)
+            params.put("send_time", send_time)
+            ResponseUtils.write(response, new ReturnMessageBean(200, "", params))
+        } else {
+            ResponseUtils.write(response, new ReturnMessageBean(404, ""))
+        }
+    }
 
     @RequestMapping(value = "/test_task")
     public void test(

@@ -156,6 +156,7 @@ class SendService {
 class MessageTaskBean {
     TSSendTaskESMap sendTaskESMap
     TSRoomConfigESMap roomInfoESMap
+    int taskType
 }
 
 class MessageSendBean {

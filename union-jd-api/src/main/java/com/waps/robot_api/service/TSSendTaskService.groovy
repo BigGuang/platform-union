@@ -1,6 +1,7 @@
 package com.waps.robot_api.service
 
 import com.waps.elastic.search.utils.PageUtils
+import com.waps.service.jd.es.domain.TSMessageESMap
 import com.waps.service.jd.es.domain.TSRoomConfigESMap
 import com.waps.service.jd.es.domain.TSSendMessageESMap
 import com.waps.service.jd.es.domain.TSSendTaskESMap
@@ -99,6 +100,10 @@ class TSSendTaskService {
         return tsSendTaskESService.findByFreeMarkerFromResource("es_script/ts_send_task_day.json", params)
     }
 
+    /**
+     * 以当前时间计算出下一次发送时间
+     * @return
+     */
     public Date getSendTaskNextTime() {
         Date currentTime = new Date();
         SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd")
@@ -108,12 +113,61 @@ class TSSendTaskService {
         return getSendTaskNextTime(send_day, searchHits)
     }
 
+
+    /**
+     * 计算出时间线，也可以读取配置文件固定
+     * @return
+     */
+    public List<Date> getTimeLine() {
+        SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd")
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm")
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm")
+
+        List<Date> timeLine = new ArrayList<>()
+        String startTime = "8:00"
+        long loopTime_5min = 5 * 1000 * 60 * 3  //循环时间，15分钟
+        Date currentTime = new Date()
+        String nowDay = dayFormat.format(currentTime)
+        Date fullDate = dateFormat.parse(nowDay + " " + startTime)
+        int loopNum=100
+        for (int i = 0; i < loopNum; i++) {
+            Date nextTime = new Date(fullDate.getTime() + (loopTime_5min) * i)
+            timeLine.add(nextTime)
+        }
+        return timeLine
+    }
+
+    /**
+     * 获取下次发送时间
+     * @return
+     */
+    public Date getSendTaskNextDateTime() {
+        return getSendTaskNextDateTime(null)
+    }
+
+    public Date getSendTaskNextDateTime(String anyTime) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm")
+        List<Date> timeLine = getTimeLine()
+        Date currentTime = new Date()
+        if (!StringUtils.isNull(anyTime)) {
+            currentTime = dateFormat.parse(anyTime)
+        }
+
+        for (Date dateTime : timeLine) {
+            if ((dateTime.getTime() - currentTime.getTime()) > (1000 * 60)) {
+                return dateTime
+            }
+        }
+        return null
+    }
+
+
     /**
      * 通过定时任务记录，计算出队列中下一步的时间
      * @return
      */
     public Date getSendTaskNextTime(String send_day, SearchHits searchHits) {
-        long loopTime_5min = 5 * 1000 * 60 //循环时间，5分钟
+
         Date currentTime = new Date();
         SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd")
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm")
@@ -121,11 +175,10 @@ class TSSendTaskService {
 
         String send_time = "08:00"
         String new_send_date = dateFormat.format(currentTime)
+        //没有记录的情况下,从当前时间获取最新时间
         if (searchHits == null) {
-            send_time = "07:45"  //最后会加15分钟，默认就减15分钟
-            new_send_date = send_day + " " + send_time
-            println "=无记录,默认:" + new_send_date
-        } else {
+            new_send_date = null
+        } else {    //以最新一条的时间来获取时间节点
             SearchHit[] hit_list = searchHits.getHits()
             if (hit_list.length > 0) {
                 TSSendTaskESMap tsSendTaskESMap = tsSendTaskESService.getObjectFromJson(hit_list[0].getSourceAsString(), TSSendTaskESMap.class) as TSSendTaskESMap
@@ -136,15 +189,9 @@ class TSSendTaskService {
                 }
             }
         }
-        Date fullDate = dateFormat.parse(new_send_date)
-        Date nextDate = new Date(fullDate.getTime() + loopTime_5min * 3)
-        if (nextDate.before(currentTime)) {
-            //小于当前时间，nextDate无效，重新计算,当前时间加5分钟
-            Date _new_nextDate = new Date(currentTime.getTime() + loopTime_5min)
-            return _new_nextDate
-        } else {
-            return nextDate
-        }
+
+        Date nextDate = getSendTaskNextDateTime(new_send_date)
+        return nextDate
     }
 
     /**
@@ -157,22 +204,26 @@ class TSSendTaskService {
      * 5. 发送要用多任务并发
      */
     public sendTask2Room(String params) {
+
+        Map<String, MessageTaskBean> sendMap = new HashMap<>()
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd")
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm")
         String send_day = dateFormat.format(new Date())
         String send_time = timeFormat.format(new Date())
 
-        List<MessageTaskBean> sendList = new ArrayList<>()
 
-        List<TSSendTaskESMap> taskList = loadSendTaskWaitingList(send_day, send_time)
+        List<TSSendTaskESMap> allTaskList = loadSendTaskWaitingList(send_day, send_time)
         List<TSSendTaskESMap> userTaskList = tsSendTaskUserService.loadSendTaskWaitingList(send_day, send_time)
-        TSSendTaskESMap userSendTaskESMap = new TSSendTaskESMap()
-        if (userTaskList.size() > 0) {
-            userSendTaskESMap = userTaskList.get(0)
+
+        if (allTaskList.size() == 0) {
+            allTaskList = new ArrayList<>()
         }
-        if (taskList.size() > 0) {
-            println "===" + taskList.size() + " 条发送任务"
-            for (TSSendTaskESMap sendTaskESMap : taskList) {
+        //将两个发送定时合并
+        allTaskList.addAll(userTaskList)
+        if (allTaskList.size() > 0) {
+            println "===" + allTaskList.size() + " 条发送任务"
+            for (TSSendTaskESMap sendTaskESMap : allTaskList) {
                 int page = 1
                 int size = 40
                 RoomConfigListBean robotRoom = tsRobotRoomService.listRobotRoom(page, size)
@@ -180,45 +231,80 @@ class TSSendTaskService {
                 println "===" + roomList.size() + " 个群聊发送"
                 for (TSRoomConfigESMap roomInfoESMap : roomList) {
                     if (!StringUtils.isNull(roomInfoESMap.getSend_status()) && "open" == roomInfoESMap.getSend_status()) {
-                        println "===判断给 " + roomInfoESMap.getVcName() + " 发送的内容 " + userSendTaskESMap.getTarget_channel_name() + "==" + roomInfoESMap.getChannel_name()
-
                         boolean flg = checkSendStatus(sendTaskESMap, roomInfoESMap)
                         //如果有群主提交的文案，优先发群主提交的文案
-                        MessageTaskBean messageTaskBean = new MessageTaskBean()
-                        if (userSendTaskESMap != null
-                                && !StringUtils.isNull(userSendTaskESMap.getId())
-                                && userSendTaskESMap.getMessage_list() != null
-                                && userSendTaskESMap.getMessage_list().size() > 0
-                                && (userSendTaskESMap.getTarget_channel_name().toLowerCase() + ",").indexOf(roomInfoESMap.getChannel_name().toLowerCase() + ",") > -1
-                        ) {
-                            println "==有群主提交文案=="
-                            flg = true
-                            messageTaskBean.setSendTaskESMap(userSendTaskESMap)
-                            Map upMap = new HashMap()
-                            upMap.put("task_status", 1)
-                            tsSendTaskUserESService.update(userSendTaskESMap.getId(), upMap)
-                        } else {
-                            messageTaskBean.setSendTaskESMap(sendTaskESMap)
-                        }
                         if (flg) {
+                            MessageTaskBean messageTaskBean = new MessageTaskBean()
+                            messageTaskBean.setSendTaskESMap(sendTaskESMap)
                             messageTaskBean.setRoomInfoESMap(roomInfoESMap)
-                            println "@@@@@@@@@@  发送 " + roomInfoESMap.vcName + "@@@@@@@@@@"
-                            for (TSSendMessageESMap messageESMap : messageTaskBean.getSendTaskESMap().getMessage_list()) {
-                                println messageESMap.getMsgContent()
-                            }
-                            sendList.add(messageTaskBean)
+//                            println "@@@@@@@@@@  发送 " + roomInfoESMap.vcName + "@@@@@@@@@@"
+//                            for (TSSendMessageESMap messageESMap : messageTaskBean.getSendTaskESMap().getMessage_list()) {
+//                                println messageESMap.getMsgContent()
+//                            }
+                            sendMap.put(roomInfoESMap.getVcChatRoomSerialNo(), messageTaskBean)
                         }
                     } else {
-                        println roomInfoESMap.getVcName() + " send_status:" + roomInfoESMap.getSend_status() + " 已关闭发送"
+//                        println roomInfoESMap.getVcName() + " send_status:" + roomInfoESMap.getSend_status() + " 已关闭发送"
                     }
                 }
             }
-            if (sendList.size() > 0) {
+            println "sendMap.size="+sendMap.size()
+            if (sendMap.size() > 0) {
+                List<MessageTaskBean> _sendList = new ArrayList<>()
+                Iterator it = sendMap.keySet().iterator()
+                while (it.hasNext()) {
+                    String room_id = it.next()
+                    MessageTaskBean messageTaskBean = sendMap.get(room_id)
+                    _sendList.add(messageTaskBean)
+                }
                 sendService.setParams(params)
-                sendService.sendTask(sendList)
+                testSendList(_sendList)
+                sendService.sendTask(_sendList)
             }
         } else {
             println "===无发送任务"
+        }
+    }
+
+
+    public void testSendList(List<MessageTaskBean> _sendList){
+        println "_sendList:"+_sendList.size()
+        for(MessageTaskBean messageTaskBean:_sendList){
+            println "===发送群:"+messageTaskBean.getRoomInfoESMap().getVcName()+"  "+messageTaskBean.getRoomInfoESMap().getChannel_name()
+            println "===发送内容==="
+            List<TSSendMessageESMap> _list= messageTaskBean.getSendTaskESMap().getMessage_list()
+            for(TSSendMessageESMap messageESMap:_list){
+                println messageESMap.getnMsgType()
+                println messageESMap.getMsgContent()
+                println "----------"
+            }
+        }
+    }
+
+
+    public sendTaskUser2Room(String params) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd")
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm")
+        String send_day = dateFormat.format(new Date())
+        String send_time = timeFormat.format(new Date())
+
+        List<MessageTaskBean> sendList = new ArrayList<>()
+        List<TSSendTaskESMap> userTaskList = tsSendTaskUserService.loadSendTaskWaitingList(send_day, send_time)
+        if (userTaskList.size() > 0) {
+            for (TSSendTaskESMap sendTaskESMap : userTaskList) {
+                int page = 1
+                int size = 40
+                RoomConfigListBean robotRoom = tsRobotRoomService.listRobotRoom(page, size)
+                List<TSRoomConfigESMap> roomList = robotRoom.getList()
+                for (TSRoomConfigESMap roomInfoESMap : roomList) {
+
+                }
+            }
+        }
+
+        if (sendList.size() > 0) {
+            sendService.setParams(params)
+            sendService.sendTask(sendList)
         }
     }
 

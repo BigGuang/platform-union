@@ -10,12 +10,12 @@
         },
         {
           "match": {
-            "task_status": 0
+            "send_day": "${send_day}"
           }
         },
         {
           "match": {
-            "send_day": "${send_day}"
+            "send_time": "${send_time}"
           }
         }
       ]
