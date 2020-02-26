@@ -158,7 +158,11 @@ class TSRobotChatRoomController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        SearchHits hits = tsRobotChatRoomService.getRoomInfoFromChannelName(params.getChannel_name(), params.getPage(), params.getSize())
+        String channel_name=""
+        if (!StringUtils.isNull(params.getChannel_name())) {
+            channel_name = params.getChannel_name().toLowerCase()
+        }
+        SearchHits hits = tsRobotChatRoomService.getRoomInfoFromChannelName(channel_name, params.getPage(), params.getSize())
         ESReturnList returnList = SearchHitsUtils.getHits2ReturnMap(hits)
         ResponseUtils.write(response, new ReturnMessageBean(200, "", returnList))
     }
@@ -180,7 +184,7 @@ class TSRobotChatRoomController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        String retStr = tsRoomConfigService.setRoomSendStatus(params.getRobot_id(), params.getRoom_id(),params.getSend_status())
+        String retStr = tsRoomConfigService.setRoomSendStatus(params.getRobot_id(), params.getRoom_id(), params.getSend_status())
         ResponseUtils.write(response, new ReturnMessageBean(200, "", retStr))
     }
 
@@ -190,7 +194,7 @@ class TSRobotChatRoomController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        String retStr = tsRoomConfigService.setRobotNickNameInRoom(params.getRobot_id(), params.getRoom_id(),params.getRoom_nick_name())
+        String retStr = tsRoomConfigService.setRobotNickNameInRoom(params.getRobot_id(), params.getRoom_id(), params.getRoom_nick_name())
         ResponseUtils.write(response, new ReturnMessageBean(200, "", retStr))
     }
 }
@@ -249,13 +253,13 @@ class CheckRoom {
 }
 
 
-class ConfigRoomSendStatusParams{
+class ConfigRoomSendStatusParams {
     String robot_id
     String room_id
     String send_status
 }
 
-class ConfigRoomNickNameParams{
+class ConfigRoomNickNameParams {
     String robot_id
     String room_id
     String room_nick_name

@@ -1,0 +1,38 @@
+{
+  "from": "${from}",
+  "size": "${size}",
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        }
+        <#if channel_name??>
+        ,{
+          "match": {
+            "target_channel_name": "${channel_name}"
+          }
+        }
+        </#if>
+        ,{
+          "match": {
+            "send_day": "${send_day}"
+          }
+        }
+        <#if task_status??>
+        ,{
+          "match": {
+            "task_status": "${task_status}"
+          }
+        }
+        </#if>
+      ]
+    }
+  },
+  "sort": {
+    "${order_by}": {
+      "order": "${order}"
+    }
+  }
+}

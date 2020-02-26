@@ -185,6 +185,10 @@ class TSSendTaskService {
                 String _last_send_time = tsSendTaskESMap.getSend_time()
                 if (!StringUtils.isNull(_last_send_time)) {
                     new_send_date = send_day + " " + _last_send_time
+                    Date lastTime=dateFormat.parse(new_send_date)
+                    if(lastTime.before(currentTime)){
+                        new_send_date=dateFormat.format(currentTime)
+                    }
                     println "=最近一轮时间:" + new_send_date
                 }
             }
@@ -272,11 +276,15 @@ class TSSendTaskService {
         for(MessageTaskBean messageTaskBean:_sendList){
             println "===发送群:"+messageTaskBean.getRoomInfoESMap().getVcName()+"  "+messageTaskBean.getRoomInfoESMap().getChannel_name()
             println "===发送内容==="
-            List<TSSendMessageESMap> _list= messageTaskBean.getSendTaskESMap().getMessage_list()
-            for(TSSendMessageESMap messageESMap:_list){
-                println messageESMap.getnMsgType()
-                println messageESMap.getMsgContent()
-                println "----------"
+            TSSendTaskESMap sendTaskESMap=messageTaskBean.getSendTaskESMap()
+            if(sendTaskESMap!=null) {
+                tsSendTaskUserESService.update(sendTaskESMap.getId(),"task_status",1)
+                List<TSSendMessageESMap> _list = sendTaskESMap.getMessage_list()
+                for (TSSendMessageESMap messageESMap : _list) {
+                    println messageESMap.getnMsgType()
+                    println messageESMap.getMsgContent()
+                    println "----------"
+                }
             }
         }
     }

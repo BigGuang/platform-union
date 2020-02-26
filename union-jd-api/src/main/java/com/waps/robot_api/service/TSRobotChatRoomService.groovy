@@ -58,6 +58,9 @@ class TSRobotChatRoomService {
         if (room.getVcName() != null) {
             String channel_name = weChatRobotService.getChannelName(room.getVcName())
             JDMediaInfoESMap jdMediaInfoESMap = weChatRobotService.getPidFromChannelName(channel_name)
+            if (!StringUtils.isNull(channel_name)) {
+                channel_name = channel_name.toLowerCase()
+            }
             room.setChannel_name(channel_name)
             if (jdMediaInfoESMap != null) {
                 room.setChannel_id(jdMediaInfoESMap.getChannel_id())

@@ -10,6 +10,7 @@ class TSSendTaskESMap extends ESBaseBean{
     String send_time  //当天发送的时间点,可预估
     String target_channel_name    //指定的群号，多个用','分割
     String black_channel_name     //排除的群号，多个用','分割
+    String sku_id    //商品ID 
     String createtime
     List<TSSendMessageESMap> message_list=new ArrayList<>()
 }

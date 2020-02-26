@@ -3,6 +3,9 @@
     "id": {
       "type": "keyword"
     },
+    "sku_id": {
+      "type": "keyword"
+    },
     "task_status": {
       "type": "integer"
     },

@@ -12,7 +12,6 @@ import com.waps.utils.ResponseUtils
 import com.waps.utils.StringUtils
 import org.elasticsearch.action.delete.DeleteResponse
 import org.elasticsearch.search.SearchHits
-import org.jsoup.helper.StringUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestBody
@@ -34,19 +33,25 @@ class TSSendTaskUserController {
 
     @RequestMapping(value = "/list")
     public void list(
-            @RequestParam(value = "task_status", required = true) Integer task_status,
+            @RequestParam(value = "channel_name", required = false) String channel_name,
+            @RequestParam(value = "task_status", required = false) String task_status,
+            @RequestParam(value = "send_day", required = false) String send_day,
             @RequestParam(value = "page", required = true) Integer page,
             @RequestParam(value = "size", required = true) Integer size,
+            @RequestParam(value = "order", required = false) String order,
+
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        SearchHits hits = tsSendTaskUserService.getSendTaskListByStatus(task_status, page, size)
-        println hits.getTotalHits().value
-        println hits.getHits().length
+
+        if (!StringUtils.isNull(order)) {
+            order = "asc"
+        }
+        String order_by = "send_time"
+        SearchHits hits = tsSendTaskUserService.getSendTaskUserListByStatus(channel_name, send_day, task_status, page, size, order_by, order)
         ESReturnList esReturnList = SearchHitsUtils.getHits2ReturnMap(hits)
         ResponseUtils.write(response, new ReturnMessageBean(200, "", esReturnList))
     }
-
 
 
     @RequestMapping(value = "/info")
@@ -65,8 +70,20 @@ class TSSendTaskUserController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        DeleteResponse deleteResponse = TSSendTaskUserESService.delete(id)
-        ResponseUtils.write(response, new ReturnMessageBean(200, "", deleteResponse))
+        try {
+            TSSendTaskESMap sendTaskESMap = tsSendTaskUserESService.load(id, TSSendTaskESMap.class) as TSSendTaskESMap
+            String channel_name = null
+            if (sendTaskESMap && sendTaskESMap.getTarget_channel_name()) {
+                channel_name = sendTaskESMap.getTarget_channel_name().toLowerCase()
+            }
+            DeleteResponse deleteResponse = tsSendTaskUserESService.delete(id)
+            if (sendTaskESMap && sendTaskESMap.getTask_status() == 0) {
+                tsSendTaskUserService.reOderByAuto(channel_name)
+            }
+            ResponseUtils.write(response, new ReturnMessageBean(200, "", deleteResponse))
+        }catch(Exception e){
+            ResponseUtils.write(response, new ReturnMessageBean(500, e.getLocalizedMessage()))
+        }
     }
 
     @RequestMapping(value = "/save")
@@ -79,11 +96,16 @@ class TSSendTaskUserController {
             if (StringUtils.isNull(tsSendTaskESMap.getId())) {
                 tsSendTaskESMap.setId(new MD5().getMD5(UUID.randomUUID().toString()))
             }
-            if(StringUtils.isNull(tsSendTaskESMap.getSend_time()) || StringUtils.isNull(tsSendTaskESMap.getSend_day())) {
+            if (StringUtils.isNull(tsSendTaskESMap.getSend_time()) || StringUtils.isNull(tsSendTaskESMap.getSend_day())) {
                 SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd")
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                 SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm")
-                Date nextDate = tsSendTaskUserService.getSendTaskUserNextTime()
+                String channel_name = tsSendTaskESMap.getTarget_channel_name()
+                if (!StringUtils.isNull(channel_name)) {
+                    channel_name = channel_name.toLowerCase()
+                    tsSendTaskESMap.setTarget_channel_name(tsSendTaskESMap.getTarget_channel_name().toLowerCase())
+                }
+                Date nextDate = tsSendTaskUserService.getSendTaskUserNextTime(channel_name)
                 String send_day = dayFormat.format(nextDate)
                 String send_time = timeFormat.format(nextDate)
                 tsSendTaskESMap.setSend_day(send_day)
@@ -91,8 +113,10 @@ class TSSendTaskUserController {
             }
             tsSendTaskESMap.setCreatetime(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
             tsSendTaskUserESService.save(tsSendTaskESMap.getId(), tsSendTaskESMap)
-            ResponseUtils.write(response, new ReturnMessageBean(200, ""))
-        }else{
+            HashMap retMap = new HashMap()
+            retMap.put("id", tsSendTaskESMap.getId())
+            ResponseUtils.write(response, new ReturnMessageBean(200, "", retMap))
+        } else {
             ResponseUtils.write(response, new ReturnMessageBean(500, "必须有定向信息"))
         }
 
@@ -100,6 +124,7 @@ class TSSendTaskUserController {
 
     @RequestMapping(value = "/task_next_time")
     public void task_next_time(
+            @RequestParam(value = "channel_name", required = true) String channel_name,
             @RequestParam(value = "day", required = false) String day,
             HttpServletRequest request,
             HttpServletResponse response
@@ -107,7 +132,7 @@ class TSSendTaskUserController {
         SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd")
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm")
-        Date nextDate = tsSendTaskUserService.getSendTaskUserNextTime()
+        Date nextDate = tsSendTaskUserService.getSendTaskUserNextTime(channel_name)
         String send_day = dayFormat.format(nextDate)
         String send_time = timeFormat.format(nextDate)
         Map params = new HashMap()
@@ -115,4 +140,21 @@ class TSSendTaskUserController {
         params.put("send_time", send_time)
         ResponseUtils.write(response, new ReturnMessageBean(200, "", params))
     }
+
+    @RequestMapping(value = "/order")
+    public void order(
+            @RequestBody OrderParams orderParams,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        if(orderParams && orderParams.getId_list().size()>0){
+            tsSendTaskUserService.reOrderByIdList(orderParams.getId_list())
+        }
+        ResponseUtils.write(response, new ReturnMessageBean(200, ""))
+    }
+
+}
+
+class OrderParams{
+    List<String> id_list=new ArrayList<>()
 }
