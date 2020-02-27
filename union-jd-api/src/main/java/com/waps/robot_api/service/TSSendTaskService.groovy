@@ -35,6 +35,8 @@ class TSSendTaskService {
     private JDConvertLinkService jdConvertLinkService
     @Autowired
     private SendService sendService
+    @Autowired
+    private TimeLineService timeLineService
 
     /**
      * 发送任务列表
@@ -115,54 +117,6 @@ class TSSendTaskService {
 
 
     /**
-     * 计算出时间线，也可以读取配置文件固定
-     * @return
-     */
-    public List<Date> getTimeLine() {
-        SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd")
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm")
-        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm")
-
-        List<Date> timeLine = new ArrayList<>()
-        String startTime = "8:00"
-        long loopTime_5min = 5 * 1000 * 60 * 3  //循环时间，15分钟
-        Date currentTime = new Date()
-        String nowDay = dayFormat.format(currentTime)
-        Date fullDate = dateFormat.parse(nowDay + " " + startTime)
-        int loopNum=100
-        for (int i = 0; i < loopNum; i++) {
-            Date nextTime = new Date(fullDate.getTime() + (loopTime_5min) * i)
-            timeLine.add(nextTime)
-        }
-        return timeLine
-    }
-
-    /**
-     * 获取下次发送时间
-     * @return
-     */
-    public Date getSendTaskNextDateTime() {
-        return getSendTaskNextDateTime(null)
-    }
-
-    public Date getSendTaskNextDateTime(String anyTime) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm")
-        List<Date> timeLine = getTimeLine()
-        Date currentTime = new Date()
-        if (!StringUtils.isNull(anyTime)) {
-            currentTime = dateFormat.parse(anyTime)
-        }
-
-        for (Date dateTime : timeLine) {
-            if ((dateTime.getTime() - currentTime.getTime()) > (1000 * 60)) {
-                return dateTime
-            }
-        }
-        return null
-    }
-
-
-    /**
      * 通过定时任务记录，计算出队列中下一步的时间
      * @return
      */
@@ -194,7 +148,7 @@ class TSSendTaskService {
             }
         }
 
-        Date nextDate = getSendTaskNextDateTime(new_send_date)
+        Date nextDate = timeLineService.getSendTaskNextDateTime(new_send_date)
         return nextDate
     }
 

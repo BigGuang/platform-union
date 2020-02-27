@@ -3,11 +3,14 @@ package com.waps.robot_api.service
 
 import com.alibaba.fastjson.JSONObject
 import com.waps.robot_api.bean.request.TSMessageBean
+import com.waps.service.jd.es.domain.RobotSendLogESMap
 import com.waps.service.jd.es.domain.TSRoomConfigESMap
 import com.waps.service.jd.es.domain.TSSendMessageESMap
 import com.waps.service.jd.es.domain.TSSendTaskESMap
+import com.waps.service.jd.es.service.RobotSendLogESService
 import com.waps.union_jd_api.service.JDConvertLinkService
 import com.waps.union_jd_api.service.ResultBean
+import com.waps.union_jd_api.utils.DateUtils
 import com.waps.utils.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -24,6 +27,8 @@ class SendService {
     TSRobotMessageService tsRobotMessageService
     @Autowired
     private JDConvertLinkService jdConvertLinkService
+    @Autowired
+    private RobotSendLogESService robotSendLogESService
 
 
     int threadPoolNum = 10
@@ -76,7 +81,12 @@ class SendService {
                                 String action_id = UUID.randomUUID().toString()
                                 List<TSMessageBean> messageList = convertTask2Message(channel_name, messageTaskBean.getSendTaskESMap())
                                 if (messageList != null && messageList.size() > 0) {
-                                    tsRobotMessageService.sendChatRoomMessageList(robot_id, room_id, action_id, "", messageList)
+                                    String retJson = tsRobotMessageService.sendChatRoomMessageList(robot_id, room_id, action_id, "", messageList)
+                                    JSONObject retObj = JSONObject.parseObject(retJson)
+                                    if (retObj != null && retObj.getIntValue("nResult") == 1) {
+                                        saveSendLog(messageTaskBean)
+                                    }
+
                                 }
                                 Thread.sleep(threadWaitTime)
                             }
@@ -107,6 +117,19 @@ class SendService {
 
     }
 
+    public void saveSendLog(MessageTaskBean messageTaskBean) {
+        RobotSendLogESMap robotSendLogESMap = new RobotSendLogESMap()
+        Long id = System.currentTimeMillis()
+        robotSendLogESMap.setId(id + "")
+        robotSendLogESMap.setRobot_id(messageTaskBean.getRoomInfoESMap().getVcRobotSerialNo())
+        robotSendLogESMap.setRoom_id(messageTaskBean.getRoomInfoESMap().getVcChatRoomSerialNo())
+        robotSendLogESMap.setChannel_name(messageTaskBean.getRoomInfoESMap().getChannel_name())
+        robotSendLogESMap.setSku_id(messageTaskBean.getSendTaskESMap().getSku_id())
+        robotSendLogESMap.setTask_id(messageTaskBean.getSendTaskESMap().getId())
+        robotSendLogESMap.setCreate_time(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
+        robotSendLogESService.save(robotSendLogESMap.getId(), robotSendLogESMap)
+    }
+
     /**
      * 发送任务中的信息转换成机器人需要的对象
      * @param taskESMap
@@ -126,10 +149,10 @@ class SendService {
         List<TSMessageBean> messageBeanList = new ArrayList<>()
         if (taskESMap != null) {
             List<TSSendMessageESMap> message_list = taskESMap.getMessage_list()
-            int i=0
+            int i = 0
             for (TSSendMessageESMap messageESMap : message_list) {
                 if (messageESMap) {
-                    i=i+1
+                    i = i + 1
                     TSMessageBean tsMessageBean = new TSMessageBean()
                     tsMessageBean.setnMsgNum(i)
                     tsMessageBean.setnMsgType(messageESMap.getnMsgType())

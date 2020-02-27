@@ -1,0 +1,29 @@
+{
+  "properties": {
+    "id": {
+      "type": "keyword"
+    },
+    "room_id": {
+      "type": "keyword"
+    },
+    "channel_name": {
+      "type": "keyword"
+    },
+    "robot_id": {
+      "type": "keyword"
+    },
+    "task_id": {
+      "type": "keyword"
+    },
+    "sku_id": {
+      "type": "keyword"
+    },
+    "create_time": {
+      "type": "date",
+      "format": "yyyy-MM-dd HH:mm:ss"
+    }
+  },
+  "_source": {
+    "enabled": true
+  }
+}

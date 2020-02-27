@@ -1,14 +1,19 @@
 package com.waps.robot_api.controller
 
 import com.waps.robot_api.bean.response.TSResponseRobotInfoBean
+import com.waps.robot_api.service.SendCount
 import com.waps.robot_api.service.TSAuthService
 import com.waps.robot_api.service.TSCallBackService
 import com.waps.robot_api.service.TSRobotConfigService
 import com.waps.robot_api.service.TSSendTaskService
+import com.waps.robot_api.service.TSSendTaskUserService
 import com.waps.robot_api.service.TestTaskService
+import com.waps.robot_api.service.TimeLineService
 import com.waps.robot_api.utils.TSApiConfig
 import com.waps.robot_api.utils.TestRequest
 import com.waps.robot_api.utils.UrlUtil
+import com.waps.service.jd.es.service.TSSendTaskUserESService
+import com.waps.tools.test.TestUtils
 import com.waps.union_jd_api.bean.ReturnMessageBean
 import com.waps.utils.ResponseUtils
 import org.elasticsearch.search.SearchHit
@@ -36,7 +41,20 @@ class TSRobotBaseController {
     private TestTaskService testTaskService
     @Autowired
     private TSSendTaskService tsSendTaskService
+    @Autowired
+    private TSSendTaskUserService tsSendTaskUserService
+    @Autowired
+    private TimeLineService timeLineService
 
+    @RequestMapping(value = "/test_time_count")
+    public void test_time_count(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        SendCount count=tsSendTaskUserService.getSendCount("s002")
+        TestUtils.outPrint(count)
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", count))
+    }
 
     @RequestMapping(value = "/test_time")
     public void test_time(
@@ -46,12 +64,12 @@ class TSRobotBaseController {
         SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd")
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm")
-        List<Date> list = tsSendTaskService.getTimeLine()
+        List<Date> list = timeLineService.getTimeLine()
         println list
         for (Date d : list) {
             println timeFormat.format(d)
         }
-        Date nextDate = tsSendTaskService.getSendTaskNextDateTime()
+        Date nextDate = timeLineService.getSendTaskNextDateTime()
         if (nextDate != null) {
             String send_day = dayFormat.format(nextDate)
             String send_time = timeFormat.format(nextDate)
