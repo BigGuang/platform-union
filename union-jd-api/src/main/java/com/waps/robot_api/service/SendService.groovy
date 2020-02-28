@@ -14,6 +14,8 @@ import com.waps.union_jd_api.utils.DateUtils
 import com.waps.utils.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import waps.jd.utils.TxtUtils
+
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -73,6 +75,8 @@ class SendService {
                             begin.await()
                             MessageTaskBean messageTaskBean = send_task_list.get(NO)
                             if (messageTaskBean != null) {
+                                //todo:对文字内容做10%差异化处理
+
                                 //发送消息
                                 String robot_id = messageTaskBean.getRoomInfoESMap().getVcRobotSerialNo()
                                 String room_id = messageTaskBean.getRoomInfoESMap().getVcChatRoomSerialNo()
@@ -86,7 +90,6 @@ class SendService {
                                     if (retObj != null && retObj.getIntValue("nResult") == 1) {
                                         saveSendLog(messageTaskBean)
                                     }
-
                                 }
                                 Thread.sleep(threadWaitTime)
                             }
@@ -173,6 +176,16 @@ class SendService {
             }
         }
         return messageBeanList
+    }
+
+    /**
+     *
+     * @return
+     */
+    public String content2New(String oldContent){
+        TxtUtils textUtils=new TxtUtils()
+        String newContent=textUtils.RandomReplaceTxt(oldContent,80)
+        return newContent
     }
 }
 

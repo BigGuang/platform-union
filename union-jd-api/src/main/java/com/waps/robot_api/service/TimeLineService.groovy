@@ -23,7 +23,7 @@ class TimeLineService {
         Date currentTime = new Date()
         String nowDay = dayFormat.format(currentTime)
         Date fullDate = dateFormat.parse(nowDay + " " + startTime)
-        int loopNum = 100
+        int loopNum = 50
         for (int i = 0; i < loopNum; i++) {
             Date nextTime = new Date(fullDate.getTime() + (loopTime_5min) * i)
             timeLine.add(nextTime)
