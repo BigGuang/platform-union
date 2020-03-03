@@ -162,7 +162,12 @@ class SendService {
                     if (tsMessageBean.getnMsgType() == 2001) {
                         ResultBean resultBean = jdConvertLinkService.convertLink(messageESMap.getMsgContent(), channel_name, "true")
                         if (resultBean) {
-                            tsMessageBean.setMsgContent(resultBean.getContent())
+                            if (!StringUtils.isNull(taskESMap.getTarget_channel_name())) {
+                                tsMessageBean.setMsgContent(resultBean.getContent())
+                            } else {
+                                //如果没有指定群收消息，需要对内容做90%不同处理
+                                tsMessageBean.setMsgContent(makeContent2New(resultBean.getContent()))
+                            }
                         }
                     } else {
                         tsMessageBean.setMsgContent(messageESMap.getMsgContent())
@@ -182,10 +187,14 @@ class SendService {
      *
      * @return
      */
-    public String content2New(String oldContent){
-        TxtUtils textUtils=new TxtUtils()
-        String newContent=textUtils.RandomReplaceTxt(oldContent,80)
+    public String makeContent2New(String oldContent) {
+        TxtUtils textUtils = new TxtUtils()
+        String newContent = textUtils.RandomReplaceTxt(oldContent, 80)
         return newContent
+    }
+
+    public String makeImage2New(String oldUrl){
+
     }
 }
 

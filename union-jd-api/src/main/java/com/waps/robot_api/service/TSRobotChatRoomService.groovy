@@ -7,6 +7,7 @@ import com.waps.elastic.search.utils.PageUtils
 import com.waps.elastic.search.utils.SearchHitsUtils
 import com.waps.robot_api.bean.request.TSPostChatRoomInfoBean
 import com.waps.robot_api.bean.request.TSPostRobotNickNameInRoom
+import com.waps.robot_api.bean.request.TSPostRobotQuitRoom
 import com.waps.robot_api.utils.TSApiConfig
 import com.waps.service.jd.es.domain.JDMediaInfoESMap
 import com.waps.service.jd.es.domain.TSChatRoomESMap
@@ -210,6 +211,15 @@ class TSRobotChatRoomService {
         }
     }
 
+    public String quitRoom(String vcRobotSerialNo, String vcChatRoomSerialNo){
+        String url = TSApiConfig.ROBOT_CHATROOM_DeleteAndLeaveGroup.replace("{TOKEN}", tsAuthService.getToken())
+        TSPostRobotQuitRoom postRobotQuitRoom=new TSPostRobotQuitRoom()
+        postRobotQuitRoom.setVcRobotSerialNo(vcRobotSerialNo)
+        postRobotQuitRoom.setVcChatRoomSerialNo(vcChatRoomSerialNo)
+        String retJson = HttpUtils.postJsonString(url, JSONObject.toJSONString(postRobotQuitRoom))
+        return retJson
+    }
+
 
     /**
      * 群信息回调  4001
@@ -341,10 +351,18 @@ class TSRobotChatRoomService {
             room_id = json['Data']['vcChatRoomSerialNo']
             friend_id = json['Data']['vcFriendSerialNo']
         }
+        //加入群后更新在群状态
+        if(room_id){
+            String id = new MD5().getMD5(robot_id + room_id)
+            String status = "0"
+            tsRobotRoomInfoESService.update(id, "room_status", status)
+        }
 
         if (robot_id) {
+            //根据已加入群数来决定是否自动同意入群
             autoSetAllowAddRoom(robot_id)
         }
+
         if (!StringUtils.isNull(friend_id)) {
             println "===查找邀请好友信息==="
             TSRobotFriendESMap friendESMap = tsRobotFriendService.getRobotFriend(robot_id, friend_id)

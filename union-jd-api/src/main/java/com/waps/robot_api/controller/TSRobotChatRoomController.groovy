@@ -167,6 +167,12 @@ class TSRobotChatRoomController {
         ResponseUtils.write(response, new ReturnMessageBean(200, "", returnList))
     }
 
+    /**
+     *
+     * @param params
+     * @param request
+     * @param response
+     */
     @RequestMapping(value = "/set_nick_room")
     public void setNickNameInRoom(
             @RequestBody NickNameInRoom params,
@@ -178,6 +184,12 @@ class TSRobotChatRoomController {
     }
 
 
+    /**
+     * 设置群可发送状态，设置是否开启文案发送
+     * @param params
+     * @param request
+     * @param response
+     */
     @RequestMapping(value = "/room_send_status")
     public void room_send_status(
             @RequestBody ConfigRoomSendStatusParams params,
@@ -188,6 +200,12 @@ class TSRobotChatRoomController {
         ResponseUtils.write(response, new ReturnMessageBean(200, "", retStr))
     }
 
+    /**
+     * 修改机器人在群众昵称
+     * @param params
+     * @param request
+     * @param response
+     */
     @RequestMapping(value = "/room_nick_name")
     public void room_nick_name(
             @RequestBody ConfigRoomNickNameParams params,
@@ -195,6 +213,23 @@ class TSRobotChatRoomController {
             HttpServletResponse response
     ) {
         String retStr = tsRoomConfigService.setRobotNickNameInRoom(params.getRobot_id(), params.getRoom_id(), params.getRoom_nick_name())
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", retStr))
+    }
+
+
+    /**
+     * 机器人主动退群
+     * @param params
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "/quit_room")
+    public void quitRoom(
+            @RequestBody QuitRoomParams params,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        String retStr = tsRobotChatRoomService.quitRoom(params.getRobot_id(), params.getRoom_id())
         ResponseUtils.write(response, new ReturnMessageBean(200, "", retStr))
     }
 }
@@ -236,6 +271,11 @@ class SendChatRoomMessageListParams {
 }
 
 class PullMemberParams {
+    String robot_id
+    String room_id
+}
+
+class QuitRoomParams {
     String robot_id
     String room_id
 }

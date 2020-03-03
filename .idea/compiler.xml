@@ -6,9 +6,8 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="union-jd-api" />
         <module name="service-jd" />
-        <module name="commons-esclient" />
+        <module name="union-jd-api" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

@@ -51,6 +51,8 @@ class TSApiConfig {
     final static String ROBOT_CHATROOM_RobotChatRoomCancel = SERVICE_HOST + "/api/ChatRoom/RobotChatRoomCancel?vcToken={TOKEN}"
     //【异步调用】设置群内昵称
     final static String ROBOT_CHATROOM_RobotChatRoomSetNickName = SERVICE_HOST + "/api/ChatRoom/SetAliasForGroup?vcToken={TOKEN}"
+    //【异步调用】机器人主动退群
+    final static String ROBOT_CHATROOM_DeleteAndLeaveGroup = SERVICE_HOST + "/api/ChatRoom/DeleteAndLeaveGroup?vcToken={TOKEN}"
 
 
     //【异步调用】机器人私聊发消息接口
