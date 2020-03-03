@@ -45,6 +45,7 @@ class JDConvertLinkService {
         int code = 0
         ArrayList<String> imgList = new ArrayList<>()
         String message = ""
+        Long sku_id = 0L
         String jd_host = ".jd."
         double commission = 0L
         Map<String, LinkBean> linkMap = new HashMap<>()
@@ -163,6 +164,7 @@ class JDConvertLinkService {
                 while (it.hasNext()) {
                     String id = it.next()
                     LinkBean linkBean = linkMap.get(id)
+                    sku_id = linkBean.getSkuId()
                     if (linkBean.oldUrl) {
                         String newStr = linkBean.newUrl
 
@@ -215,6 +217,9 @@ class JDConvertLinkService {
         }
         ResultBean resultBean = new ResultBean()
         resultBean.setCode(code)
+        if (sku_id > 0) {
+            resultBean.setSku_id(sku_id + "")
+        }
         resultBean.setMessage(message)
         resultBean.setContent(content)
         resultBean.setCommission(commission)
@@ -380,11 +385,11 @@ class JDConvertLinkService {
             }
             if (StringUtils.isNull(sukId)) {
                 println "==通过sku参数判断=="
-                sukId= SkuUtils.getSkuIDFromUrl(url,"sku")
+                sukId = SkuUtils.getSkuIDFromUrl(url, "sku")
             }
             if (StringUtils.isNull(sukId)) {
                 println "==通过wareId参数判断=="
-                sukId= SkuUtils.getSkuIDFromUrl(url,"wareId")
+                sukId = SkuUtils.getSkuIDFromUrl(url, "wareId")
             }
             return sukId
         }
@@ -707,6 +712,7 @@ class LinkBean {
 
 class ResultBean {
     int code
+    String sku_id
     String content
     String message
     String positionId
