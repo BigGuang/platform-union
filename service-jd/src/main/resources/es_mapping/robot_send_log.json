@@ -18,6 +18,9 @@
     "sku_id": {
       "type": "keyword"
     },
+    "run_result": {
+      "type": "keyword"
+    },
     "create_time": {
       "type": "date",
       "format": "yyyy-MM-dd HH:mm:ss"

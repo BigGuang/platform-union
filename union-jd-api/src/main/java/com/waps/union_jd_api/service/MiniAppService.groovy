@@ -16,7 +16,7 @@ class MiniAppService {
 
     public static final APP_ID = "wx51546016a2d42464"
     public static final APP_SECRET = "362c795d83649bffe9981788330a53c1"
-    public static final DEFAULT_SCENE = "scene=A004"
+    public static final DEFAULT_SCENE = "scene=S006"
 
     /**
      * 获取小程序带参二维码

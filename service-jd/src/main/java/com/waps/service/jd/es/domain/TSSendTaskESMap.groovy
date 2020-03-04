@@ -12,6 +12,8 @@ class TSSendTaskESMap extends ESBaseBean{
     String black_channel_name     //排除的群号，多个用','分割
     String sku_id    //商品ID 
     String createtime
+    String run_time       //执行时间
+    String run_result     //执行结果
     List<TSSendMessageESMap> message_list=new ArrayList<>()
 }
 

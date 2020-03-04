@@ -1,7 +1,6 @@
 package com.waps.robot_api.service
 
 import com.waps.elastic.search.utils.PageUtils
-import com.waps.service.jd.es.domain.TSMessageESMap
 import com.waps.service.jd.es.domain.TSRoomConfigESMap
 import com.waps.service.jd.es.domain.TSSendMessageESMap
 import com.waps.service.jd.es.domain.TSSendTaskESMap
@@ -194,7 +193,7 @@ class TSSendTaskService {
                         if (flg) {
                             MessageTaskBean messageTaskBean = new MessageTaskBean()
                             messageTaskBean.setSendTaskESMap(sendTaskESMap)
-                            messageTaskBean.setRoomInfoESMap(roomInfoESMap)
+                            messageTaskBean.setRoomConfigESMap(roomInfoESMap)
 //                            println "@@@@@@@@@@  发送 " + roomInfoESMap.vcName + "@@@@@@@@@@"
 //                            for (TSSendMessageESMap messageESMap : messageTaskBean.getSendTaskESMap().getMessage_list()) {
 //                                println messageESMap.getMsgContent()
@@ -228,7 +227,7 @@ class TSSendTaskService {
     public void testSendList(List<MessageTaskBean> _sendList){
         println "_sendList:"+_sendList.size()
         for(MessageTaskBean messageTaskBean:_sendList){
-            println "===发送群:"+messageTaskBean.getRoomInfoESMap().getVcName()+"  "+messageTaskBean.getRoomInfoESMap().getChannel_name()
+            println "===发送群:"+messageTaskBean.getRoomConfigESMap().getVcName()+"  "+messageTaskBean.getRoomConfigESMap().getChannel_name()
             println "===发送内容==="
             TSSendTaskESMap sendTaskESMap=messageTaskBean.getSendTaskESMap()
             if(sendTaskESMap!=null) {

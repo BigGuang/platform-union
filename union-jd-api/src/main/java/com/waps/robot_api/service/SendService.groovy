@@ -8,13 +8,14 @@ import com.waps.service.jd.es.domain.TSRoomConfigESMap
 import com.waps.service.jd.es.domain.TSSendMessageESMap
 import com.waps.service.jd.es.domain.TSSendTaskESMap
 import com.waps.service.jd.es.service.RobotSendLogESService
+import com.waps.service.jd.es.service.TSSendTaskUserESService
 import com.waps.union_jd_api.service.JDConvertLinkService
 import com.waps.union_jd_api.service.ResultBean
 import com.waps.union_jd_api.utils.DateUtils
 import com.waps.utils.StringUtils
+import com.waps.utils.TxtUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-import waps.jd.utils.TxtUtils
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
@@ -31,6 +32,8 @@ class SendService {
     private JDConvertLinkService jdConvertLinkService
     @Autowired
     private RobotSendLogESService robotSendLogESService
+    @Autowired
+    private TSSendTaskUserESService tsSendTaskUserESService
 
 
     int threadPoolNum = 10
@@ -78,17 +81,17 @@ class SendService {
                                 //todo:对文字内容做10%差异化处理
 
                                 //发送消息
-                                String robot_id = messageTaskBean.getRoomInfoESMap().getVcRobotSerialNo()
-                                String room_id = messageTaskBean.getRoomInfoESMap().getVcChatRoomSerialNo()
-                                String channel_id = messageTaskBean.getRoomInfoESMap().getChannel_id()
-                                String channel_name = messageTaskBean.getRoomInfoESMap().getChannel_name()
+                                String robot_id = messageTaskBean.getRoomConfigESMap().getVcRobotSerialNo()
+                                String room_id = messageTaskBean.getRoomConfigESMap().getVcChatRoomSerialNo()
+                                String channel_id = messageTaskBean.getRoomConfigESMap().getChannel_id()
+                                String channel_name = messageTaskBean.getRoomConfigESMap().getChannel_name()
                                 String action_id = UUID.randomUUID().toString()
                                 List<TSMessageBean> messageList = convertTask2Message(channel_name, messageTaskBean.getSendTaskESMap())
                                 if (messageList != null && messageList.size() > 0) {
                                     String retJson = tsRobotMessageService.sendChatRoomMessageList(robot_id, room_id, action_id, "", messageList)
                                     JSONObject retObj = JSONObject.parseObject(retJson)
                                     if (retObj != null && retObj.getIntValue("nResult") == 1) {
-                                        saveSendLog(messageTaskBean)
+                                        saveSendLog(messageTaskBean, retJson)
                                     }
                                 }
                                 Thread.sleep(threadWaitTime)
@@ -120,17 +123,36 @@ class SendService {
 
     }
 
-    public void saveSendLog(MessageTaskBean messageTaskBean) {
-        RobotSendLogESMap robotSendLogESMap = new RobotSendLogESMap()
-        Long id = System.currentTimeMillis()
-        robotSendLogESMap.setId(id + "")
-        robotSendLogESMap.setRobot_id(messageTaskBean.getRoomInfoESMap().getVcRobotSerialNo())
-        robotSendLogESMap.setRoom_id(messageTaskBean.getRoomInfoESMap().getVcChatRoomSerialNo())
-        robotSendLogESMap.setChannel_name(messageTaskBean.getRoomInfoESMap().getChannel_name())
-        robotSendLogESMap.setSku_id(messageTaskBean.getSendTaskESMap().getSku_id())
-        robotSendLogESMap.setTask_id(messageTaskBean.getSendTaskESMap().getId())
-        robotSendLogESMap.setCreate_time(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
-        robotSendLogESService.save(robotSendLogESMap.getId(), robotSendLogESMap)
+    /**
+     * 记录发送日志
+     * @param messageTaskBean
+     * @param runResultJson
+     */
+    public void saveSendLog(MessageTaskBean messageTaskBean, String runResultJson) {
+        try {
+            RobotSendLogESMap robotSendLogESMap = new RobotSendLogESMap()
+            TSSendTaskESMap sendTaskESMap = messageTaskBean.getSendTaskESMap()
+            TSRoomConfigESMap roomConfigESMap = messageTaskBean.getRoomConfigESMap()
+            Long id = System.currentTimeMillis()
+            robotSendLogESMap.setId(id + "")
+            robotSendLogESMap.setRobot_id(roomConfigESMap.getVcRobotSerialNo())
+            robotSendLogESMap.setRoom_id(roomConfigESMap.getVcChatRoomSerialNo())
+            robotSendLogESMap.setChannel_name(roomConfigESMap.getChannel_name())
+            robotSendLogESMap.setSku_id(sendTaskESMap.getSku_id())
+            robotSendLogESMap.setTask_id(sendTaskESMap.getId())
+            robotSendLogESMap.setRun_result(runResultJson)
+            robotSendLogESMap.setCreate_time(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
+            robotSendLogESService.save(robotSendLogESMap.getId(), robotSendLogESMap)
+            //群主自发消息发送状态更新
+            if (!StringUtils.isNull(messageTaskBean.getSendTaskESMap().getTarget_channel_name())) {
+                Map updateParams = new HashMap()
+                updateParams.put("run_time", DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
+                updateParams.put("run_result", runResultJson)
+                tsSendTaskUserESService.update(sendTaskESMap.getId(), updateParams)
+            }
+        } catch (Exception e) {
+            println "==saveSendLog ERROR:" + e.getLocalizedMessage()
+        }
     }
 
     /**
@@ -170,7 +192,13 @@ class SendService {
                             }
                         }
                     } else {
-                        tsMessageBean.setMsgContent(messageESMap.getMsgContent())
+                        if (tsMessageBean.getnMsgType() == 2002) {
+                            String sendImg = makeImage2NewUUID(messageESMap.getMsgContent())
+                            println "==sendImg:" + sendImg
+                            tsMessageBean.setMsgContent(sendImg)
+                        } else {
+                            tsMessageBean.setMsgContent(messageESMap.getMsgContent())
+                        }
                     }
                     tsMessageBean.setnVoiceTime(messageESMap.getnVoiceTime())
                     tsMessageBean.setVcTitle(messageESMap.getVcTitle())
@@ -183,6 +211,33 @@ class SendService {
         return messageBeanList
     }
 
+    public String makeImage2NewUUID(String oldImageUrl) {
+        String ret = makeImage2New(oldImageUrl)
+        if (!StringUtils.isNull(ret) && ret.endsWith("/")) {
+            String uuid = UUID.randomUUID().toString()
+            ret = ret + uuid + ".jpg"
+        }
+        return ret
+    }
+
+    public String makeImage2New(String oldImageUrl) {
+        String newImageUrl = ""
+        if (!StringUtils.isNull(oldImageUrl) && oldImageUrl.startsWith("http")) {
+            try {
+                String ret = StringUtils.getUrlTxt("https://api.wapg.cn/union_robot/pic/picConVert?fileurl=" + oldImageUrl)
+                if (ret) {
+                    newImageUrl = "https://api.wapg.cn/union_robot/" + ret
+                }
+            } catch (Exception e) {
+                newImageUrl = oldImageUrl
+                println "makeImage2New ERROR:" + e.getLocalizedMessage()
+            }
+        } else {
+            newImageUrl = oldImageUrl
+        }
+        return newImageUrl
+    }
+
     /**
      *
      * @return
@@ -192,15 +247,11 @@ class SendService {
         String newContent = textUtils.RandomReplaceTxt(oldContent, 80)
         return newContent
     }
-
-    public String makeImage2New(String oldUrl){
-
-    }
 }
 
 class MessageTaskBean {
     TSSendTaskESMap sendTaskESMap
-    TSRoomConfigESMap roomInfoESMap
+    TSRoomConfigESMap roomConfigESMap
     int taskType
 }
 

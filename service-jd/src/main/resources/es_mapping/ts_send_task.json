@@ -69,6 +69,12 @@
         }
       }
     },
+    "run_time": {
+      "type": "keyword"
+    },
+    "run_result": {
+      "type": "keyword"
+    },
     "createtime": {
       "type": "date",
       "format": "yyyy-MM-dd HH:mm:ss"

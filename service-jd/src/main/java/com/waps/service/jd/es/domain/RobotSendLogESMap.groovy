@@ -8,5 +8,6 @@ class RobotSendLogESMap extends ESBaseBean{
     String channel_name
     String task_id
     String sku_id
+    String run_result
     String create_time
 }

@@ -123,6 +123,7 @@ class MiniAppApiService {
         param.put("scene", qrParam.getScene())
         param.put("width", qrParam.getWidth())
         param.put("path", qrParam.getPage())
+        param.put("page", qrParam.getPage())
         param.put("auto_color", qrParam.getAuto_color())
         String json = JSONObject.toJSONString(param)
 

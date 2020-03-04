@@ -50,7 +50,7 @@
     <!--    &lt;!&ndash;<mvc:resources location="/admin/" mapping="/admin/**" cache-period="2592000"/>&ndash;&gt;-->
     <!--    &lt;!&ndash;<mvc:resources location="/manager/" mapping="/manager/**" cache-period="2592000"/>&ndash;&gt;-->
 
-    <context:component-scan base-package="com.waps.**"/>
+    <context:component-scan base-package="com.waps.**,cn.waps.**"/>
 
     <!--<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
     <!--<property name="locations">-->
