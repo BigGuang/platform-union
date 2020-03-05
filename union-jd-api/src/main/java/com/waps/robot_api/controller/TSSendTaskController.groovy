@@ -4,6 +4,7 @@ import com.waps.elastic.search.ESReturnList
 import com.waps.elastic.search.utils.SearchHitsUtils
 import com.waps.robot_api.service.TSSendTaskService
 import com.waps.service.jd.es.domain.TSSendTaskESMap
+import com.waps.service.jd.es.service.RobotSendLogESService
 import com.waps.service.jd.es.service.TSSendTaskESService
 import com.waps.tools.security.MD5
 import com.waps.union_jd_api.bean.ReturnMessageBean
@@ -11,7 +12,6 @@ import com.waps.union_jd_api.utils.DateUtils
 import com.waps.utils.ResponseUtils
 import com.waps.utils.StringUtils
 import org.elasticsearch.action.delete.DeleteResponse
-import org.elasticsearch.search.SearchHit
 import org.elasticsearch.search.SearchHits
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
@@ -27,9 +27,9 @@ import java.text.SimpleDateFormat
 @RequestMapping("/ts/robot/task")
 class TSSendTaskController {
     @Autowired
-    TSSendTaskService tsSendTaskService
+    private TSSendTaskService tsSendTaskService
     @Autowired
-    TSSendTaskESService tsSendTaskESService
+    private TSSendTaskESService tsSendTaskESService
 
     @RequestMapping(value = "/send")
     public void getToken(
@@ -122,4 +122,5 @@ class TSSendTaskController {
             ResponseUtils.write(response, new ReturnMessageBean(404, ""))
         }
     }
+
 }

@@ -10,4 +10,5 @@ class RobotSendLogESMap extends ESBaseBean{
     String sku_id
     String run_result
     String create_time
+    List<TSSendMessageESMap> message_list=new ArrayList<>()
 }

@@ -13,7 +13,6 @@ import com.waps.union_jd_api.utils.DateUtils
 import com.waps.utils.ResponseUtils
 import com.waps.utils.StringUtils
 import org.elasticsearch.action.delete.DeleteResponse
-import org.elasticsearch.action.get.GetResponse
 import org.elasticsearch.action.index.IndexResponse
 import org.elasticsearch.search.SearchHits
 import org.springframework.beans.factory.annotation.Autowired

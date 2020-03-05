@@ -141,6 +141,7 @@ class SendService {
             robotSendLogESMap.setSku_id(sendTaskESMap.getSku_id())
             robotSendLogESMap.setTask_id(sendTaskESMap.getId())
             robotSendLogESMap.setRun_result(runResultJson)
+            robotSendLogESMap.setMessage_list(sendTaskESMap.getMessage_list())
             robotSendLogESMap.setCreate_time(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
             robotSendLogESService.save(robotSendLogESMap.getId(), robotSendLogESMap)
             //群主自发消息发送状态更新

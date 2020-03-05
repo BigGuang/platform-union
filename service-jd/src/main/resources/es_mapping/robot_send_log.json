@@ -21,6 +21,37 @@
     "run_result": {
       "type": "keyword"
     },
+    "message_list": {
+      "properties": {
+        "nMsgNum": {
+          "type": "integer"
+        },
+        "nMsgType": {
+          "type": "integer"
+        },
+        "msgContent": {
+          "type": "text",
+          "fields": {
+            "raw": {
+              "type": "keyword"
+            }
+          },
+          "store": true
+        },
+        "nVoiceTime": {
+          "type": "integer"
+        },
+        "vcTitle": {
+          "type": "keyword"
+        },
+        "vcDesc": {
+          "type": "keyword"
+        },
+        "vcHref": {
+          "type": "keyword"
+        }
+      }
+    },
     "create_time": {
       "type": "date",
       "format": "yyyy-MM-dd HH:mm:ss"

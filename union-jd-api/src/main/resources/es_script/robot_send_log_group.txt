@@ -1,0 +1,56 @@
+{
+  "aggs": {
+    "group_by": {
+      "terms": {
+        "field": "robot_id",
+        "order": {
+          "_count": "desc"
+        },
+        "size": 10
+      }
+    }
+  },
+  "size": 0,
+  "_source": {
+    "excludes": []
+  },
+  "stored_fields": [
+    "*"
+  ],
+  "script_fields": {},
+  "docvalue_fields": [
+    {
+      "field": "create_time",
+      "format": "date_time"
+    }
+  ],
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_phrase": {
+            "message_list.nMsgType": {
+              "query": "${type}"
+            }
+          }
+        },
+        {
+          "range": {
+            "create_time": {
+              "format": "strict_date_optional_time",
+              "gte": "${day_start}T00:00:00.000Z",
+              "lte": "${day_end}T23:59:59.999Z"
+            }
+          }
+        }
+      ],
+      "filter": [
+        {
+          "match_all": {}
+        }
+      ],
+      "should": [],
+      "must_not": []
+    }
+  }
+}

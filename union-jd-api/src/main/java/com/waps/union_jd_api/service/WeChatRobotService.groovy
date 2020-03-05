@@ -30,6 +30,7 @@ class WeChatRobotService {
     final static String POST_WECHAT_PUBLIC_ACCOUNT_URL = "http://wx.wapg.cn/send"
 
     final static String CMD_HELP = "帮助,help"
+    final static String DOMAIN_HOST = ".wapg.cn"
     final static String CMD_CREATE_CHANNEL = "建群"
     final static String CMD_RED_PACKET = "红包"
 
@@ -132,9 +133,9 @@ class WeChatRobotService {
 
             if (jdMediaInfoESMaps != null) {
                 pid = jdMediaInfoESMaps.getChannel_id()
-                domain = jdMediaInfoESMaps.getDesc()
+//                domain = jdMediaInfoESMaps.getDesc()
+                domain = (jdMediaInfoESMaps.getChannel_name() + DOMAIN_HOST).toLowerCase()
             }
-
 
             //匹配出搜索词
             String search = getSearchWrods(content)
@@ -144,7 +145,7 @@ class WeChatRobotService {
                     sendMessageFlg = 1  //正常搜索回复内容
                     if (search.indexOf(CMD_RED_PACKET.trim()) > -1) {
                         sendMessageFlg = 11
-                    }else if (CMD_HELP.indexOf(search) > -1) {
+                    } else if (CMD_HELP.indexOf(search) > -1) {
                         sendMessageFlg = 3
                     } else if (CMD_CREATE_CHANNEL.indexOf(search) > -1) {
                         sendMessageFlg = 4

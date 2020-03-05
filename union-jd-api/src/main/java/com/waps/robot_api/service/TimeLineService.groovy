@@ -18,8 +18,8 @@ class TimeLineService {
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm")
 
         List<Date> timeLine = new ArrayList<>()
-        String startTime = "8:00"
-        long loopTime_5min = 5 * 1000 * 60 * 3  //循环时间，15分钟
+        String startTime = "8:03"
+        long loopTime_5min = 6 * 1000 * 60 * 3  //循环时间，18分钟
         Date currentTime = new Date()
         String nowDay = dayFormat.format(currentTime)
         Date fullDate = dateFormat.parse(nowDay + " " + startTime)
