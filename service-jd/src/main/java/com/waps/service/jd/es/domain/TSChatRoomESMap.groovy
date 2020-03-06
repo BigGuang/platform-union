@@ -68,6 +68,7 @@ class TSRoomConfigESMap extends ESBaseBean {
     String room_status
     String room_nick_name      //机器人在群内的昵称
     String send_status      //自定义发送消息的开关, 打开为open, 其他都视为close
+    String public_send_status  //接收统一发送消息开关，打开为open,其他都是为close
     String createtime
 }
 

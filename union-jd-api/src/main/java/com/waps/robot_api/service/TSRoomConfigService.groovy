@@ -54,6 +54,13 @@ class TSRoomConfigService {
             tsRoomConfigESService.update(id,"room_nick_name",inRoomNickName)
         }
     }
+
+    public void setRoomPublicSendStatus(String robot_id,String room_id,String public_send_status){
+        if(!StringUtils.isNull(robot_id) && !StringUtils.isNull(room_id)) {
+            String id = new MD5().getMD5(robot_id + room_id)
+            tsRoomConfigESService.update(id,"public_send_status",public_send_status)
+        }
+    }
 }
 
 class RoomConfigListBean {

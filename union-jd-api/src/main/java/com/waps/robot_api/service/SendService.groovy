@@ -81,15 +81,18 @@ class SendService {
                                 //todo:对文字内容做10%差异化处理
 
                                 //发送消息
-                                String robot_id = messageTaskBean.getRoomConfigESMap().getVcRobotSerialNo()
-                                String room_id = messageTaskBean.getRoomConfigESMap().getVcChatRoomSerialNo()
-                                String channel_id = messageTaskBean.getRoomConfigESMap().getChannel_id()
-                                String channel_name = messageTaskBean.getRoomConfigESMap().getChannel_name()
+                                TSRoomConfigESMap roomConfigESMap = messageTaskBean.getRoomConfigESMap()
+                                TSSendTaskESMap sendTaskESMap = messageTaskBean.getSendTaskESMap()
+                                String robot_id = roomConfigESMap.getVcRobotSerialNo()
+                                String room_id = roomConfigESMap.getVcChatRoomSerialNo()
+                                String channel_id = roomConfigESMap.getChannel_id()
+                                String channel_name = roomConfigESMap.getChannel_name()
                                 String action_id = UUID.randomUUID().toString()
-                                List<TSMessageBean> messageList = convertTask2Message(channel_name, messageTaskBean.getSendTaskESMap())
+                                List<TSMessageBean> messageList = convertTask2Message(channel_name, sendTaskESMap)
                                 if (messageList != null && messageList.size() > 0) {
                                     String retJson = tsRobotMessageService.sendChatRoomMessageList(robot_id, room_id, action_id, "", messageList)
                                     JSONObject retObj = JSONObject.parseObject(retJson)
+                                    sendTaskESMap.setMessage_list(messageList as List<TSSendMessageESMap>)
                                     if (retObj != null && retObj.getIntValue("nResult") == 1) {
                                         saveSendLog(messageTaskBean, retJson)
                                     }
@@ -123,38 +126,6 @@ class SendService {
 
     }
 
-    /**
-     * 记录发送日志
-     * @param messageTaskBean
-     * @param runResultJson
-     */
-    public void saveSendLog(MessageTaskBean messageTaskBean, String runResultJson) {
-        try {
-            RobotSendLogESMap robotSendLogESMap = new RobotSendLogESMap()
-            TSSendTaskESMap sendTaskESMap = messageTaskBean.getSendTaskESMap()
-            TSRoomConfigESMap roomConfigESMap = messageTaskBean.getRoomConfigESMap()
-            Long id = System.currentTimeMillis()
-            robotSendLogESMap.setId(id + "")
-            robotSendLogESMap.setRobot_id(roomConfigESMap.getVcRobotSerialNo())
-            robotSendLogESMap.setRoom_id(roomConfigESMap.getVcChatRoomSerialNo())
-            robotSendLogESMap.setChannel_name(roomConfigESMap.getChannel_name())
-            robotSendLogESMap.setSku_id(sendTaskESMap.getSku_id())
-            robotSendLogESMap.setTask_id(sendTaskESMap.getId())
-            robotSendLogESMap.setRun_result(runResultJson)
-            robotSendLogESMap.setMessage_list(sendTaskESMap.getMessage_list())
-            robotSendLogESMap.setCreate_time(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
-            robotSendLogESService.save(robotSendLogESMap.getId(), robotSendLogESMap)
-            //群主自发消息发送状态更新
-            if (!StringUtils.isNull(messageTaskBean.getSendTaskESMap().getTarget_channel_name())) {
-                Map updateParams = new HashMap()
-                updateParams.put("run_time", DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
-                updateParams.put("run_result", runResultJson)
-                tsSendTaskUserESService.update(sendTaskESMap.getId(), updateParams)
-            }
-        } catch (Exception e) {
-            println "==saveSendLog ERROR:" + e.getLocalizedMessage()
-        }
-    }
 
     /**
      * 发送任务中的信息转换成机器人需要的对象
@@ -247,6 +218,40 @@ class SendService {
         TxtUtils textUtils = new TxtUtils()
         String newContent = textUtils.RandomReplaceTxt(oldContent, 80)
         return newContent
+    }
+
+
+    /**
+     * 记录发送日志
+     * @param messageTaskBean
+     * @param runResultJson
+     */
+    public void saveSendLog(MessageTaskBean messageTaskBean, String runResultJson) {
+        try {
+            RobotSendLogESMap robotSendLogESMap = new RobotSendLogESMap()
+            TSSendTaskESMap sendTaskESMap = messageTaskBean.getSendTaskESMap()
+            TSRoomConfigESMap roomConfigESMap = messageTaskBean.getRoomConfigESMap()
+            Long id = System.currentTimeMillis()
+            robotSendLogESMap.setId(id + "")
+            robotSendLogESMap.setRobot_id(roomConfigESMap.getVcRobotSerialNo())
+            robotSendLogESMap.setRoom_id(roomConfigESMap.getVcChatRoomSerialNo())
+            robotSendLogESMap.setChannel_name(roomConfigESMap.getChannel_name())
+            robotSendLogESMap.setSku_id(sendTaskESMap.getSku_id())
+            robotSendLogESMap.setTask_id(sendTaskESMap.getId())
+            robotSendLogESMap.setRun_result(runResultJson)
+            robotSendLogESMap.setMessage_list(sendTaskESMap.getMessage_list())
+            robotSendLogESMap.setCreate_time(DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
+            robotSendLogESService.save(robotSendLogESMap.getId(), robotSendLogESMap)
+            //群主自发消息发送状态更新
+            if (!StringUtils.isNull(messageTaskBean.getSendTaskESMap().getTarget_channel_name())) {
+                Map updateParams = new HashMap()
+                updateParams.put("run_time", DateUtils.timeTmp2DateStr(System.currentTimeMillis() + ""))
+                updateParams.put("run_result", runResultJson)
+                tsSendTaskUserESService.update(sendTaskESMap.getId(), updateParams)
+            }
+        } catch (Exception e) {
+            println "==saveSendLog ERROR:" + e.getLocalizedMessage()
+        }
     }
 }
 

@@ -51,6 +51,9 @@
     "send_status": {
       "type": "keyword"
     },
+    "public_send_status": {
+      "type": "keyword"
+    },
     "room_nick_name": {
       "type": "keyword"
     },

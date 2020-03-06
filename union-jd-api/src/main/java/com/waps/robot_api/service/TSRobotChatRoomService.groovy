@@ -79,6 +79,9 @@ class TSRobotChatRoomService {
             if (!StringUtils.isNull(tsRoomInfoESMap.getRoom_status())) {
                 room.setRoom_status(tsRoomInfoESMap.getRoom_status())
             }
+            if (!StringUtils.isNull(tsRoomInfoESMap.getPublic_send_status())) {
+                room.setPublic_send_status(tsRoomInfoESMap.getPublic_send_status())
+            }
             if (!StringUtils.isNull(tsRoomInfoESMap.getCreatetime())) {
                 room.setCreatetime(tsRoomInfoESMap.getCreatetime())
             }

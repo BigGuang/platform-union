@@ -1,0 +1,18 @@
+{
+  "list": [
+    {
+      "id": "share_1",
+      "share_image_url": "https://jd.wapg.cn/images/mini_share.png",
+      "share_title": "好友邀请您享受京东99%的商品优惠",
+      "share_desc": "",
+      "page": "/pages/index/index"
+    },
+    {
+      "id": "share_2",
+      "share_image_url": "https://jd.wapg.cn/images/mini_share.png",
+      "share_title": "好友分享给你一个搜索优惠券的神器",
+      "share_desc": "",
+      "page": "/pages/index/index"
+    }
+  ]
+}

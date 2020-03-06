@@ -138,9 +138,9 @@ class TSSendTaskService {
                 String _last_send_time = tsSendTaskESMap.getSend_time()
                 if (!StringUtils.isNull(_last_send_time)) {
                     new_send_date = send_day + " " + _last_send_time
-                    Date lastTime=dateFormat.parse(new_send_date)
-                    if(lastTime.before(currentTime)){
-                        new_send_date=dateFormat.format(currentTime)
+                    Date lastTime = dateFormat.parse(new_send_date)
+                    if (lastTime.before(currentTime)) {
+                        new_send_date = dateFormat.format(currentTime)
                     }
                     println "=最近一轮时间:" + new_send_date
                 }
@@ -187,25 +187,17 @@ class TSSendTaskService {
                 List<TSRoomConfigESMap> roomList = robotRoom.getList()
                 println "===" + roomList.size() + " 个群聊发送"
                 for (TSRoomConfigESMap roomInfoESMap : roomList) {
-                    if (!StringUtils.isNull(roomInfoESMap.getSend_status()) && "open" == roomInfoESMap.getSend_status()) {
-                        boolean flg = checkSendStatus(sendTaskESMap, roomInfoESMap)
-                        //如果有群主提交的文案，优先发群主提交的文案
-                        if (flg) {
-                            MessageTaskBean messageTaskBean = new MessageTaskBean()
-                            messageTaskBean.setSendTaskESMap(sendTaskESMap)
-                            messageTaskBean.setRoomConfigESMap(roomInfoESMap)
-//                            println "@@@@@@@@@@  发送 " + roomInfoESMap.vcName + "@@@@@@@@@@"
-//                            for (TSSendMessageESMap messageESMap : messageTaskBean.getSendTaskESMap().getMessage_list()) {
-//                                println messageESMap.getMsgContent()
-//                            }
-                            sendMap.put(roomInfoESMap.getVcChatRoomSerialNo(), messageTaskBean)
-                        }
-                    } else {
-//                        println roomInfoESMap.getVcName() + " send_status:" + roomInfoESMap.getSend_status() + " 已关闭发送"
+                    boolean flg = checkSendStatus(sendTaskESMap, roomInfoESMap)
+                    //如果有群主提交的文案，优先发群主提交的文案
+                    if (flg) {
+                        MessageTaskBean messageTaskBean = new MessageTaskBean()
+                        messageTaskBean.setSendTaskESMap(sendTaskESMap)
+                        messageTaskBean.setRoomConfigESMap(roomInfoESMap)
+                        sendMap.put(roomInfoESMap.getVcChatRoomSerialNo(), messageTaskBean)
                     }
                 }
             }
-            println "sendMap.size="+sendMap.size()
+            println "sendMap.size=" + sendMap.size()
             if (sendMap.size() > 0) {
                 List<MessageTaskBean> _sendList = new ArrayList<>()
                 Iterator it = sendMap.keySet().iterator()
@@ -224,14 +216,14 @@ class TSSendTaskService {
     }
 
 
-    public void testSendList(List<MessageTaskBean> _sendList){
-        println "_sendList:"+_sendList.size()
-        for(MessageTaskBean messageTaskBean:_sendList){
-            println "===发送群:"+messageTaskBean.getRoomConfigESMap().getVcName()+"  "+messageTaskBean.getRoomConfigESMap().getChannel_name()
+    public void testSendList(List<MessageTaskBean> _sendList) {
+        println "_sendList:" + _sendList.size()
+        for (MessageTaskBean messageTaskBean : _sendList) {
+            println "===发送群:" + messageTaskBean.getRoomConfigESMap().getVcName() + "  " + messageTaskBean.getRoomConfigESMap().getChannel_name()
             println "===发送内容==="
-            TSSendTaskESMap sendTaskESMap=messageTaskBean.getSendTaskESMap()
-            if(sendTaskESMap!=null) {
-                tsSendTaskUserESService.update(sendTaskESMap.getId(),"task_status",1)
+            TSSendTaskESMap sendTaskESMap = messageTaskBean.getSendTaskESMap()
+            if (sendTaskESMap != null) {
+                tsSendTaskUserESService.update(sendTaskESMap.getId(), "task_status", 1)
                 List<TSSendMessageESMap> _list = sendTaskESMap.getMessage_list()
                 for (TSSendMessageESMap messageESMap : _list) {
                     println messageESMap.getnMsgType()
@@ -270,20 +262,37 @@ class TSSendTaskService {
     }
 
 
+    /**
+     * 发送条件综合判断
+     * @param tsSendTaskESMap
+     * @param roomInfoESMap
+     * @return
+     */
     public boolean checkSendStatus(TSSendTaskESMap tsSendTaskESMap, TSRoomConfigESMap roomInfoESMap) {
         boolean flg = true
+        String message = ""
         //机器人在群里
         if (roomInfoESMap.nRobotInStatus != 0) {
             flg = false
+            message = "机器人不在群中:" + roomInfoESMap.getVcName()
         }
+
         //对应群号得存在
         if (flg && StringUtils.isNull(roomInfoESMap.getChannel_name())) {
             flg = false
+            message = "群号不存在"
+        }
+        if (!StringUtils.isNull(roomInfoESMap.getSend_status()) && "open" == roomInfoESMap.getSend_status()) {
+            flg = true
+        } else {
+            flg = false
+            message = "未开放消息发送"
         }
         //判断是否在黑名单中
         if (flg && !StringUtils.isNull(tsSendTaskESMap.getBlack_channel_name())
                 && tsSendTaskESMap.getBlack_channel_name().toLowerCase().indexOf(roomInfoESMap.getChannel_name().toLowerCase()) > -1) {
             flg = false
+            message = "在发送黑名单中"
         }
 
         if (flg) {
@@ -293,11 +302,19 @@ class TSSendTaskService {
                     flg = true
                 } else {
                     flg = false
+                    message = "不在指定接收群中"
                 }
             } else {
-                flg = true
+                //判断是否接受公用的发送
+                if (!StringUtils.isNull(roomInfoESMap.getPublic_send_status()) && "close" == roomInfoESMap.getPublic_send_status()) {
+                    flg = false
+                    message = "不接收公共群发消息"
+                } else {
+                    flg = true
+                }
             }
         }
+        println "checkSendStatus message:" + message
         return flg
     }
 }

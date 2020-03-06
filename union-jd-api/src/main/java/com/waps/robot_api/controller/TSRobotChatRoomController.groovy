@@ -158,7 +158,7 @@ class TSRobotChatRoomController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        String channel_name=""
+        String channel_name = ""
         if (!StringUtils.isNull(params.getChannel_name())) {
             channel_name = params.getChannel_name().toLowerCase()
         }
@@ -197,6 +197,22 @@ class TSRobotChatRoomController {
             HttpServletResponse response
     ) {
         String retStr = tsRoomConfigService.setRoomSendStatus(params.getRobot_id(), params.getRoom_id(), params.getSend_status())
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", retStr))
+    }
+
+    /**
+     * 设置群可发送状态，设置是否开启文案发送
+     * @param params
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "/room_public_send_status")
+    public void room_public_send_status(
+            @RequestBody ConfigRoomSendStatusParams params,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        String retStr = tsRoomConfigService.setRoomPublicSendStatus(params.getRobot_id(), params.getRoom_id(), params.getSend_status())
         ResponseUtils.write(response, new ReturnMessageBean(200, "", retStr))
     }
 
