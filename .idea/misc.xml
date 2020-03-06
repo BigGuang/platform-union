@@ -14,12 +14,8 @@
         <option value="$PROJECT_DIR$/common-esclient/pom.xml" />
         <option value="$PROJECT_DIR$/service-jd/pom.xml" />
         <option value="$PROJECT_DIR$/union-jd-pai/pom.xml" />
-      </list>
-    </option>
-    <option name="ignoredFiles">
-      <set>
         <option value="$PROJECT_DIR$/commons-esclient/pom.xml" />
-      </set>
+      </list>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false" project-jdk-name="1.8" project-jdk-type="JavaSDK">
