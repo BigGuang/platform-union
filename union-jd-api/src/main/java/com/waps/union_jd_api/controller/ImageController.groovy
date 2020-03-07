@@ -1,8 +1,12 @@
 package com.waps.union_jd_api.controller
 
+import com.alibaba.fastjson.JSONArray
+import com.alibaba.fastjson.JSONObject
 import com.waps.tools.security.MD5
 import com.waps.tools.test.TestUtils
 import com.waps.union_jd_api.bean.ReturnMessageBean
+import com.waps.union_jd_api.service.ElementBean
+import com.waps.union_jd_api.service.ImageService
 import com.waps.union_jd_api.utils.FFMpegUtils
 import com.waps.union_jd_api.utils.FileMD5
 import com.waps.union_jd_api.utils.ImageUtils
@@ -10,6 +14,7 @@ import com.waps.union_jd_api.utils.VideoInfo
 import com.waps.utils.ConfigUtils
 import com.waps.utils.ResponseUtils
 import com.waps.utils.StringUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -24,15 +29,17 @@ import java.text.SimpleDateFormat
 @Controller
 @RequestMapping("/image")
 class ImageController {
+    @Autowired
+    ImageService imageService
 
     @RequestMapping(value = "/upload")
     public void upLoad(HttpServletRequest request,
-                                      HttpServletResponse response) throws Exception {
+                       HttpServletResponse response) throws Exception {
         println "==upload=="
         try {
             MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
             MultipartFile multipartFile = req.getFile("file");
-            println "===multipartFile.getContentType():"+multipartFile.getContentType()
+            println "===multipartFile.getContentType():" + multipartFile.getContentType()
             String type = ".jpg"
             if (multipartFile.getContentType() == "image/jpeg") {
                 type = ".jpg"
@@ -61,10 +68,10 @@ class ImageController {
             println saveRealPath
             println url
             multipartFile.transferTo(new File(saveRealPath))
-            if(saveRealPath.endsWith(".mp4")){
-                String ret=FFMpegUtils.getAutoScreenShot(saveRealPath,saveRealDir)
+            if (saveRealPath.endsWith(".mp4")) {
+                String ret = FFMpegUtils.getAutoScreenShot(saveRealPath, saveRealDir)
                 println ret
-                VideoInfo videoInfo=FFMpegUtils.getVideoINFO(saveRealPath)
+                VideoInfo videoInfo = FFMpegUtils.getVideoINFO(saveRealPath)
                 TestUtils.outPrint(videoInfo)
             }
 
@@ -95,8 +102,37 @@ class ImageController {
     }
 
 
+    @RequestMapping(value = "/make")
+    public void make(
+            HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        List<ElementBean> elementBeanList = new ArrayList<>()
+        File file = new File("/Users/xguang/temp06/share_img.json")
+        StringBuffer buffer = new StringBuffer()
+        file.eachLine { line ->
+            buffer.append(line)
+        }
+        println buffer.toString()
+        JSONObject configObj = JSONObject.parseObject(buffer.toString())
+        JSONArray array = configObj.getJSONArray("list")
+        if (array != null) {
+            println array
+            for (int i = 0; i < array.size(); i++) {
+                JSONObject jsonObject = array.getJSONObject(i)
+                println jsonObject
+                ElementBean elementBean = jsonObject.toJavaObject(ElementBean.class) as ElementBean
+                elementBeanList.add(elementBean)
+            }
+            imageService.makeImage(elementBeanList, "png", response)
+        }
+    }
+
 }
 
 class ImagesBean {
     String[] img_list
+}
+
+class MakeImageParams {
+    List<ElementBean> list = new ArrayList<>()
 }

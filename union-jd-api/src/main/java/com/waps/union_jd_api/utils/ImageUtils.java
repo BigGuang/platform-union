@@ -1,5 +1,7 @@
 package com.waps.union_jd_api.utils;
 
+import com.alibaba.fastjson.JSONArray;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
