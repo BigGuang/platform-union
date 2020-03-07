@@ -1,0 +1,63 @@
+{
+  "aggs": {
+    "group_by": {
+      "terms": {
+        "field": "room_id",
+        "order": {
+          "_count": "desc"
+        },
+        "size": 100
+      }
+    }
+  },
+  "size": 0,
+  "_source": {
+    "excludes": []
+  },
+  "stored_fields": [
+    "*"
+  ],
+  "script_fields": {},
+  "docvalue_fields": [
+    {
+      "field": "create_time",
+      "format": "date_time"
+    }
+  ],
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_phrase": {
+            "message_list.nMsgType": {
+              "query": "2001"
+            }
+          }
+        }
+        <#if robot_id??>
+        ,{
+          "match_phrase": {
+            "robot_id": "${robot_id}"
+          }
+        }
+        </#if>
+        ,{
+          "range": {
+            "create_time": {
+              "format": "strict_date_optional_time",
+              "gte": "${day_start}T00:00:00.000Z",
+              "lte": "${day_end}T23:59:59.999Z"
+            }
+          }
+        }
+      ],
+      "filter": [
+        {
+          "match_all": {}
+        }
+      ],
+      "should": [],
+      "must_not": []
+    }
+  }
+}

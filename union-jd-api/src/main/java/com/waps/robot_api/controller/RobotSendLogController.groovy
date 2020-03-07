@@ -39,7 +39,7 @@ class RobotSendLogController {
         ResponseUtils.write(response, new ReturnMessageBean(200, "", esReturnList))
     }
 
-    @RequestMapping(value = "/count")
+    @RequestMapping(value = "/count_robot")
     public void groupCount(
             @RequestParam(value = "type", required = true) String type,
             @RequestParam(value = "date_day", required = true) String date_day,
@@ -50,7 +50,25 @@ class RobotSendLogController {
         params.put("type", type)
         params.put("day_start", date_day)
         params.put("day_end", date_day)
-        Aggregations aggregations = robotSendLogESService.groupByFreeMarkerFromResource("es_script/robot_send_log_group.txt", params)
+        Aggregations aggregations = robotSendLogESService.groupByFreeMarkerFromResource("es_script/robot_send_log_groupby_robot.txt", params)
+        LinkedHashMap linkedHashMap = AggregationsUtils.getAggReturnMap(aggregations,"group_by")
+        ResponseUtils.write(response, new ReturnMessageBean(200, "", linkedHashMap))
+    }
+
+    @RequestMapping(value = "/count_room")
+    public void groupCountRoom(
+            @RequestParam(value = "robot_id", required = false) String robot_id,
+            @RequestParam(value = "type", required = true) String type,
+            @RequestParam(value = "date_day", required = true) String date_day,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        HashMap params = new HashMap()
+        params.put("robot_id", robot_id)
+        params.put("type", type)
+        params.put("day_start", date_day)
+        params.put("day_end", date_day)
+        Aggregations aggregations = robotSendLogESService.groupByFreeMarkerFromResource("es_script/robot_send_log_groupby_room.txt", params)
         LinkedHashMap linkedHashMap = AggregationsUtils.getAggReturnMap(aggregations,"group_by")
         ResponseUtils.write(response, new ReturnMessageBean(200, "", linkedHashMap))
     }
