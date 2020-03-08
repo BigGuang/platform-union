@@ -2,6 +2,9 @@ package com.waps.union_jd_api.controller
 
 import com.alibaba.fastjson.JSONArray
 import com.alibaba.fastjson.JSONObject
+import com.waps.service.jd.api.bean.SearchParams
+import com.waps.service.jd.api.service.JdUnionService
+import com.waps.service.jd.es.domain.JDSkuInfoESMap
 import com.waps.tools.security.MD5
 import com.waps.tools.test.TestUtils
 import com.waps.union_jd_api.bean.ReturnMessageBean
@@ -10,15 +13,24 @@ import com.waps.union_jd_api.service.ImageService
 import com.waps.union_jd_api.utils.FFMpegUtils
 import com.waps.union_jd_api.utils.FileMD5
 import com.waps.union_jd_api.utils.ImageUtils
+import com.waps.union_jd_api.utils.JDConfig
 import com.waps.union_jd_api.utils.VideoInfo
 import com.waps.utils.ConfigUtils
 import com.waps.utils.ResponseUtils
 import com.waps.utils.StringUtils
+import com.waps.utils.TemplateUtils
+import jd.union.open.goods.promotiongoodsinfo.query.response.PromotionGoodsResp
+import jd.union.open.goods.promotiongoodsinfo.query.response.UnionOpenGoodsPromotiongoodsinfoQueryResponse
+import jd.union.open.goods.query.response.Coupon
+import jd.union.open.goods.query.response.GoodsResp
+import jd.union.open.goods.query.response.UnionOpenGoodsQueryResponse
+import jd.union.open.goods.query.response.UrlInfo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
@@ -31,6 +43,8 @@ import java.text.SimpleDateFormat
 class ImageController {
     @Autowired
     ImageService imageService
+    @Autowired
+    private JdUnionService jdUnionService
 
     @RequestMapping(value = "/upload")
     public void upLoad(HttpServletRequest request,
@@ -104,26 +118,62 @@ class ImageController {
 
     @RequestMapping(value = "/make")
     public void make(
+            @RequestParam(value = "sku_id", required = false) Long skuID,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        List<ElementBean> elementBeanList = new ArrayList<>()
-        File file = new File("/Users/xguang/temp06/share_img.json")
-        StringBuffer buffer = new StringBuffer()
-        file.eachLine { line ->
-            buffer.append(line)
-        }
-        println buffer.toString()
-        JSONObject configObj = JSONObject.parseObject(buffer.toString())
-        JSONArray array = configObj.getJSONArray("list")
-        if (array != null) {
-            println array
-            for (int i = 0; i < array.size(); i++) {
-                JSONObject jsonObject = array.getJSONObject(i)
-                println jsonObject
-                ElementBean elementBean = jsonObject.toJavaObject(ElementBean.class) as ElementBean
-                elementBeanList.add(elementBean)
+
+        Map params = new HashMap()
+        if (skuID!=null && skuID>0) {
+            SearchParams searchParams = new SearchParams()
+            searchParams.setApp_key(JDConfig.APP_KEY)
+            searchParams.setApp_secret(JDConfig.SECRET_KEY)
+            searchParams.setPageIndex(1)
+            searchParams.setPageSize(1)
+            searchParams.setSkuIds(skuID as Long)
+            UnionOpenGoodsQueryResponse goodsResponse = jdUnionService.getGoodsQueryRequest(searchParams);
+            if (goodsResponse.getCode() == 200) {
+                if (goodsResponse.getData().size() > 0) {
+                    GoodsResp goodsResp = goodsResponse.getData()[0];
+                    UrlInfo skuImage = goodsResp.getImageInfo().getImageList()[0]
+                    params.put("sku_img", skuImage.getUrl())
+                    params.put("sku_name", goodsResp.getSkuName())
+                    params.put("sku_price", goodsResp.getPriceInfo().getPrice())
+                    params.put("sku_new_price", goodsResp.getPriceInfo().getLowestPriceType())
+                    Double couponPrice = 0
+                    if (goodsResp.getCouponInfo().getCouponList().size() > 0) {
+                        for (Coupon coupon : goodsResp.getCouponInfo().getCouponList()) {
+                            if (coupon.isBest) {
+                                couponPrice = coupon.getDiscount()
+                                break
+                            }
+                        }
+                    }
+                    Double newPrice= (goodsResp.getPriceInfo().getPrice() - couponPrice)
+                    params.put("sku_new_price", newPrice)
+                    params.put("sku_coupon", couponPrice)
+                }
             }
-            imageService.makeImage(elementBeanList, "png", response)
+
+            if (params.size() > 0) {
+                List<ElementBean> elementBeanList = new ArrayList<>()
+                String makeJsonConfig = new TemplateUtils().getFreeMarkerFromResource("image_maker/share_img.json", params, "UTF-8")
+                JSONObject configObj = JSONObject.parseObject(makeJsonConfig)
+                JSONArray array = configObj.getJSONArray("list")
+                if (array != null) {
+                    println array
+                    for (int i = 0; i < array.size(); i++) {
+                        JSONObject jsonObject = array.getJSONObject(i)
+                        println jsonObject
+                        ElementBean elementBean = jsonObject.toJavaObject(ElementBean.class) as ElementBean
+                        elementBeanList.add(elementBean)
+                    }
+                    imageService.makeImage(elementBeanList, "png", response)
+                }
+            } else {
+
+            }
+        } else {
+
         }
     }
 

@@ -130,6 +130,28 @@ public class JdUnionService {
         }
     }
 
+    public UnionOpenGoodsQueryResponse getGoodsQueryRequest(SearchParams searchParams) {
+        JdClient client = new DefaultJdClient(SERVER_URL, accessToken, searchParams.getApp_key(), searchParams.getApp_secret());
+
+        UnionOpenGoodsQueryRequest request = new UnionOpenGoodsQueryRequest();
+        GoodsReq goodsReq = new GoodsReq();
+
+        if (searchParams != null) {
+            goodsReq = searchParams;
+        }
+
+        request.setGoodsReqDTO(goodsReq);
+        try {
+            UnionOpenGoodsQueryResponse response = client.execute(request);
+            response.setSysOriginalMsg("");
+            response.setSysRequestUrl("");
+            return response;
+        } catch (JdException e) {
+            System.out.println(e.getLocalizedMessage());
+            return null;
+        }
+    }
+
 
     /**
      * 优惠券领取情况查询接口【申请】jd.union.open.coupon.query

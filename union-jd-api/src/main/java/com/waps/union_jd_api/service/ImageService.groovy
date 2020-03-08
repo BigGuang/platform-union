@@ -10,7 +10,8 @@ import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics2D
-import java.awt.geom.Ellipse2D
+import java.awt.GraphicsEnvironment
+import java.awt.geom.RoundRectangle2D
 import java.awt.image.BufferedImage
 import java.awt.RenderingHints
 
@@ -19,6 +20,8 @@ class ImageService {
     static int width = 720
     static int height = 570
     private Font font
+    private int wordLine = 0
+    private int wordMaxLine = 3
     private BufferedImage bufferedImage;
     private Graphics2D graphics
 
@@ -39,32 +42,40 @@ class ImageService {
         this.graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         // 消除文字锯齿
         this.graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); // 消除图片锯齿
+
+
+        GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        String[] fontNames = e.getAvailableFontFamilyNames();
+        for (String fontName : fontNames) {
+            System.out.println(fontName);
+        }
     }
 
     public String makeImage(List<ElementBean> elementBeanList, String type, HttpServletResponse response) {
         this.init(true)
-        for (ElementBean element : elementBeanList) {
-            String _type = element.getType()
+        for (ElementBean el : elementBeanList) {
+            String _type = el.getType()
             switch (_type) {
                 case "text":
-                    this.font = new Font("黑体", Font.PLAIN, element.getSize())
-                    drawWord(element.getText(), element.getColor(), this.font, element.getX(), element.getY())
+                    this.font = new Font(el.getFont(), Font.PLAIN, el.getSize())
+                    drawWord(el.getText(), el.getColor(), this.font,el.getInterval(), el.getX(), el.getY())
                     break
 
                 case "text-blod":
-                    this.font = new Font("黑体", Font.BOLD, element.getSize())
-                    drawWord(element.getText(), element.getX(), element.getY())
+                    this.font = new Font(el.getFont(), Font.BOLD, el.getSize())
+                    drawWord(el.getText(),el.getInterval(), el.getX(), el.getY())
                     break
 
                 case "img":
-                    drawImage(element.getUrl(), element.getX(), element.getY(), element.getW(), element.getH())
+                    drawImage(el.getUrl(), el.getX(), el.getY(), el.getW(), el.getH())
                     break
 
-                case "ar":
-                    drawArea(element.getX(), element.getY(), element.getW(), element.getH(), element.getColor())
+                case "area":
+                    drawArea(el.getX(), el.getY(), el.getW(), el.getH(), el.getColor())
                     break
 
                 case "area-round":
+                    drawAreaRound(el.getX(), el.getY(), el.getW(), el.getH(), el.getArc(), el.getColor())
                     break
 
             }
@@ -91,25 +102,62 @@ class ImageService {
         ImageIO.write(bufferedImage, _type, outputStream)
     }
 
+    /**
+     * 矩形
+     * @param x
+     * @param y
+     * @param w
+     * @param h
+     * @param colorStr
+     */
     public void drawArea(int x, int y, int w, int h, String colorStr) {
         this.graphics.drawRect(x, y, w, h)//画线框
         this.graphics.setColor(toColorFromString(colorStr))
         this.graphics.fillRect(x, y, w, h)//画着色块
     }
 
+    /**
+     * 圆角矩形
+     * @param x
+     * @param y
+     * @param w
+     * @param h
+     */
+    public void drawAreaRound(int x, int y, int w, int h, int arc, String colorStr) {
+        this.graphics.setColor(toColorFromString(colorStr))
+        RoundRectangle2D rect = new RoundRectangle2D.Double(x, y, w, h, arc, arc)
+        this.graphics.draw(rect);
+    }
+
+    /**
+     * 将一个在线图片绘制下来
+     * @param imgUrl
+     * @param x
+     * @param y
+     * @param w
+     * @param h
+     * @throws FileNotFoundException* @throws IOException
+     */
     public void drawImage(String imgUrl, int x, int y, int w, int h) throws FileNotFoundException, IOException {
         ArrayList<BufferedImage> imgList = ImageUtils.downloadImages(imgUrl)
         BufferedImage _bufferImg = imgList.get(0)
         this.graphics.drawImage(_bufferImg, x, y, w, h, null);    // 写入图片
     }
 
-
-    public void drawWord(String content, String colorStr, Font font, int x, int y) {
-        drawWord(content, 0, x, y, font, 5, toColorFromString(colorStr))
+    /**
+     * 绘制文本，自动换行
+     * @param content
+     * @param colorStr
+     * @param font
+     * @param x
+     * @param y
+     */
+    public void drawWord(String content, String colorStr, Font font,int interval, int x, int y) {
+        drawWord(content, interval, x, y, font, wordLine, toColorFromString(colorStr))
     }
 
-    public void drawWord(String content, int x, int y) {
-        drawWord(content, 0, x, y, this.font, 5, Color.BLACK);
+    public void drawWord(String content,int interval, int x, int y) {
+        drawWord(content, interval, x, y, this.font, wordLine, Color.BLACK);
     }
 
     /**
@@ -134,8 +182,13 @@ class ImageService {
             result = y + fontSize;
             this.graphics.drawString(content, x, y + fontSize); // 文字画入画布中
         } else { // 文字超出一行处理
-            List<Integer> oneLineCharNumber = getOneLineCharNumber(content, oneLineWidth);
-            for (int i = 0; i < oneLineCharNumber.size(); i++) {
+            List<Integer> oneLineCharNumber = getOneLineCharNumber(content, oneLineWidth)
+            //控制文字显示在几行内
+            int num = wordMaxLine
+            if (oneLineCharNumber.size() < num) {
+                num = oneLineCharNumber.size()
+            }
+            for (int i = 0; i < num; i++) {
                 String string = "";
                 if (i == 0) {
                     result = y + fontSize;
@@ -143,6 +196,10 @@ class ImageService {
                 } else {
                     result = y + (fontSize + (fontSize * i));
                     string = content.substring(oneLineCharNumber.get(i - 1), oneLineCharNumber.get(i));
+                }
+                //最后一行
+                if(i==(num-1)){
+                    string=string.substring(0,string.length()-1)+"..."
                 }
                 this.graphics.drawString(string, x, result); // 文字画入画布中
             }
@@ -226,7 +283,7 @@ class ImageService {
                 start = i + 1;
             }
         }
-        list.add(charArray.length);
+        list.add(charArray.length)
 
         return list;
     }
@@ -234,13 +291,12 @@ class ImageService {
     /**
      * 字符串转换成Color对象
      * @param colorStr 16进制颜色字符串
-     * @return Color对象*        */
+     * @return Color对象*           */
     public static Color toColorFromString(String colorStr) {
         try {
-            colorStr = colorStr.substring(4)
-            Color color = new Color(Integer.parseInt(colorStr, 16))
-            //java.awt.Color[r=0,g=0,b=255]
-            return color;
+            colorStr = colorStr.replaceAll("#", "")
+            int i = Integer.parseInt(colorStr, 16)
+            return new Color(i);
         } catch (Exception e) {
             return Color.black
         }
@@ -252,9 +308,12 @@ class ElementBean {
     String url
     String text
     String color
+    String font="宋体"
     int size
     int x = 0
     int y = 0
     int w
     int h
+    int arc = 0
+    int interval=20   //文字左右间隔
 }
