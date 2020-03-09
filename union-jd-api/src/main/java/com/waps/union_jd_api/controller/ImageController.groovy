@@ -118,18 +118,21 @@ class ImageController {
 
     @RequestMapping(value = "/make")
     public void make(
+            @RequestParam(value = "from", required = false) Long from,
             @RequestParam(value = "sku_id", required = false) Long skuID,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-
+        String template = "image_maker/share_img.txt"
         Map params = new HashMap()
-        if (skuID!=null && skuID>0) {
+        params.put("sku_img", "http://jd.wapg.cn/images/share_02.png")
+        if (skuID != null && skuID > 0) {
             SearchParams searchParams = new SearchParams()
             searchParams.setApp_key(JDConfig.APP_KEY)
             searchParams.setApp_secret(JDConfig.SECRET_KEY)
             searchParams.setPageIndex(1)
             searchParams.setPageSize(1)
             searchParams.setSkuIds(skuID as Long)
+            Double couponPrice = 0
             UnionOpenGoodsQueryResponse goodsResponse = jdUnionService.getGoodsQueryRequest(searchParams);
             if (goodsResponse.getCode() == 200) {
                 if (goodsResponse.getData().size() > 0) {
@@ -137,9 +140,9 @@ class ImageController {
                     UrlInfo skuImage = goodsResp.getImageInfo().getImageList()[0]
                     params.put("sku_img", skuImage.getUrl())
                     params.put("sku_name", goodsResp.getSkuName())
-                    params.put("sku_price", goodsResp.getPriceInfo().getPrice())
-                    params.put("sku_new_price", goodsResp.getPriceInfo().getLowestPriceType())
-                    Double couponPrice = 0
+                    params.put("sku_price", goodsResp.getPriceInfo().getLowestPrice())
+                    params.put("sku_new_price", goodsResp.getPriceInfo().getLowestPrice())
+
                     if (goodsResp.getCouponInfo().getCouponList().size() > 0) {
                         for (Coupon coupon : goodsResp.getCouponInfo().getCouponList()) {
                             if (coupon.isBest) {
@@ -148,32 +151,29 @@ class ImageController {
                             }
                         }
                     }
-                    Double newPrice= (goodsResp.getPriceInfo().getPrice() - couponPrice)
+                    Double newPrice = (goodsResp.getPriceInfo().getLowestPrice() - couponPrice)
                     params.put("sku_new_price", newPrice)
                     params.put("sku_coupon", couponPrice)
                 }
             }
-
-            if (params.size() > 0) {
-                List<ElementBean> elementBeanList = new ArrayList<>()
-                String makeJsonConfig = new TemplateUtils().getFreeMarkerFromResource("image_maker/share_img.json", params, "UTF-8")
-                JSONObject configObj = JSONObject.parseObject(makeJsonConfig)
-                JSONArray array = configObj.getJSONArray("list")
-                if (array != null) {
-                    println array
-                    for (int i = 0; i < array.size(); i++) {
-                        JSONObject jsonObject = array.getJSONObject(i)
-                        println jsonObject
-                        ElementBean elementBean = jsonObject.toJavaObject(ElementBean.class) as ElementBean
-                        elementBeanList.add(elementBean)
-                    }
-                    imageService.makeImage(elementBeanList, "png", response)
-                }
-            } else {
-
+            if (couponPrice > 0) {
+                template = "image_maker/share_img_coupon.txt"
             }
-        } else {
 
+        }
+        List<ElementBean> elementBeanList = new ArrayList<>()
+        String makeJsonConfig = new TemplateUtils().getFreeMarkerFromResource(template, params, "UTF-8")
+        JSONObject configObj = JSONObject.parseObject(makeJsonConfig)
+        JSONArray array = configObj.getJSONArray("list")
+        if (array != null) {
+            println array
+            for (int i = 0; i < array.size(); i++) {
+                JSONObject jsonObject = array.getJSONObject(i)
+                println jsonObject
+                ElementBean elementBean = jsonObject.toJavaObject(ElementBean.class) as ElementBean
+                elementBeanList.add(elementBean)
+            }
+            imageService.makeImage(elementBeanList, "png", response)
         }
     }
 

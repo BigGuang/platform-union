@@ -1,0 +1,79 @@
+{
+  "list": [
+    {
+      "type": "area",
+      "color": "#FF2600",
+      "x": 0,
+      "y": 0,
+      "w": 720,
+      "h": 570
+    },
+    {
+      "type": "area",
+      "color": "FFFFFF",
+      "x": 10,
+      "y": 10,
+      "w": 700,
+      "h": 550
+    },
+    {
+      "type": "img",
+      "url": "${sku_img}",
+      "x": 20,
+      "y": 20,
+      "w": 300,
+      "h": 300
+    },
+    {
+      "type": "text",
+      "text": "${sku_name}",
+      "color": "#53553",
+      "size": 35,
+      "x": 310,
+      "y": 20,
+      "w": 100,
+      "h": 100,
+      "interval": 30
+    },
+    {
+      "type": "area-round",
+      "color": "#FF2600",
+      "x": 55,
+      "y": 400,
+      "w": 600,
+      "h": 100,
+      "arc":40
+    },
+    {
+      "type": "text",
+      "text": "领¥${sku_coupon}购物券",
+      "color": "#FF2600",
+      "size": 60,
+      "x": 220,
+      "y": 410,
+      "w": 100,
+      "h": 100
+    },
+    {
+      "type": "text",
+      "text": "¥${sku_new_price}",
+      "color": "#FF2600",
+      "size": 45,
+      "x": 340,
+      "y": 200,
+      "w": 100,
+      "h": 100
+    },
+    {
+      "type": "text",
+      "text": "原价: ¥${sku_price}",
+      "color": "#797979",
+      "size": 30,
+      "x": 340,
+      "y": 260,
+      "w": 100,
+      "h": 100
+    },
+
+  ]
+}
