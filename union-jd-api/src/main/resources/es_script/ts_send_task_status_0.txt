@@ -1,0 +1,36 @@
+{
+  "from": "${from}",
+  "size": "${size}",
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        },
+        {
+          "range": {
+            "send_day": {
+              "gte": "${date_day}"
+            }
+          }
+        },
+        {
+          "range": {
+            "send_time": {
+              "gte": "${date_time}"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "sort": {
+    "send_day": {
+      "order": "desc"
+    },
+    "send_time": {
+      "order": "asc"
+    }
+  }
+}

@@ -118,20 +118,22 @@ class ImageController {
 
     @RequestMapping(value = "/make")
     public void make(
-            @RequestParam(value = "from", required = false) Long from,
-            @RequestParam(value = "sku_id", required = false) Long skuID,
+            @RequestParam(value = "from", required = false) String from,
+            @RequestParam(value = "sku_id", required = false) String skuID,
             HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         String template = "image_maker/share_img.txt"
         Map params = new HashMap()
         params.put("sku_img", "http://jd.wapg.cn/images/share_02.png")
-        if (skuID != null && skuID > 0) {
+        params.put("from", from)
+        if (!StringUtils.isNull(skuID)) {
+            Long _skuID = Long.parseLong(skuID)
             SearchParams searchParams = new SearchParams()
             searchParams.setApp_key(JDConfig.APP_KEY)
             searchParams.setApp_secret(JDConfig.SECRET_KEY)
             searchParams.setPageIndex(1)
             searchParams.setPageSize(1)
-            searchParams.setSkuIds(skuID as Long)
+            searchParams.setSkuIds(_skuID)
             Double couponPrice = 0
             UnionOpenGoodsQueryResponse goodsResponse = jdUnionService.getGoodsQueryRequest(searchParams);
             if (goodsResponse.getCode() == 200) {

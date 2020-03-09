@@ -98,10 +98,10 @@
 
 
     <!--    每小时触发-->
-    <!--    <task:scheduler id="hemaService.startSyncHemaUserTree_1hour"/>-->
-    <!--    <task:scheduled-tasks scheduler="hemaService.startSyncHemaUserTree_1hour">-->
-    <!--        <task:scheduled ref="syncHMUserTreeJob" method="doSomething" cron="0 0 */1 * * ?"/>-->
-    <!--    </task:scheduled-tasks>-->
+        <task:scheduler id="hemaService.startSyncHemaUserTree_1hour"/>
+        <task:scheduled-tasks scheduler="hemaService.startSyncHemaUserTree_1hour">
+            <task:scheduled ref="syncHMUserTreeJob" method="doSomething" cron="0 0 */1 * * ?"/>
+        </task:scheduled-tasks>
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix">

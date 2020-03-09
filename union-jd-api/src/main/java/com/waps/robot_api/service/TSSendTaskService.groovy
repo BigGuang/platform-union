@@ -73,13 +73,25 @@ class TSSendTaskService {
      * @return
      */
     public SearchHits getSendTaskListByStatus(int task_status, int page, int size) {
+        Date currentTime = new Date();
+        SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd")
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm")
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm")
+        String template
+        if (task_status == 0) {
+            template = "es_script/ts_send_task_status_0.txt"
+        } else {
+            template = "es_script/ts_send_task_status_1.txt"
+        }
         HashMap params = new HashMap()
         PageUtils pageUtils = new PageUtils(page, size)
         params.put("from", pageUtils.getFrom())
         params.put("size", pageUtils.getSize())
         params.put("task_status", task_status)
+        params.put("date_day", dayFormat.format(currentTime))
+        params.put("date_time", timeFormat.format(currentTime))
         println params
-        return tsSendTaskESService.findByFreeMarkerFromResource("es_script/ts_send_task_status.json", params)
+        return tsSendTaskESService.findByFreeMarkerFromResource(template, params)
     }
 
     /**
