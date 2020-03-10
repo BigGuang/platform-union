@@ -18,7 +18,7 @@
         {
           "range": {
             "send_time": {
-              "gte": "${date_time}"
+              "gt": "${date_time}"
             }
           }
         }

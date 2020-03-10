@@ -136,7 +136,12 @@ class TSRobotMessageService {
             i = i + 1
         }
         postMessageBean.setData(list)
-        String retJson = HttpUtils.postJsonString(url, JSONObject.toJSONString(postMessageBean))
+        println "==============发送json================="
+        String sendText=JSONObject.toJSONString(postMessageBean)
+        println sendText
+        String retJson = HttpUtils.postJsonString(url, sendText)
+        println "==============返回json================"
+        println retJson
         return retJson
     }
 
@@ -203,9 +208,6 @@ class TSRobotMessageService {
                         if (tsMessageESMap.getnMsgType() == 2001) {
                             if (!StringUtils.isNull(tsMessageESMap.getVcContent())) {
                                 String content = tsMessageESMap.getVcContent()
-                                println "==Test=="
-                                println Base64.decode(content)
-                                println Base64Utils.decode(content.getBytes())
                                 try {
                                     tsMessageESMap.setContent(new String(Base64.decode(content), "UTF-8"))
                                 } catch (Exception e) {

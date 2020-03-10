@@ -229,17 +229,20 @@ class TSSendTaskService {
 
 
     public void testSendList(List<MessageTaskBean> _sendList) {
-        println "_sendList:" + _sendList.size()
+        println "======testSendList=====:" + _sendList.size()
         for (MessageTaskBean messageTaskBean : _sendList) {
             println "===发送群:" + messageTaskBean.getRoomConfigESMap().getVcName() + "  " + messageTaskBean.getRoomConfigESMap().getChannel_name()
             println "===发送内容==="
             TSSendTaskESMap sendTaskESMap = messageTaskBean.getSendTaskESMap()
             if (sendTaskESMap != null) {
-                tsSendTaskUserESService.update(sendTaskESMap.getId(), "task_status", 1)
+                try {
+                    tsSendTaskUserESService.update(sendTaskESMap.getId(), "task_status", 1)
+                }catch(Exception e){
+                    println "ERROR tsSendTaskUserESService update:"+e.getLocalizedMessage()
+                }
                 List<TSSendMessageESMap> _list = sendTaskESMap.getMessage_list()
                 for (TSSendMessageESMap messageESMap : _list) {
                     println messageESMap.getnMsgType()
-                    println messageESMap.getMsgContent()
                     println "----------"
                 }
             }
@@ -326,7 +329,7 @@ class TSSendTaskService {
                 }
             }
         }
-        println "checkSendStatus message:" + message
+        println roomInfoESMap.getVcName() + "  checkSendStatus:" + message
         return flg
     }
 }

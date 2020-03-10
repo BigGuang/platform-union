@@ -58,7 +58,7 @@ class SendService {
     }
 
     public void sendTask(List<MessageTaskBean> send_task_list) {
-
+        println "====sendTask====="
         try {
             // 开始的倒数锁
             final CountDownLatch begin = new CountDownLatch(1);
@@ -78,8 +78,7 @@ class SendService {
                             begin.await()
                             MessageTaskBean messageTaskBean = send_task_list.get(NO)
                             if (messageTaskBean != null) {
-                                //todo:对文字内容做10%差异化处理
-
+                                println "=====messageTaskBean is not null !!!"
                                 //发送消息
                                 TSRoomConfigESMap roomConfigESMap = messageTaskBean.getRoomConfigESMap()
                                 TSSendTaskESMap sendTaskESMap = messageTaskBean.getSendTaskESMap()
@@ -88,9 +87,13 @@ class SendService {
                                 String channel_id = roomConfigESMap.getChannel_id()
                                 String channel_name = roomConfigESMap.getChannel_name()
                                 String action_id = UUID.randomUUID().toString()
+                                println  "=======convertTask2Message======"
                                 List<TSMessageBean> messageList = convertTask2Message(channel_name, sendTaskESMap)
+                                println "===messageList.size:"+messageList.size()+"==="
                                 if (messageList != null && messageList.size() > 0) {
+                                    //测试
                                     String retJson = tsRobotMessageService.sendChatRoomMessageList(robot_id, room_id, action_id, "", messageList)
+                                    println "===发送结果:"+retJson
                                     JSONObject retObj = JSONObject.parseObject(retJson)
                                     sendTaskESMap.setMessage_list(messageList as List<TSSendMessageESMap>)
                                     if (retObj != null && retObj.getIntValue("nResult") == 1) {
@@ -98,6 +101,8 @@ class SendService {
                                     }
                                 }
                                 Thread.sleep(threadWaitTime)
+                            }else{
+                                println "=====messageTaskBean is null !!!"
                             }
 
                         } catch (Exception e) {
@@ -145,14 +150,17 @@ class SendService {
 //        2016 音乐
         List<TSMessageBean> messageBeanList = new ArrayList<>()
         if (taskESMap != null) {
+            println "==taskESMap=="+taskESMap.getMessage_list()
             List<TSSendMessageESMap> message_list = taskESMap.getMessage_list()
             int i = 0
             for (TSSendMessageESMap messageESMap : message_list) {
+                println "==messageESMap=="+messageESMap.getnMsgType()
                 if (messageESMap) {
                     i = i + 1
                     TSMessageBean tsMessageBean = new TSMessageBean()
                     tsMessageBean.setnMsgNum(i)
                     tsMessageBean.setnMsgType(messageESMap.getnMsgType())
+                    //文本
                     if (tsMessageBean.getnMsgType() == 2001) {
                         ResultBean resultBean = jdConvertLinkService.convertLink(messageESMap.getMsgContent(), channel_name, "true")
                         if (resultBean) {
@@ -164,11 +172,13 @@ class SendService {
                             }
                         }
                     } else {
+                        //图片
                         if (tsMessageBean.getnMsgType() == 2002) {
                             String sendImg = makeImage2NewUUID(messageESMap.getMsgContent())
                             println "==sendImg:" + sendImg
                             tsMessageBean.setMsgContent(sendImg)
                         } else {
+                            //其他
                             tsMessageBean.setMsgContent(messageESMap.getMsgContent())
                         }
                     }
@@ -180,6 +190,7 @@ class SendService {
                 }
             }
         }
+        println "==messageBeanList=="+messageBeanList.size()
         return messageBeanList
     }
 
@@ -216,8 +227,9 @@ class SendService {
      */
     public String makeContent2New(String oldContent) {
         TxtUtils textUtils = new TxtUtils()
-        String newContent = textUtils.RandomReplaceTxt(oldContent, 80)
+        String newContent = textUtils.RandomReplaceTxt(oldContent, 500)
         return newContent
+//        return oldContent
     }
 
 
